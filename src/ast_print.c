@@ -1,3 +1,13 @@
+/*
+ * FILENAME: ast_print.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for pretty-printing an abstract syntax tree.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "ast.h"
 
 static void _pretty_print_binary_node(asn* tree, int level, int_stack* ws_stack);

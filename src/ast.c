@@ -1,3 +1,13 @@
+/*
+ * FILENAME: ast.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for an abstract syntax tree.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "ast.h"
 
 void append_exp_list(asn_list** list, asn* e){

@@ -1,3 +1,13 @@
+/*
+ * FILENAME: asm_gen_unary_op.c
+ *
+ * DESCRIPTION:
+ *     Implementation of assembly generation of unary operators.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "asm_gen.h"
 
 const char* asm_gen_unary_minus(asn* u_minus){

@@ -1,3 +1,13 @@
+/*
+ * FILENAME: parse_assign.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for parsing assignment expressions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "parse.h"
 
 /*

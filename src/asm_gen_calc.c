@@ -1,3 +1,13 @@
+/*
+ * FILENAME: asm_gen_calc.c
+ *
+ * DESCRIPTION:
+ *     Implementation of assembly generation of integer arithmetic.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "asm_gen.h"
 
 const char* asm_gen_binary_plus(asn* b_plus){

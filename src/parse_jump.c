@@ -1,3 +1,14 @@
+/*
+ * FILENAME: parse_jump.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for parsing jump, return and function call
+ *     expressions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "parse.h"
 
 asn* parse_ret_exp(token** tl, size_t* tnt, pv_root* symbol_map){

@@ -1,3 +1,13 @@
+/*
+ * FILENAME: parse_binary_op.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for parsing binary operation expressions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "parse.h"
 
 asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){

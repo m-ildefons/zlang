@@ -1,3 +1,14 @@
+/*
+ * FILENAME: main.c
+ *
+ * DESCRIPTION:
+ *     Entry point for the Boa compiler. Also various global declarations and
+ *     miscelanious functions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

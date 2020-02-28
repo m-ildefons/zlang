@@ -1,3 +1,13 @@
+/*
+ * FILENAME: asm_gen_logic_op.c
+ *
+ * DESCRIPTION:
+ *     Implementation of assembly generation of logical operators.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "asm_gen.h"
 
 const char* asm_gen_log_and(asn* l_and){

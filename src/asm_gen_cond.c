@@ -1,3 +1,13 @@
+/*
+ * FILENAME: asm_gen_cond.c
+ *
+ * DESCRIPTION:
+ *     Implementation of assembly generation of conditionals.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "asm_gen.h"
 
 const char* asm_gen_cond(asn* cond){

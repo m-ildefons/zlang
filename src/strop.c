@@ -1,3 +1,13 @@
+/*
+ * FILENAME: strop.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for string operations.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "strop.h"
 
 char* strrep(const char* str, const char* exp, const char* rep){

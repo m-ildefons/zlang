@@ -1,3 +1,13 @@
+/*
+ * FILENAME: asm_gen.c
+ *
+ * DESCRIPTION:
+ *     Implementation of assembly generation - Various functions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "asm_gen.h"
 
 const char* gen_label(const char* cust_str){

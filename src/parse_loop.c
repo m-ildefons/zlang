@@ -1,3 +1,13 @@
+/*
+ * FILENAME: parse_loop.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for parsing loop expressions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "parse.h"
 
 asn* parse_for_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map){

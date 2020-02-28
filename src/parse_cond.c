@@ -1,3 +1,13 @@
+/*
+ * FILENAME: parse_cond.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for parsing conditional expressions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "parse.h"
 
 asn* parse_cond_exp(token** tl, size_t* tnt, pv_root* symbol_map){

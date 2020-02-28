@@ -1,3 +1,13 @@
+/*
+ * FILENAME: parse_const.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for parsing constant expressions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "parse.h"
 
 asn* parse_const_exp(token** tl, size_t* tnt, pv_root* symbol_map){

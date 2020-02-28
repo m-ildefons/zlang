@@ -1,3 +1,13 @@
+/*
+ * FILENAME: parse_unary_op.c
+ *
+ * DESCRIPTION:
+ *     Implementation of functions for parsing unary operator expressions.
+ *
+ * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
+ *
+ */
+
 #include "parse.h"
 
 asn* parse_unary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
