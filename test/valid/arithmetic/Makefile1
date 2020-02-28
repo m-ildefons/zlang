@@ -1,0 +1,15 @@
+.PHONY: plus brackets deep_expr mult div sub mult_neg neg_backets
+
+plus: plus.x
+	../../../bin/boa plus.x
+	gcc out.s
+	./a.out
+	if [ $$? -eq 3 ] ; then echo "Addition Successful" ; else exi $$? ; fi
+
+brackets: brackets.x
+deep_expr: deep_expr.x
+mult: mult.x
+div: div.x
+sub: sub.x
+mult_neg: mult_neg.x
+neg_brackets: neg_backets.x
