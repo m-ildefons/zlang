@@ -11,7 +11,7 @@ MKDIR_P=mkdir -p
 	directories
 
 all: directories src
-test: src
+test: directories src
 	$(MAKE) -C test
 clean: clean_src
 src: clean_src
