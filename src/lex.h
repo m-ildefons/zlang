@@ -94,6 +94,9 @@ typedef struct token_struct {
 size_t string_count;
 char** string_index;
 
+size_t float_count;
+double* float_index;
+
 void init_regex(void);
 void lex(const char* filename,
         token** full_token_list,

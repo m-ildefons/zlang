@@ -288,6 +288,7 @@ void lex(const char* filename,
         token** full_token_list,
         unsigned long* total_num_tokens){
     string_count = 0;
+    float_count = 0;
     const char* tokens = "\n";
     char* buffer = read_file(filename);
     pre_lex_src(&buffer);

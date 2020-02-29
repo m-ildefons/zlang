@@ -15,7 +15,7 @@ asn* parse_const_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     asn* r = NULL;
     int i_val;
-    float f_val;
+    double f_val;
     char* s_val;
 
     switch(tlp->type){
@@ -25,9 +25,15 @@ asn* parse_const_exp(token** tl, size_t* tnt, pv_root* symbol_map){
             r = make_int_exp(i_val);
             break;
         case const_float:
-            printf("found float const\n");
             f_val = atof(tlp->str);
-            r = make_float_exp(f_val);
+            if(float_count == 0)
+                float_index = (double*) malloc(sizeof(double));
+            else
+                float_index = (double*) realloc(float_index, (float_count + 1) * sizeof(double));
+            float_index[float_count] = f_val;
+            r = make_float_exp(float_count);
+            float_count++;
+            printf("found float const %f\n", f_val);
             break;
         case const_char:
             printf("%s\n", tlp->str);

@@ -31,10 +31,13 @@ const char* asm_gen_var_def(asn* var_def);
 const char* asm_gen_var_ref(asn* var_ref);
 const char* asm_gen_global_var(asn* e);
 const char* asm_gen_ret(asn* ret, int num_vars);
-const char* asm_gen_int_const(asn* int_const);
-const char* asm_gen_string_const(asn* str_const);
 const char* asm_gen_body(asn_list* body, int num_vars);
 const char* asm_gen_jump(asn* jump);
+
+/* implemented in asm_gen_const.c */
+const char* asm_gen_int_const(asn* int_const);
+const char* asm_gen_float_const(asn* float_const);
+const char* asm_gen_string_const(asn* str_const);
 
 /* implemented in asm_gen_unary_op.c */
 const char* asm_gen_unary_minus(asn* u_minus);

@@ -76,13 +76,29 @@ void asm_gen_prog(asn* ast_tree, char** asm_src){
         }
     }
     unsigned int i;
-    for(i = 0; i < string_count; i ++){
+    for(i = 0; i < string_count; i++){
         block_src = (char*) malloc(80 * sizeof(char));
         assert(block_src != NULL);
         sprintf(block_src, ".SC%u:\n", i);
         strapp(&src, "    .section    .rodata\n");
         strapp(&src, block_src);
         sprintf(block_src, "    .string \"%s\"\n", string_index[i]);
+        strapp(&src, block_src);
+        free(block_src);
+    }
+
+    for(i = 0; i < float_count; i++){
+        block_src = (char*) malloc(80 * sizeof(char));
+        assert(block_src != NULL);
+        sprintf(block_src, ".FC%u:\n", i);
+        strapp(&src, "    .section    .rodata\n");
+        strapp(&src, block_src);
+        unsigned long bits = *((unsigned long*) &(float_index[i]));
+        unsigned int upper = ((unsigned int*) &bits)[0];
+        unsigned int lower = ((unsigned int*) &bits)[1];
+        sprintf(block_src, "    .long   %u\n", upper);
+        strapp(&src, block_src);
+        sprintf(block_src, "    .long   %u\n", lower);
         strapp(&src, block_src);
         free(block_src);
     }
@@ -101,6 +117,7 @@ const char* asm_gen(asn* e){
         case var_def_tag: res = asm_gen_var_def(e); break;
         case var_ref_tag: res = asm_gen_var_ref(e); break;
         case const_int_tag: res = asm_gen_int_const(e); break;
+        case const_float_tag: res = asm_gen_float_const(e); break;
         case const_string_tag: res = asm_gen_string_const(e); break;
         case unary_minus_tag: res = asm_gen_unary_minus(e); break;
         case unary_not_tag: res = asm_gen_unary_not(e); break;
@@ -336,27 +353,6 @@ const char* asm_gen_ret(asn* ret_exp, int num_vars){
     strcat(expr_str, "    popq   %rbp\n");
     strcat(expr_str, "    ret\n");
     return expr_str;
-}
-
-const char* asm_gen_int_const(asn* int_const){
-    printf("generating const\n");
-    int num = int_const->op.int_exp;
-    char* _str = (char*) malloc(20 * sizeof(char));
-    sprintf(_str, "%d", num);
-
-	size_t bufsize = strlen(_str) + 1;
-    char* ret = (char*) malloc(bufsize * sizeof(char));
-    sprintf(ret, "    movq   $%d, %%rax\n", num);
-    return ret;
-}
-
-const char* asm_gen_string_const(asn* str_const){
-    printf("generating const string\n");
-    int idx = str_const->op.int_exp;
-    char* buffer = (char*) malloc(80 * sizeof(char));
-
-    sprintf(buffer, "    leaq   .SC%d(%%rip), %%rax\n", idx);
-    return buffer;
 }
 
 const char* asm_gen_body(asn_list* body, int num_vars){

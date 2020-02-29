@@ -189,7 +189,8 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             printf("[ integer node (%d) ]\n", tree->op.int_exp);
             break;
         case const_float_tag:
-            printf("[ float node (%f) ]\n", tree->op.float_exp);
+            ty = tree->op.int_exp;
+            printf("[ float node (%d) %f ]\n", ty, float_index[ty]);
             break;
         case const_char_tag:
             printf("[ char node (%c) ]\n", tree->op.char_exp);

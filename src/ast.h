@@ -76,7 +76,6 @@ typedef struct ast_node {
     } tag;
     union {
         int int_exp;
-        float float_exp;
         char char_exp;
         struct {atomic_type type;
                 char* ident;
@@ -131,7 +130,7 @@ void pretty_print(asn* tree);
 /* implemented in ast.c */
 void append_exp_list(asn_list** list, asn* e);
 asn* make_int_exp(int val);
-asn* make_float_exp(float val);
+asn* make_float_exp(int idx);
 asn* make_char_exp(char val);
 asn* make_string_exp(int idx);
 asn* make_call_exp(char* id, asn_list* args);

@@ -38,11 +38,11 @@ asn* make_int_exp(int val){
     return e;
 }
 
-asn* make_float_exp(float val){
+asn* make_float_exp(int idx){
     asn* e = (asn*) malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = const_float_tag;
-    e->op.float_exp = val;
+    e->op.int_exp = idx;
     return e;
 }
 
