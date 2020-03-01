@@ -23,7 +23,7 @@ asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_factor = parse_cast_exp(tl, tnt, symbol_map);
-        term = make_binary_exp(term, next_factor, tok_type);
+        term = make_binary_exp(at_int, term, next_factor, tok_type);
         tlp = *tl;
     }
     return term;
@@ -41,7 +41,7 @@ asn* parse_bin_sum_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_term = parse_bin_term(tl, tnt, symbol_map);
-        expr = make_binary_exp(expr, next_term, tok_type);
+        expr = make_binary_exp(at_int, expr, next_term, tok_type);
         tlp = *tl;
     }
     return expr;
@@ -59,7 +59,7 @@ asn* parse_bin_bit_shift_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_sum = parse_bin_sum_exp(tl, tnt, symbol_map);
-        sum = make_binary_exp(sum, next_sum, tok_type);
+        sum = make_binary_exp(at_int, sum, next_sum, tok_type);
         tlp = *tl;
     }
     return sum;
@@ -79,7 +79,7 @@ asn* parse_bin_rel_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_bit_shift = parse_bin_bit_shift_exp(tl, tnt, symbol_map);
-        bit_shift = make_binary_exp(bit_shift, next_bit_shift, tok_type);
+        bit_shift = make_binary_exp(at_int, bit_shift, next_bit_shift, tok_type);
         tlp = *tl;
     }
     return bit_shift;
@@ -97,7 +97,7 @@ asn* parse_bin_eql_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_rel = parse_bin_rel_exp(tl, tnt, symbol_map);
-        rel = make_binary_exp(rel, next_rel, tok_type);
+        rel = make_binary_exp(at_int, rel, next_rel, tok_type);
         tlp = *tl;
     }
     return rel;
@@ -114,7 +114,7 @@ asn* parse_bin_bit_and_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_equal = parse_bin_eql_exp(tl, tnt, symbol_map);
-        equal = make_binary_exp(equal, next_equal, tok_type);
+        equal = make_binary_exp(at_int, equal, next_equal, tok_type);
         tlp = *tl;
     }
     return equal;
@@ -132,7 +132,7 @@ asn* parse_bin_bit_xor_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_bit_and = parse_bin_bit_and_exp(tl, tnt, symbol_map);
-        bit_and = make_binary_exp(bit_and, next_bit_and, tok_type);
+        bit_and = make_binary_exp(at_int, bit_and, next_bit_and, tok_type);
         tlp = *tl;
     }
     return bit_and;
@@ -150,7 +150,7 @@ asn* parse_bin_bit_or_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_bit_xor = parse_bin_bit_xor_exp(tl, tnt, symbol_map);
-        bit_xor = make_binary_exp(bit_xor, next_bit_xor, tok_type);
+        bit_xor = make_binary_exp(at_int, bit_xor, next_bit_xor, tok_type);
         tlp = *tl;
     }
     return bit_xor;
@@ -168,7 +168,7 @@ asn* parse_bin_log_and_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_bit_or = parse_bin_bit_or_exp(tl, tnt, symbol_map);
-        bit_or = make_binary_exp(bit_or, next_bit_or, tok_type);
+        bit_or = make_binary_exp(at_int, bit_or, next_bit_or, tok_type);
         tlp = *tl;
     }
     return bit_or;
@@ -185,7 +185,7 @@ asn* parse_bin_log_xor_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_log_and = parse_bin_log_and_exp(tl, tnt, symbol_map);
-        log_and = make_binary_exp(log_and, next_log_and, tok_type);
+        log_and = make_binary_exp(at_int, log_and, next_log_and, tok_type);
         tlp = *tl;
     }
     return log_and;
@@ -202,7 +202,7 @@ asn* parse_bin_log_or_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_log_xor = parse_bin_log_xor_exp(tl, tnt, symbol_map);
-        log_xor = make_binary_exp(log_xor, next_log_xor, tok_type);
+        log_xor = make_binary_exp(at_int, log_xor, next_log_xor, tok_type);
         tlp = *tl;
     }
     return log_xor;

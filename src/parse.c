@@ -121,10 +121,10 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     tlp = (*tl);
     if(tlp->type == token_inc){
         pop_token(&tlp, tl, tnt);
-        postfix_exp = make_unary_exp(primary_exp, token_inc);
+        postfix_exp = make_unary_exp(at_int, primary_exp, token_inc);
     } else if(tlp->type == token_dec){
         pop_token(&tlp, tl, tnt);
-        postfix_exp = make_unary_exp(primary_exp, token_dec);
+        postfix_exp = make_unary_exp(at_int, primary_exp, token_dec);
     }
 
     if(tlp->type == token_semi_colon)

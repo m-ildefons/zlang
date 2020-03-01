@@ -170,7 +170,7 @@ asn* make_prog_exp(const char* name, asn_list* prog){
     return e;
 }
 
-asn* make_unary_exp(asn* expr, int type){
+asn* make_unary_exp(atomic_type at_type, asn* expr, int type){
     asn* e = (asn*) malloc(sizeof(asn));
     assert(e != NULL);
 
@@ -184,11 +184,12 @@ asn* make_unary_exp(asn* expr, int type){
         case token_asterisk: e->tag = deref_tag; break;
         default: abort();
     }
+    e->op.unary_exp.type = at_type;
     e->op.unary_exp.expr = expr;
     return e;
 }
 
-asn* make_binary_exp(asn* expr_l, asn* expr_r, int type){
+asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type){
     asn* e = (asn*) malloc(sizeof(asn));
     assert(e != NULL);
     switch(type){
@@ -214,6 +215,7 @@ asn* make_binary_exp(asn* expr_l, asn* expr_r, int type){
         default:
             abort();
     }
+    e->op.binary_exp.type = at_type;
     e->op.binary_exp.expr_l = expr_l;
     e->op.binary_exp.expr_r = expr_r;
     return e;

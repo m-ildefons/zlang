@@ -110,8 +110,10 @@ typedef struct ast_node {
         struct {const char* name;
             struct ast_node_list* prog;
             struct trie_root_node* symbol_map;} prog_exp;
-        struct {struct ast_node* expr;} unary_exp;
-        struct {struct ast_node* expr_l;
+        struct {atomic_type type;
+            struct ast_node* expr;} unary_exp;
+        struct {atomic_type type;
+            struct ast_node* expr_l;
             struct ast_node* expr_r;} binary_exp;
         struct {struct ast_node* lval;
             struct ast_node* val;} assign_exp;
@@ -153,8 +155,8 @@ asn* make_while_exp(asn* cond, asn_list* body, int scope);
 asn* make_var_def_exp(atomic_type type, char* ident, int scope);
 asn* make_var_ref_exp(char* ident);
 asn* make_prog_exp(const char* name, asn_list* prog);
-asn* make_unary_exp(asn* expr, int type);
-asn* make_binary_exp(asn* expr_l, asn* expr_r, int type);
+asn* make_unary_exp(atomic_type at_type, asn* expr, int type);
+asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type);
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type);
 asn* make_jump_exp(int type);
 

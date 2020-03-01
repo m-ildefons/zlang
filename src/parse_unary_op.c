@@ -41,7 +41,7 @@ asn* parse_unary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     }
 
     printf("found unary expr %d\n", tok_type);
-    asn* ue = make_unary_exp(inner, tok_type);
+    asn* ue = make_unary_exp(at_int, inner, tok_type);
 
     return ue;
 }

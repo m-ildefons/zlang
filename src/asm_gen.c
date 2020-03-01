@@ -49,7 +49,7 @@ void asm_gen_prog(asn* ast_tree, char** asm_src){
             sprintf(line, "    .global    %s\n", expr->op.var_def_exp.ident);
             strcat(block_src, line);
             strcat(block_src, "    .data\n");
-            strcat(block_src, "    .align 4\n");
+            strcat(block_src, "    .align 8\n");
             sprintf(line, "    .type      %s, @object\n", expr->op.var_def_exp.ident);
             strcat(block_src, line);
             strcat(block_src, expr_src);
@@ -92,6 +92,7 @@ void asm_gen_prog(asn* ast_tree, char** asm_src){
         assert(block_src != NULL);
         sprintf(block_src, ".FC%u:\n", i);
         strapp(&src, "    .section    .rodata\n");
+        strapp(&src, "    .align 8\n");
         strapp(&src, block_src);
         unsigned long bits = *((unsigned long*) &(float_index[i]));
         unsigned int upper = ((unsigned int*) &bits)[0];
@@ -103,7 +104,7 @@ void asm_gen_prog(asn* ast_tree, char** asm_src){
         free(block_src);
     }
 
-    strapp(&src, "    .ident  \"Boa pre-release version 0.1\"\n");
+    strapp(&src, "    .ident  \"Boa Version 0.1\"\n");
     (*asm_src) = src;
     free(line);
 }
@@ -228,6 +229,7 @@ const char* asm_gen_fun_def(asn* fun_def){
 }
 
 const char* asm_gen_fun_call(asn* call){
+    printf("generating function call\n");
 	const char* id = call->op.call_exp.ident;
 
 	char* src = (char*) malloc(sizeof(char));
@@ -238,10 +240,22 @@ const char* asm_gen_fun_call(asn* call){
 	sprintf(stack_args_src, "%c", '\0');
 
 	const char* arg_ref;
+    const char* arg_ident;
+    pv_leaf* leaf;
+    unsigned int c_xmm_regs = 0;
 	int i = 0;
 	asn_list* args = call->op.call_exp.args;
 	for(; args != NULL; args = args->next, i++){
 		arg_ref = asm_gen(args->expr);
+        if(args->expr->tag == var_ref_tag){
+            arg_ident = args->expr->op.var_ref_exp.ident;
+            leaf = pv_search(symbol_map_ptr, arg_ident);
+            if(leaf->type == at_float){
+                //strapp(&src, arg_ref);
+                c_xmm_regs++;
+                continue;
+            }
+        }
 		switch(i){
 			case 0:
 		        strapp(&src, arg_ref);
@@ -274,12 +288,25 @@ const char* asm_gen_fun_call(asn* call){
 		}
 	}
     strapp(&src, stack_args_src);
-    // This should actually be the count of XMM registers used to pass float values!
-    strapp(&src, "    movq   $0, %rax\n");
-	char* call_line = (char*) malloc(80 * sizeof(char));
-    assert(call_line != NULL);
-	sprintf(call_line, "    call   %s\n", id);
-    strapp(&src, call_line);
+
+    char* line = (char*) malloc(80 * sizeof(char));
+    assert(line != NULL);
+    sprintf(line, "    movq   $%u, %%rax\n", c_xmm_regs);
+    strapp(&src, line);
+
+    int stack_align = (16 - (symbol_map_ptr->mem_offset % 16)) % 16;
+    if(stack_align != 0){
+        sprintf(line, "    subq   $%d, %%rsp\n", stack_align);
+        strapp(&src, line);
+    }
+
+	sprintf(line, "    call   %s\n", id);
+    strapp(&src, line);
+
+    if(stack_align != 0){
+        sprintf(line, "    addq   $%d, %%rsp\n", stack_align);
+        strapp(&src, line);
+    }
 
 	args = call->op.call_exp.args;
 	for(i = 0; args != NULL; args = args->next, i++){
@@ -288,7 +315,7 @@ const char* asm_gen_fun_call(asn* call){
         strapp(&src, "    popq   %rdx\n");
 	}
 
-    free(call_line);
+    free(line);
 	return src;
 }
 
@@ -307,7 +334,21 @@ const char* asm_gen_var_def(asn* var_def){
     char* code = (char*) malloc((80 + rhs_len) * sizeof(char));
     assert(code != NULL);
     strcpy(code, rhs);
-    strcat(code, "    pushq  %rax\n");
+
+    const char* id;
+    pv_leaf* leaf;
+    int offset;
+    char* line = (char*) malloc(80 * sizeof(char));
+    if(var_def->op.var_def_exp.type == at_float){
+        id = var_def->op.var_def_exp.ident;
+        leaf = pv_search(symbol_map_ptr, id);
+        offset = -(leaf->offset + leaf->size);
+        strapp(&code, "    subq   $8, %rsp\n");
+        sprintf(line, "    movsd  %%xmm0, %d(%%rbp)\n", offset);
+        strapp(&code, line);
+    } else {
+        strapp(&code, "    pushq  %rax\n");
+    }
     return code;
 }
 
