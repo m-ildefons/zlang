@@ -77,6 +77,13 @@ int main(int argc, char* argv[]){
     init_regex();
 
     const char* filename = argv[1];
+    if(access(filename, F_OK) == -1){
+        printf("\033[91mError\033[39m: File not found: %s\n", filename);
+        exit(1);
+    } else if(access(filename, X_OK) != -1){
+        printf("\033[91mError\033[39m: Can not compile directory: %s\n", filename);
+        exit(1);
+    }
 
     print_separator("Lexing");
 
