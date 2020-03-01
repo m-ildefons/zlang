@@ -19,7 +19,7 @@ const char* asm_gen_binary_plus(asn* b_plus){
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
-    if(b_plus->op.binary_exp.type == at_float){
+    if(b_plus->op.binary_exp.type == at_real){
         strapp(&lines, left_str);
         strapp(&lines, "    subq   $8, %rsp\n");
         strapp(&lines, "    movsd  %xmm0, (%rsp)\n");
@@ -46,7 +46,7 @@ const char* asm_gen_binary_sub(asn* b_sub){
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
-    if(b_sub->op.binary_exp.type == at_float){
+    if(b_sub->op.binary_exp.type == at_real){
         strapp(&lines, left_str);
         strapp(&lines, "    subq   $8, %rsp\n");
         strapp(&lines, "    movsd  %xmm0, (%rsp)\n");
@@ -73,7 +73,7 @@ const char* asm_gen_binary_mult(asn* b_mult){
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
-    if(b_mult->op.binary_exp.type == at_float){
+    if(b_mult->op.binary_exp.type == at_real){
         strapp(&lines, left_str);
         strapp(&lines, "    subq   $8, %rsp\n");
         strapp(&lines, "    movsd  %xmm0, (%rsp)\n");
@@ -100,7 +100,7 @@ const char* asm_gen_binary_div(asn* b_div){
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
-    if(b_div->op.binary_exp.type == at_float){
+    if(b_div->op.binary_exp.type == at_real){
         strapp(&lines, left_str);
         strapp(&lines, "    subq   $8, %rsp\n");
         strapp(&lines, "    movsd  %xmm0, (%rsp)\n");

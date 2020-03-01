@@ -36,7 +36,7 @@ const char* asm_gen_jump(asn* jump);
 
 /* implemented in asm_gen_const.c */
 const char* asm_gen_int_const(asn* int_const);
-const char* asm_gen_float_const(asn* float_const);
+const char* asm_gen_real_const(asn* real_const);
 const char* asm_gen_string_const(asn* str_const);
 
 /* implemented in asm_gen_unary_op.c */

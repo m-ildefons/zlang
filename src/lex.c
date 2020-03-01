@@ -11,9 +11,9 @@
 #include "lex.h"
 
 static regex_t int_regex;
-static regex_t float_regex;
+static regex_t real_regex;
 static const char* int_regex_str = "^([1-9][0-9]*|0)$";
-static const char* float_regex_str = "^([0-9]*[.][0-9]+)$";
+static const char* real_regex_str = "^([0-9]*[.][0-9]+)$";
 
 static void tokenize_line(char* line,
                 int indent_depth,
@@ -32,10 +32,10 @@ void init_regex(){
         printf("%s\n", err);
         exit(1);
     }
-    regret = regcomp(&float_regex, float_regex_str, REG_EXTENDED);
+    regret = regcomp(&real_regex, real_regex_str, REG_EXTENDED);
     if(regret != 0){
         fprintf(stderr, "Could not compile regex\n");
-        regerror(regret, &float_regex, err, 1024);
+        regerror(regret, &real_regex, err, 1024);
         printf("%s\n", err);
         exit(1);
     }
@@ -70,8 +70,8 @@ static void tokenize_line(char* line,
             t = type_void_kw;
         } else if(strcmp(tok, "int") == 0){
             t = type_int_kw;
-        } else if(strcmp(tok, "float") == 0){
-            t = type_float_kw;
+        } else if(strcmp(tok, "real") == 0){
+            t = type_real_kw;
         } else if(strcmp(tok, "char") == 0){
             t = type_char_kw;
         } else if(strcmp(tok, "(") == 0){
@@ -98,8 +98,8 @@ static void tokenize_line(char* line,
             t = token_asterisk;
         } else if(regexec(&int_regex, tok, 0, NULL, 0) == 0){
             t = const_int;
-        } else if(regexec(&float_regex, tok, 0, NULL, 0) == 0){
-            t = const_float;
+        } else if(regexec(&real_regex, tok, 0, NULL, 0) == 0){
+            t = const_real;
         } else if(strcmp(tok, "%s") == 0){
             idx++;
             t = const_string;
@@ -288,7 +288,7 @@ void lex(const char* filename,
         token** full_token_list,
         unsigned long* total_num_tokens){
     string_count = 0;
-    float_count = 0;
+    real_count = 0;
     const char* tokens = "\n";
     char* buffer = read_file(filename);
     pre_lex_src(&buffer);

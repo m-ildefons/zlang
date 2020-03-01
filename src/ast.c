@@ -38,10 +38,10 @@ asn* make_int_exp(int val){
     return e;
 }
 
-asn* make_float_exp(int idx){
+asn* make_real_exp(int idx){
     asn* e = (asn*) malloc(sizeof(asn));
     assert(e != NULL);
-    e->tag = const_float_tag;
+    e->tag = const_real_tag;
     e->op.int_exp = idx;
     return e;
 }
@@ -265,7 +265,7 @@ atomic_type get_atomic_type(asn* expr, pv_root* symbol_map){
         return at_void;
     switch(expr->tag){
         case const_int_tag: return at_int;
-        case const_float_tag: return at_float;
+        case const_real_tag: return at_real;
         case const_char_tag: return at_char;
         case const_string_tag: return at_char_ptr;
         case unary_minus_tag: return expr->op.unary_exp.type;

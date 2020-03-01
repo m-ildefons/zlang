@@ -87,14 +87,14 @@ void asm_gen_prog(asn* ast_tree, char** asm_src){
         free(block_src);
     }
 
-    for(i = 0; i < float_count; i++){
+    for(i = 0; i < real_count; i++){
         block_src = (char*) malloc(80 * sizeof(char));
         assert(block_src != NULL);
         sprintf(block_src, ".FC%u:\n", i);
         strapp(&src, "    .section    .rodata\n");
         strapp(&src, "    .align 8\n");
         strapp(&src, block_src);
-        unsigned long bits = *((unsigned long*) &(float_index[i]));
+        unsigned long bits = *((unsigned long*) &(real_index[i]));
         unsigned int upper = ((unsigned int*) &bits)[0];
         unsigned int lower = ((unsigned int*) &bits)[1];
         sprintf(block_src, "    .long   %u\n", upper);
@@ -118,7 +118,7 @@ const char* asm_gen(asn* e){
         case var_def_tag: res = asm_gen_var_def(e); break;
         case var_ref_tag: res = asm_gen_var_ref(e); break;
         case const_int_tag: res = asm_gen_int_const(e); break;
-        case const_float_tag: res = asm_gen_float_const(e); break;
+        case const_real_tag: res = asm_gen_real_const(e); break;
         case const_string_tag: res = asm_gen_string_const(e); break;
         case unary_minus_tag: res = asm_gen_unary_minus(e); break;
         case unary_not_tag: res = asm_gen_unary_not(e); break;
@@ -250,7 +250,7 @@ const char* asm_gen_fun_call(asn* call){
         if(args->expr->tag == var_ref_tag){
             arg_ident = args->expr->op.var_ref_exp.ident;
             leaf = pv_search(symbol_map_ptr, arg_ident);
-            if(leaf->type == at_float){
+            if(leaf->type == at_real){
                 //strapp(&src, arg_ref);
                 c_xmm_regs++;
                 continue;
@@ -339,7 +339,7 @@ const char* asm_gen_var_def(asn* var_def){
     pv_leaf* leaf;
     int offset;
     char* line = (char*) malloc(80 * sizeof(char));
-    if(var_def->op.var_def_exp.type == at_float){
+    if(var_def->op.var_def_exp.type == at_real){
         id = var_def->op.var_def_exp.ident;
         leaf = pv_search(symbol_map_ptr, id);
         offset = -(leaf->offset + leaf->size);

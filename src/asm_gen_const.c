@@ -20,9 +20,9 @@ const char* asm_gen_int_const(asn* int_const){
     return buffer;
 }
 
-const char* asm_gen_float_const(asn* float_const){
-    printf("generating const float\n");
-    int idx = float_const->op.int_exp;
+const char* asm_gen_real_const(asn* real_const){
+    printf("generating const real\n");
+    int idx = real_const->op.int_exp;
     char* buffer = (char*) malloc(80 * sizeof(char));
 
     sprintf(buffer, "    movsd  .FC%d(%%rip), %%xmm0\n", idx);

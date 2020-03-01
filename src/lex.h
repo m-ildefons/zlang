@@ -27,10 +27,10 @@ typedef struct token_struct {
         token_null,
         type_void_kw,
     	type_int_kw,
-        type_float_kw,
+        type_real_kw,
         type_char_kw,
         const_int,
-        const_float,
+        const_real,
         const_char,
         const_string,
     	ident,
@@ -94,8 +94,8 @@ typedef struct token_struct {
 size_t string_count;
 char** string_index;
 
-size_t float_count;
-double* float_index;
+size_t real_count;
+double* real_index;
 
 void init_regex(void);
 void lex(const char* filename,

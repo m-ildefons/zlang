@@ -24,16 +24,16 @@ asn* parse_const_exp(token** tl, size_t* tnt, pv_root* symbol_map){
             i_val = atoi(tlp->str);
             r = make_int_exp(i_val);
             break;
-        case const_float:
+        case const_real:
             f_val = atof(tlp->str);
-            if(float_count == 0)
-                float_index = (double*) malloc(sizeof(double));
+            if(real_count == 0)
+                real_index = (double*) malloc(sizeof(double));
             else
-                float_index = (double*) realloc(float_index, (float_count + 1) * sizeof(double));
-            float_index[float_count] = f_val;
-            r = make_float_exp(float_count);
-            float_count++;
-            printf("found float const %f\n", f_val);
+                real_index = (double*) realloc(real_index, (real_count + 1) * sizeof(double));
+            real_index[real_count] = f_val;
+            r = make_real_exp(real_count);
+            real_count++;
+            printf("found real const %f\n", f_val);
             break;
         case const_char:
             printf("%s\n", tlp->str);

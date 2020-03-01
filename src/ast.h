@@ -22,7 +22,7 @@
 typedef struct ast_node {
     enum {
         const_int_tag,
-        const_float_tag,
+        const_real_tag,
         const_char_tag,
         const_string_tag,
         var_def_tag,
@@ -132,7 +132,7 @@ void pretty_print(asn* tree);
 /* implemented in ast.c */
 void append_exp_list(asn_list** list, asn* e);
 asn* make_int_exp(int val);
-asn* make_float_exp(int idx);
+asn* make_real_exp(int idx);
 asn* make_char_exp(char val);
 asn* make_string_exp(int idx);
 asn* make_call_exp(char* id, asn_list* args);

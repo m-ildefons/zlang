@@ -142,7 +142,7 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
     switch(tok_type){
         case const_int: primary = parse_const_exp(tl, tnt, symbol_map); break;
-        case const_float: primary = parse_const_exp(tl, tnt, symbol_map); break;
+        case const_real: primary = parse_const_exp(tl, tnt, symbol_map); break;
         case const_char: primary = parse_const_exp(tl, tnt, symbol_map); break;
         case const_string: primary = parse_const_exp(tl, tnt, symbol_map); break;
         case ident:
@@ -220,12 +220,12 @@ asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map){
                 ty = at_int;
             }
             break;
-        case type_float_kw:
+        case type_real_kw:
             if((tlp+1)->type == token_asterisk){
-                ty = at_float_ptr;
+                ty = at_real_ptr;
                 pop_token(&tlp, tl, tnt);
             } else {
-                ty = at_float;
+                ty = at_real;
             }
             break;
         case type_char_kw:
