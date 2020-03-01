@@ -259,3 +259,35 @@ asn* make_jump_exp(int type){
 	return e;
 }
 
+atomic_type get_atomic_type(asn* expr, pv_root* symbol_map){
+    pv_leaf* leaf;
+    if(expr == NULL)
+        return at_void;
+    switch(expr->tag){
+        case const_int_tag: return at_int;
+        case const_float_tag: return at_float;
+        case const_char_tag: return at_char;
+        case const_string_tag: return at_char_ptr;
+        case unary_minus_tag: return expr->op.unary_exp.type;
+        case unary_not_tag: return expr->op.unary_exp.type;
+        case unary_compl_tag: return expr->op.unary_exp.type;
+        case inc_tag: return expr->op.unary_exp.type;
+        case dec_tag: return expr->op.unary_exp.type;
+
+        case bin_add_tag: return expr->op.binary_exp.type;
+        case bin_sub_tag: return expr->op.binary_exp.type;
+        case bin_mul_tag: return expr->op.binary_exp.type;
+        case bin_div_tag: return expr->op.binary_exp.type;
+        case bin_mod_tag: return expr->op.binary_exp.type;
+        case log_and_tag: return expr->op.binary_exp.type;
+        case log_xor_tag: return expr->op.binary_exp.type;
+        case log_or_tag: return expr->op.binary_exp.type;
+
+        case var_def_tag: return expr->op.var_def_exp.type;
+        case var_ref_tag:
+            leaf = pv_search(symbol_map, expr->op.var_ref_exp.ident);
+            return leaf->type;
+        default: return at_void;
+    }
+}
+

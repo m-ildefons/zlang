@@ -160,5 +160,6 @@ asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type);
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type);
 asn* make_jump_exp(int type);
 
+atomic_type get_atomic_type(asn* expr, pv_root* symbol_map);
 #endif
 

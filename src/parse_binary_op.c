@@ -12,6 +12,7 @@
 
 asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){
     asn* term = parse_cast_exp(tl, tnt, symbol_map);
+    atomic_type lhs_ty = get_atomic_type(term, symbol_map);
     asn* next_factor = NULL;
     token* tlp = *tl;
     int tok_type;
@@ -23,7 +24,11 @@ asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_factor = parse_cast_exp(tl, tnt, symbol_map);
-        term = make_binary_exp(at_int, term, next_factor, tok_type);
+        atomic_type rhs_ty = get_atomic_type(next_factor, symbol_map);
+        term = make_binary_exp(binary_cast_matrix[lhs_ty][rhs_ty],
+                            term,
+                            next_factor,
+                            tok_type);
         tlp = *tl;
     }
     return term;
@@ -31,9 +36,11 @@ asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){
 
 asn* parse_bin_sum_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     asn* expr = parse_bin_term(tl, tnt, symbol_map);
+    atomic_type lhs_ty = get_atomic_type(expr, symbol_map);
     asn* next_term = NULL;
     token* tlp = *tl;
     int tok_type;
+
 
     while(expr != NULL && (tlp->type == token_plus ||
                         tlp->type == token_minus)){
@@ -41,7 +48,12 @@ asn* parse_bin_sum_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_term = parse_bin_term(tl, tnt, symbol_map);
-        expr = make_binary_exp(at_int, expr, next_term, tok_type);
+        atomic_type rhs_ty = get_atomic_type(next_term, symbol_map);
+
+        expr = make_binary_exp(binary_cast_matrix[lhs_ty][rhs_ty],
+                            expr,
+                            next_term,
+                            tok_type);
         tlp = *tl;
     }
     return expr;

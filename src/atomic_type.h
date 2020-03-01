@@ -47,5 +47,17 @@ static const char* atomic_type_cn[] = {
     [at_char_ptr] = "char ptr",
 };
 
+static const atomic_type binary_cast_matrix[9][9] = {
+    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs func
+    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs void
+    {at_void, at_void, at_int, at_float, at_void, at_void, at_void, at_void, at_void}, // lhs int
+    {at_void, at_void, at_float, at_float, at_void, at_void, at_void, at_void, at_void}, // lhs float
+    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs char
+    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs void ptr
+    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs int ptr
+    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs float ptr
+    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs char ptr
+};
+
 #endif
 
