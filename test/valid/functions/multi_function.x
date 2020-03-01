@@ -12,7 +12,7 @@ int three(int a, int b):
 int main():
     int z = 5;
     int w = four(z + 3);
-    int y = one(z) + two(z, y);
+    int y = one(z) + two(z, w);
     int x = z + one(w);
     return z + w + y - x;
 
