@@ -73,6 +73,7 @@ typedef struct ast_node {
         bsr_assign_tag,
         for_loop_tag,
         while_loop_tag,
+        cast_to_real_tag,
     } tag;
     union {
         int int_exp;
@@ -159,6 +160,7 @@ asn* make_unary_exp(atomic_type at_type, asn* expr, int type);
 asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type);
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type);
 asn* make_jump_exp(int type);
+asn* make_cast_to_real(asn* val);
 
 atomic_type get_atomic_type(asn* expr, pv_root* symbol_map);
 #endif

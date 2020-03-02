@@ -33,6 +33,7 @@ const char* asm_gen_global_var(asn* e);
 const char* asm_gen_ret(asn* ret, int num_vars);
 const char* asm_gen_body(asn_list* body, int num_vars);
 const char* asm_gen_jump(asn* jump);
+const char* asm_gen_int_to_real(asn* cast);
 
 /* implemented in asm_gen_const.c */
 const char* asm_gen_int_const(asn* int_const);

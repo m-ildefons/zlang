@@ -356,6 +356,10 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             printf("[ dec node ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
+        case cast_to_real_tag:
+            printf("[ cast to real ]\n");
+            _pretty_print_unary_node(tree, level, ws_stack);
+            break;
         case cond_tag:
             printf("[ condition node ]\n");
             _pretty_print_body(tree, level, ws_stack);

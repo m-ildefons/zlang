@@ -259,6 +259,15 @@ asn* make_jump_exp(int type){
 	return e;
 }
 
+asn* make_cast_to_real(asn* val){
+	asn* e = (asn*) malloc(sizeof(asn));
+    assert(e != NULL);
+    e->tag = cast_to_real_tag;
+    e->op.unary_exp.type = at_real;
+    e->op.unary_exp.expr = val;
+	return e;
+}
+
 atomic_type get_atomic_type(asn* expr, pv_root* symbol_map){
     pv_leaf* leaf;
     if(expr == NULL)

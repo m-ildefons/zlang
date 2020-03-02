@@ -25,6 +25,12 @@ asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){
 		pop_token(&tlp, tl, tnt);
         next_factor = parse_cast_exp(tl, tnt, symbol_map);
         atomic_type rhs_ty = get_atomic_type(next_factor, symbol_map);
+
+        if(lhs_ty != at_real && rhs_ty == at_real)
+            term = make_cast_to_real(term);
+        else if(rhs_ty != at_real && lhs_ty == at_real)
+            next_factor = make_cast_to_real(next_factor);
+
         term = make_binary_exp(binary_cast_matrix[lhs_ty][rhs_ty],
                             term,
                             next_factor,
@@ -49,6 +55,11 @@ asn* parse_bin_sum_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 		pop_token(&tlp, tl, tnt);
         next_term = parse_bin_term(tl, tnt, symbol_map);
         atomic_type rhs_ty = get_atomic_type(next_term, symbol_map);
+
+        if(lhs_ty != at_real && rhs_ty == at_real)
+            expr = make_cast_to_real(expr);
+        else if(rhs_ty != at_real && lhs_ty == at_real)
+            next_term = make_cast_to_real(next_term);
 
         expr = make_binary_exp(binary_cast_matrix[lhs_ty][rhs_ty],
                             expr,

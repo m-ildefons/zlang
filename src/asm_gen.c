@@ -160,6 +160,7 @@ const char* asm_gen(asn* e){
 		case cond_tag: res = asm_gen_cond(e); break;
 		case while_loop_tag: res = asm_gen_while_loop(e); break;
 		case for_loop_tag: res = asm_gen_for_loop(e); break;
+        case cast_to_real_tag: res = asm_gen_int_to_real(e); break;
         default:
             printf("encountered unimplemented expression... skipping\n");
             res = "\n";
@@ -433,5 +434,15 @@ const char* asm_gen_jump(asn* jump){
 
 	sprintf(src, "    jmp    %s\n", jump_label);
 	return src;
+}
+
+const char* asm_gen_int_to_real(asn* cast){
+    const char* inner = asm_gen(cast->op.unary_exp.expr);
+    char* src = (char*) malloc(sizeof(char));
+    assert(src != NULL);
+    sprintf(src, "%c", '\0');
+    strapp(&src, inner);
+    strapp(&src, "    cvtsi2sd   %rax, %xmm0\n");
+    return src;
 }
 
