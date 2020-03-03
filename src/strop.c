@@ -74,7 +74,7 @@ void strprp(char** str, const char* prp){
     size_t prp_len = strlen(prp);
 
     char* new_str = (char*) malloc((str_len + prp_len + 1) * sizeof(char));
-    assert((*str) != NULL);
+    assert(new_str != NULL);
 
     strcpy(new_str, prp);
     strcat(new_str, (*str));

@@ -106,18 +106,21 @@ int main(int argc, char* argv[]){
     char* asm_source;
     asm_gen_prog(expr, &asm_source);
 
-    printf("%s\n", asm_source);
+    fprintf(stdout, "%s\n", asm_source);
 
     char* fn;
     if(argv[2])
         fn = argv[2];
     else {
-        fn = (char*) malloc(5 * sizeof(char));
+        fn = (char*) malloc(6 * sizeof(char));
         sprintf(fn, "out.s");
     }
 
     write_file(fn, asm_source);
 
+    delete_prog_exp(expr);
+    free(tl);
+    free(asm_source);
     return 0;
 }
 

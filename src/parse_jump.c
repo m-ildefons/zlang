@@ -51,7 +51,6 @@ asn* parse_fun_call_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
 	asn_list* args = NULL;
 	asn* arg = NULL;
-	//for(; tlp->type == ident || tlp->type == const_int;){
     for(; tlp->type != close_p; ){
 		arg = parse_exp(tl, tnt, symbol_map);
 		tlp = (*tl);

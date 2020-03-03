@@ -142,7 +142,11 @@ static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
                 push_back(&ws_stack, 1);
             else
                 push_back(&ws_stack, 2);
-            _print_tabs(ws_stack); printf("[ %s (%d) ]\n", leaf->ident, leaf->scope);
+            _print_tabs(ws_stack);
+            printf("[ %d %s (%s) ]\n",
+                leaf->scope,
+                leaf->ident,
+                atomic_type_cn[leaf->type]);
             pop_back(&ws_stack);
             pop_back(&ws_stack);
         }
@@ -373,7 +377,9 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             _pretty_print_body(tree, level, ws_stack);
             break;
         case fun_def_tag:
-            printf("[ function def node (%s) ]\n", tree->op.fun_def_exp.ident);
+            printf("[ function def node (%s %s) ]\n",
+                    atomic_type_cn[tree->op.fun_def_exp.type],
+                    tree->op.fun_def_exp.ident);
             _pretty_print_body(tree, level, ws_stack);
             break;
         case call_tag:

@@ -14,7 +14,7 @@ const char* asm_gen_unary_minus(asn* u_minus){
     asn* e = u_minus->op.unary_exp.expr;
     const char* inner = asm_gen(e);
 
-    char* src = (char*) malloc(sizeof(char));
+    char* src = (char*) malloc(2 * sizeof(char));
     assert(src != NULL);
     sprintf(src, "%c", '\0');
 

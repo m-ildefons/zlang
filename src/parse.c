@@ -24,7 +24,8 @@ asn* parse_prog(token** tl, size_t* tnt, const char* filename){
         if(e->tag == fun_def_tag){
             if(pv_search(symbol_map, e->op.fun_def_exp.ident) != NULL)
                 abort();
-            pv_leaf* l = new_pv_leaf(e->op.fun_def_exp.ident, at_func, -1, 0, 0);
+            pv_leaf* l = new_pv_leaf(e->op.fun_def_exp.ident,
+								e->op.fun_def_exp.type, -1, 0, 0);
             symbol_map = pv_insert(symbol_map, l->ident, l);
         }
 
@@ -119,15 +120,15 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     asn* postfix_exp = primary_exp;
 
     tlp = (*tl);
-    if(tlp->type == token_inc){
+    if(tlp != NULL && tlp->type == token_inc){
         pop_token(&tlp, tl, tnt);
         postfix_exp = make_unary_exp(at_int, primary_exp, token_inc);
-    } else if(tlp->type == token_dec){
+    } else if(tlp != NULL && tlp->type == token_dec){
         pop_token(&tlp, tl, tnt);
         postfix_exp = make_unary_exp(at_int, primary_exp, token_dec);
     }
 
-    if(tlp->type == token_semi_colon)
+    if(tlp != NULL && tlp->type == token_semi_colon)
         pop_token(&tlp, tl, tnt);
 
     printf("found postfix expr.\n");
@@ -147,7 +148,7 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         case const_char: primary = parse_const_exp(tl, tnt, symbol_map); break;
         case const_string: primary = parse_const_exp(tl, tnt, symbol_map); break;
         case ident:
-            if((tlp+1)->type == open_p){
+            if((*tnt) > 1 && (tlp+1)->type == open_p){
 		        primary = parse_fun_call_exp(tl, tnt, symbol_map);
             } else {
                 primary = parse_var_ref(tl, tnt, symbol_map);
@@ -163,7 +164,7 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
                 abort();
             }
 		    pop_token(&tlp, tl, tnt);
-            if(tlp->type == token_semi_colon)
+            if(tlp != NULL && tlp->type == token_semi_colon)
 		    	pop_token(&tlp, tl, tnt);
             break;
         case close_p: pop_token(&tlp, tl, tnt); break;
@@ -191,7 +192,7 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
 
 	pop_token(&tlp, tl, tnt);
 
-	if(tlp->type == token_semi_colon)
+	if(tlp != NULL && tlp->type == token_semi_colon)
 		pop_token(&tlp, tl, tnt);
 
     printf("found var ref expr\n");
@@ -282,7 +283,7 @@ void parse_body(token** tl,
             pv_root** symbol_map,
             int top_level){
     token* tlp = (*tl);
-    while((*tnt) > 0 && tlp->level > top_level){
+    while((*tnt) > 0 && tlp != NULL && tlp->level > top_level){
         asn* e = parse_exp(tl, tnt, (*symbol_map));
         if(e == NULL)
             break;
@@ -324,6 +325,8 @@ pv_root* symbol_map_copy(pv_root* symbol_map){
 void pop_token(token** tlp, token** tl, size_t* tnt){
 	(*tlp)++;
 	(*tnt)--;
+	if((*tnt) == 0)
+		(*tlp) = NULL;
 	(*tl) = (*tlp);
 }
 

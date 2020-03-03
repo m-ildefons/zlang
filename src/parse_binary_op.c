@@ -17,9 +17,10 @@ asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(term != NULL && (tlp->type == token_asterisk ||
-                        tlp->type == token_div ||
-                        tlp->type == token_mod)){
+    while(term != NULL && tlp != NULL &&
+			(tlp->type == token_asterisk ||
+			tlp->type == token_div ||
+			tlp->type == token_mod)){
         printf("parsing term expression. %zu tokens left.\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -48,8 +49,9 @@ asn* parse_bin_sum_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     int tok_type;
 
 
-    while(expr != NULL && (tlp->type == token_plus ||
-                        tlp->type == token_minus)){
+    while(expr != NULL && tlp != NULL &&
+			(tlp->type == token_plus ||
+			tlp->type == token_minus)){
         printf("parsing binary expression. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -76,8 +78,9 @@ asn* parse_bin_bit_shift_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(sum != NULL && (tlp->type == token_bit_shift_left ||
-                        tlp->type == token_bit_shift_right)){
+    while(sum != NULL && tlp != NULL &&
+			(tlp->type == token_bit_shift_left ||
+            tlp->type == token_bit_shift_right)){
         printf("parsing binary bit shift expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -94,10 +97,11 @@ asn* parse_bin_rel_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(bit_shift != NULL &&(tlp->type == token_less ||
-                            tlp->type == token_less_or_equal ||
-                            tlp->type == token_greater ||
-                            tlp->type == token_greater_or_equal)){
+    while(bit_shift != NULL && tlp != NULL &&
+			(tlp->type == token_less ||
+            tlp->type == token_less_or_equal ||
+            tlp->type == token_greater ||
+            tlp->type == token_greater_or_equal)){
         printf("parsing binary relation expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -114,8 +118,9 @@ asn* parse_bin_eql_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(rel != NULL && (tlp->type == token_equal ||
-                        tlp->type == token_not_equal)){
+    while(rel != NULL && tlp != NULL &&
+			(tlp->type == token_equal ||
+            tlp->type == token_not_equal)){
         printf("parsing binary euality expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -132,7 +137,7 @@ asn* parse_bin_bit_and_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(equal != NULL && tlp->type == token_ampersand){
+    while(equal != NULL && tlp != NULL && tlp->type == token_ampersand){
         printf("parsing binary bitwise and expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -150,7 +155,7 @@ asn* parse_bin_bit_xor_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(bit_and != NULL && tlp->type == token_bit_xor){
+    while(bit_and != NULL && tlp != NULL && tlp->type == token_bit_xor){
         printf("parsing binary bitwise xor and expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -168,7 +173,7 @@ asn* parse_bin_bit_or_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(bit_xor != NULL && tlp->type == token_bit_or){
+    while(bit_xor != NULL && tlp != NULL && tlp->type == token_bit_or){
         printf("parsing binary bitwise or expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -186,7 +191,7 @@ asn* parse_bin_log_and_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(bit_or != NULL && tlp->type == token_log_and){
+    while(bit_or != NULL && tlp != NULL && tlp->type == token_log_and){
         printf("parsing binary logical and expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -203,7 +208,7 @@ asn* parse_bin_log_xor_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(log_and != NULL && tlp->type == token_log_xor){
+    while(log_and != NULL && tlp != NULL && tlp->type == token_log_xor){
         printf("parsing binary logical xor expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
@@ -220,7 +225,7 @@ asn* parse_bin_log_or_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
     int tok_type;
 
-    while(log_xor != NULL && tlp->type == token_log_or){
+    while(log_xor != NULL && tlp != NULL && tlp->type == token_log_or){
         printf("parsing binary logical or expr. %zu tokens left\n", *tnt);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);

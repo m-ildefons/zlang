@@ -62,6 +62,10 @@ asn* make_string_exp(int idx){
     return e;
 }
 
+void delete_const_exp(asn* e){
+	free(e);
+}
+
 asn* make_call_exp(char* id, asn_list* args){
     asn* e = (asn*) malloc(sizeof(asn));
     assert(e != NULL);
@@ -79,7 +83,7 @@ asn* make_ret_exp(asn* v){
     return e;
 }
 
-asn* make_fun_def_exp(asn* ret_exp,
+asn* make_fun_def_exp(atomic_type type,
 					char* id,
 					asn_list* args,
 					asn_list* body,
@@ -87,7 +91,7 @@ asn* make_fun_def_exp(asn* ret_exp,
     asn* e = (asn*) malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = fun_def_tag;
-    e->op.fun_def_exp.ret_exp = ret_exp;
+    e->op.fun_def_exp.type = type;
     e->op.fun_def_exp.ident = id;
     e->op.fun_def_exp.args = args;
     e->op.fun_def_exp.body = body;
@@ -168,6 +172,10 @@ asn* make_prog_exp(const char* name, asn_list* prog){
     e->op.prog_exp.prog = prog;
     e->op.prog_exp.symbol_map = new_trie();
     return e;
+}
+
+void delete_prog_exp(asn* e){
+	free(e);
 }
 
 asn* make_unary_exp(atomic_type at_type, asn* expr, int type){

@@ -20,25 +20,69 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     asn* f;
     asn* e;
     pv_leaf* leaf;
-	int i;
+	unsigned int i;
+    atomic_type ty;
 
     tlp = *tl;
     level = tlp->level;
-    if(tlp->type != type_int_kw)
-        return NULL;
+
+    i = 0;
+    switch(tlp->type){
+        case type_void_kw:
+            if((tlp+1)->type == token_asterisk){
+                ty = at_void_ptr;
+                tlp++;
+                i++;
+            } else {
+                ty = at_void;
+            }
+            break;
+        case type_int_kw:
+            if((tlp+1)->type == token_asterisk){
+                ty = at_int_ptr;
+                tlp++;
+                i++;
+            } else {
+                ty = at_int;
+            }
+            break;
+        case type_real_kw:
+            if((tlp+1)->type == token_asterisk){
+                ty = at_real_ptr;
+                tlp++;
+                i++;
+            } else {
+                ty = at_real;
+            }
+            break;
+        case type_char_kw:
+            if((tlp+1)->type == token_asterisk){
+                ty = at_char_ptr;
+                tlp++;
+                i++;
+            } else {
+                ty = at_char;
+            }
+            break;
+        default: return NULL;
+    }
     tlp++;
+    i++;
+
     if(tlp->type != ident)
         return NULL;
     id = tlp->str;
     scope = tlp->level;
     tlp++;
+    i++;
     if(tlp->type != open_p)
         return NULL;
     tlp++;
+    i++;
 
     printf("parsing function expr. %zu tokens\n", (*tnt));
 	(*tl) = tlp;
-	(*tnt) -= 3;
+	(*tnt) -= i;
 
 	asn_list* args = NULL;
 	asn* arg = NULL;
@@ -54,7 +98,7 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 		if(i >= 6){
 			symbol_map->mem_offset -= 8;
 			leaf = pv_search(symbol_map, arg->op.var_def_exp.ident);
-			leaf->offset = -(leaf->size) - ((i - 6) * 8 + 16);
+			leaf->offset = -(leaf->size) - ((((int) i) - 6) * 8 + 16);
 		}
 
 		if(tlp->type == token_comma)
@@ -69,10 +113,9 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         return NULL;
     pop_token(&tlp, tl, tnt);
 
-    r = make_int_exp(0);
-    f = make_fun_def_exp(r, id, args, NULL, scope);
+    f = make_fun_def_exp(ty, id, args, NULL, scope);
     f->op.fun_def_exp.symbol_map = symbol_map;
-    leaf = new_pv_leaf(id, at_func, -1, symbol_map->mem_offset, scope);
+    leaf = new_pv_leaf(id, ty, -1, symbol_map->mem_offset, scope);
     symbol_map = pv_insert(symbol_map, id, leaf);
     symbol_map->scope = scope + 1;
 

@@ -15,7 +15,7 @@ const char* asm_gen_binary_plus(asn* b_plus){
     asn* right_exp = b_plus->op.binary_exp.expr_r;
     const char* left_str = asm_gen(left_exp);
     const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(sizeof(char));
+    char* lines = (char*) malloc(2 * sizeof(char));
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
@@ -42,7 +42,7 @@ const char* asm_gen_binary_sub(asn* b_sub){
     asn* right_exp = b_sub->op.binary_exp.expr_r;
     const char* left_str = asm_gen(left_exp);
     const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(sizeof(char));
+    char* lines = (char*) malloc(2 * sizeof(char));
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
@@ -69,7 +69,7 @@ const char* asm_gen_binary_mult(asn* b_mult){
     asn* right_exp = b_mult->op.binary_exp.expr_r;
     const char* left_str = asm_gen(left_exp);
     const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(sizeof(char));
+    char* lines = (char*) malloc(2 * sizeof(char));
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
@@ -96,7 +96,7 @@ const char* asm_gen_binary_div(asn* b_div){
     asn* right_exp = b_div->op.binary_exp.expr_r;
     const char* left_str = asm_gen(left_exp);
     const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(sizeof(char));
+    char* lines = (char*) malloc(2 * sizeof(char));
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 
@@ -124,7 +124,7 @@ const char* asm_gen_binary_mod(asn* b_mod){
     asn* right_exp = b_mod->op.binary_exp.expr_r;
     const char* left_str = asm_gen(left_exp);
     const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(sizeof(char));
+    char* lines = (char*) malloc(2 * sizeof(char));
     assert(lines != NULL);
     sprintf(lines, "%c", '\0');
 

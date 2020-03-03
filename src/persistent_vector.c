@@ -98,9 +98,12 @@ pv_root* new_trie(){
 }
 
 pv_node* new_pv_node(){
+    unsigned int i;
     pv_node* n = (pv_node*) malloc(sizeof(pv_node));
     assert(n != NULL);
     n->ident = ' ';
+    for(i = 0; i < PV_BRANCHING_FACTOR; i++)
+        n->children[i] = NULL;
     n->leaf = NULL;
     return n;
 }

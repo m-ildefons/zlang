@@ -197,9 +197,16 @@ const char* asm_gen_fun_def(asn* fun_def){
     strapp(&src, "    pushq  %rbp\n");
     strapp(&src, "    movq   %rsp, %rbp\n");
     const char* other_src = NULL;
-	int i;
-	char* arg_src;
+	unsigned int i;
+	char* arg_src = NULL;
+	unsigned int c_xmm_regs = 0;
 	for(i = 0; i < 6 && args != NULL; i++, args = args->next){
+		if(args->expr->tag == var_def_tag){
+			if(args->expr->op.var_def_exp.type == at_real){
+				c_xmm_regs++;
+				continue;
+			}
+		}
 		switch(i){
 			case 0: strapp(&src, "    pushq  %rdi\n"); break;
 			case 1: strapp(&src, "    pushq  %rsi\n"); break;
@@ -209,6 +216,16 @@ const char* asm_gen_fun_def(asn* fun_def){
 			case 5: strapp(&src, "    pushq  %r9\n"); break;
 			default: strcat(src, "; should not have happened\n"); break;
 		}
+	}
+
+	if(arg_src != NULL)
+		free(arg_src);
+	arg_src = (char*) malloc(80 * sizeof(char));
+	assert(arg_src != NULL);
+	for(i = 0; i < c_xmm_regs; i++){
+		sprintf(arg_src, "    movsd  %%xmm%u, %%rax\n", i);
+		strapp(&src, arg_src);
+		strapp(&src, "    pushq  %rax\n");
 	}
 
     for(; body != NULL; body = body->next){

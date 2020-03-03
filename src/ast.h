@@ -86,7 +86,7 @@ typedef struct ast_node {
         struct {char* ident;
             struct ast_node_list* args;} call_exp;
         struct {struct ast_node* val;} ret_exp;
-        struct {struct ast_node* ret_exp;
+        struct {atomic_type type;
             char* ident;
             struct ast_node_list* args;
             struct ast_node_list* body;
@@ -138,7 +138,7 @@ asn* make_char_exp(char val);
 asn* make_string_exp(int idx);
 asn* make_call_exp(char* id, asn_list* args);
 asn* make_ret_exp(asn* v);
-asn* make_fun_def_exp(asn* ret_exp,
+asn* make_fun_def_exp(atomic_type type,
                     char* ident,
                     asn_list* args,
                     asn_list* body,
@@ -156,6 +156,7 @@ asn* make_while_exp(asn* cond, asn_list* body, int scope);
 asn* make_var_def_exp(atomic_type type, char* ident, int scope);
 asn* make_var_ref_exp(char* ident);
 asn* make_prog_exp(const char* name, asn_list* prog);
+void delete_prog_exp(asn* e);
 asn* make_unary_exp(atomic_type at_type, asn* expr, int type);
 asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type);
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type);

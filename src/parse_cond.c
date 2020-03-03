@@ -42,7 +42,7 @@ asn* parse_cond_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     cond_exp->op.cond_exp.if_symbol_map = symbol_map;
 
 	tlp = (*tl);
-	if(tlp->type == token_cond_else && tlp->level == scope){
+	if(tlp != NULL && tlp->type == token_cond_else && tlp->level == scope){
 		pop_token(&tlp, tl, tnt);
 
     	if(tlp->type == token_colon){
