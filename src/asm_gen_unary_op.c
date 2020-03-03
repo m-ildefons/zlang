@@ -11,15 +11,24 @@
 #include "asm_gen.h"
 
 const char* asm_gen_unary_minus(asn* u_minus){
-    char* line = (char*) malloc(80 * sizeof(char));
     asn* e = u_minus->op.unary_exp.expr;
     const char* inner = asm_gen(e);
-    sprintf(line, "    negq   %%rax\n");
-    size_t inner_len = strlen(inner);
-    char* ret = (char*) malloc((80 + inner_len) * sizeof(char));
-    strcpy(ret, inner);
-    strcat(ret, line);
-    return ret;
+
+    char* src = (char*) malloc(sizeof(char));
+    assert(src != NULL);
+    sprintf(src, "%c", '\0');
+
+    if(u_minus->op.unary_exp.type == at_real){
+        strapp(&src, inner);
+        strapp(&src, "    xorpd  %xmm1, %xmm1\n");
+        strapp(&src, "    subsd  %xmm0, %xmm1\n");
+        strapp(&src, "    movsd  %xmm1, %xmm0\n");
+    } else {
+        strapp(&src, inner);
+        strapp(&src, "    negq   %rax\n");
+    }
+
+    return src;
 }
 
 const char* asm_gen_unary_not(asn* u_not){

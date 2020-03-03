@@ -295,6 +295,8 @@ atomic_type get_atomic_type(asn* expr, pv_root* symbol_map){
         case var_def_tag: return expr->op.var_def_exp.type;
         case var_ref_tag:
             leaf = pv_search(symbol_map, expr->op.var_ref_exp.ident);
+            if(leaf == NULL)
+                return at_void;
             return leaf->type;
         default: return at_void;
     }

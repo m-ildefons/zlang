@@ -130,6 +130,7 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     if(tlp->type == token_semi_colon)
         pop_token(&tlp, tl, tnt);
 
+    printf("found postfix expr.\n");
     return postfix_exp;
 }
 

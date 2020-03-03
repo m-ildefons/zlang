@@ -40,8 +40,9 @@ asn* parse_unary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         return NULL;
     }
 
+    atomic_type inner_ty = get_atomic_type(inner, symbol_map);
     printf("found unary expr %d\n", tok_type);
-    asn* ue = make_unary_exp(at_int, inner, tok_type);
+    asn* ue = make_unary_exp(inner_ty, inner, tok_type);
 
     return ue;
 }

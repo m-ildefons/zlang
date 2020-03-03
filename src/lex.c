@@ -192,7 +192,6 @@ static void tokenize_line(char* line,
         } else {
             (*tokens)[num_tokens - 1].str = (char*) malloc((idx / 10 + 1) * sizeof(char));
             sprintf((*tokens)[num_tokens - 1].str, "%u", (idx-1));
-            printf("%u", idx);
         }
         (*tokens)[num_tokens - 1].type = t;
         (*tokens)[num_tokens - 1].level = indent_depth;
@@ -231,9 +230,6 @@ static void pre_lex_src(char** src){
             (*src) = strrep((*src), tok, "%s");
         }
     }
-
-    for(i = 0; i < string_count; i++)
-        printf("%s\n", string_index[i]);
 }
 
 static void pre_lex_line(char** src){
