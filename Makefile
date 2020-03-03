@@ -11,11 +11,20 @@ MKDIR_P=mkdir -p
 	directories
 
 all: directories src
+
+debug: directories src_debug
+
 test: directories src
 	$(MAKE) -C test
+
 clean: clean_src
+
 src: clean_src
 	$(MAKE) -C src
+
+src_debug: clean_src
+	$(MAKE) debug -C src
+
 clean_src:
 	$(MAKE) clean -C src
 
