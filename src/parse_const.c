@@ -10,7 +10,7 @@
 
 #include "parse.h"
 
-asn* parse_const_exp(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_const_exp(token** tl, size_t* tnt){
     printf("parsing const expr. %lu tokens\n", *tnt);
     token* tlp = *tl;
     asn* r = NULL;

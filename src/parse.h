@@ -37,7 +37,7 @@ pv_root* symbol_map_copy(pv_root* symbol_map);
 void pop_token(token** tlp, token** tl, size_t* tnt);
 
 /* implemented in parse_const.c */
-asn* parse_const_exp(token** tl, size_t* tnt, pv_root* symbol_map);
+asn* parse_const_exp(token** tl, size_t* tnt);
 
 /* implemented in parse_cond.c */
 asn* parse_cond_exp(token** tl, size_t* tnt, pv_root* symbol_map);
@@ -48,7 +48,7 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 /* implemented in parse_jump.c */
 asn* parse_ret_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_fun_call_exp(token** tl, size_t* tnt, pv_root* symbol_map);
-asn* parse_jump_exp(token** tl, size_t* tnt, pv_root* symbol_map);
+asn* parse_jump_exp(token** tl, size_t* tnt);
 
 /* implemented in parse_assign_op.c */
 asn* parse_assign_exp(token** tl, size_t* tnt, pv_root* symbol_map);

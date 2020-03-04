@@ -55,7 +55,7 @@ char* asm_gen_for_loop(asn* for_loop){
 	char* init_src = asm_gen(init);
 	char* cond_src = asm_gen(cond);
 	char* move_src = asm_gen(move);
-	char* body_src = asm_gen_body(body, num_vars);
+	char* body_src = asm_gen_body(body);
 	char* src = strnew();
 
 	strapp(&src, init_src);
@@ -122,7 +122,7 @@ char* asm_gen_while_loop(asn* while_loop){
 	loop_end_label = label_end;
 
 	char* cond_src = asm_gen(cond);
-	char* body_src = asm_gen_body(body, num_vars);
+	char* body_src = asm_gen_body(body);
 	char* src = strnew();
 
 	strapp(&src, label_start_line);

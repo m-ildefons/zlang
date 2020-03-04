@@ -71,7 +71,7 @@ asn* parse_fun_call_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	return call;
 }
 
-asn* parse_jump_exp(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_jump_exp(token** tl, size_t* tnt){
 	token* tlp = (*tl);
 	asn* jump = NULL;
 	if(tlp->type == break_kw || tlp->type == continue_kw){

@@ -29,8 +29,8 @@ char* asm_gen_fun_call(asn* call);
 char* asm_gen_var_def(asn* var_def);
 char* asm_gen_var_ref(asn* var_ref);
 char* asm_gen_global_var(asn* e);
-char* asm_gen_ret(asn* ret, int num_vars);
-char* asm_gen_body(asn_list* body, int num_vars);
+char* asm_gen_ret(asn* ret);
+char* asm_gen_body(asn_list* body);
 char* asm_gen_jump(asn* jump);
 char* asm_gen_int_to_real(asn* cast);
 

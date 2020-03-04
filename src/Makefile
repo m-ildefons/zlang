@@ -21,11 +21,10 @@ C_WARN_FLAGS= -Wall \
 			-Wstrict-overflow=5 \
 			-Wnested-externs \
 			-Wwrite-strings \
-			-Wno-unused-parameter \
 			-Wfloat-equal \
 			-Wdisabled-optimization \
 			-Wformat=2 \
-			-Wno-format-extra-args \
+			-Wformat-extra-args \
 			-Wformat-security \
 			-Wformat-nonliteral \
 			-Wformat-signedness \
@@ -36,6 +35,7 @@ C_WARN_FLAGS= -Wall \
 			-Wunused-label \
 			-Wunused-value \
 			-Wunused-variable \
+			-Wunused-parameter \
 			-Wnull-dereference
 			#-ansi
 LDFLAGS= -L/usr/lib/x86_64-linux-gnu/

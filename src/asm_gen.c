@@ -233,7 +233,7 @@ char* asm_gen_fun_def(asn* fun_def){
 	}
     free(arg_src);
 
-    other_src = asm_gen_body(body, num_vars);
+    other_src = asm_gen_body(body);
     strapp(&src, other_src);
     free(other_src);
 
@@ -398,7 +398,7 @@ char* asm_gen_global_var(asn* e){
     return src;
 }
 
-char* asm_gen_ret(asn* ret_exp, int num_vars){
+char* asm_gen_ret(asn* ret_exp){
     asn* e = ret_exp->op.ret_exp.val;
     char* str = asm_gen(e);
     char* expr_str = strnew();
@@ -410,13 +410,13 @@ char* asm_gen_ret(asn* ret_exp, int num_vars){
     return expr_str;
 }
 
-char* asm_gen_body(asn_list* body, int num_vars){
+char* asm_gen_body(asn_list* body){
     char* body_src = strnew();
 	char* statement_src = NULL;
 
 	for(; body != NULL; body = body->next){
 		if(body->expr->tag == ret_tag){
-			statement_src = asm_gen_ret(body->expr, num_vars);
+			statement_src = asm_gen_ret(body->expr);
 		} else if(body->expr->tag == break_tag){
 			statement_src = asm_gen_jump(body->expr);
 		} else if(body->expr->tag == continue_tag){

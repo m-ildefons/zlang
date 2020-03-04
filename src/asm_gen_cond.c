@@ -31,11 +31,11 @@ char* asm_gen_cond(asn* cond){
 
 	char* condition_src = asm_gen(condition);
 
-	char* body_src = asm_gen_body(body, num_vars);
+	char* body_src = asm_gen_body(body);
 
 	char* else_body_src = NULL;
 	if(cond->op.cond_exp.else_body != NULL){
-		else_body_src = asm_gen_body(cond->op.cond_exp.else_body, num_vars);
+		else_body_src = asm_gen_body(cond->op.cond_exp.else_body);
 	}
 
 	char* label_post_body = gen_label("post_body");

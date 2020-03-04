@@ -90,7 +90,7 @@ asn* parse_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         printf("\033[92mfound\033[39m function call at level %d.\n", level);
         return expr;
     }
-    expr = parse_jump_exp(tl, tnt, symbol_map);
+    expr = parse_jump_exp(tl, tnt);
     if(expr != NULL){
         printf("\033[92mfound\033[39m jump at level %d.\n", level);
         return expr;
@@ -141,10 +141,10 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     asn* primary = NULL;
 
     switch(tok_type){
-        case const_int: primary = parse_const_exp(tl, tnt, symbol_map); break;
-        case const_real: primary = parse_const_exp(tl, tnt, symbol_map); break;
-        case const_char: primary = parse_const_exp(tl, tnt, symbol_map); break;
-        case const_string: primary = parse_const_exp(tl, tnt, symbol_map); break;
+        case const_int: primary = parse_const_exp(tl, tnt); break;
+        case const_real: primary = parse_const_exp(tl, tnt); break;
+        case const_char: primary = parse_const_exp(tl, tnt); break;
+        case const_string: primary = parse_const_exp(tl, tnt); break;
         case ident:
             if((*tnt) > 1 && (tlp+1)->type == open_p){
 		        primary = parse_fun_call_exp(tl, tnt, symbol_map);
@@ -180,11 +180,18 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = *tl;
 	asn* var = NULL;
 
-	if(tlp->type != ident){
+	if(tlp == NULL || tlp->type != ident){
 		return NULL;
     }
 
     printf("parsing var ref expression. %zu, %s\n", (*tnt), (*tl)->str);
+
+    pv_leaf* leaf = pv_search(symbol_map, tlp->str);
+    if(leaf == NULL){
+        printf("\033[91mError\033[39m: Reference to undeclared symbol: %s\n",
+                tlp->str);
+        return NULL;
+    }
 
 	var = make_var_ref_exp(tlp->str);
 
