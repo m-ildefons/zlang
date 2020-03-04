@@ -73,7 +73,7 @@ clean_obj:
 
 clean: clean_bin clean_obj
 
-clean_after_build: $(OUT)
+clean_after_build:
 	$(MAKE) clean_obj
 
 lint:

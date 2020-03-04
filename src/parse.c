@@ -266,9 +266,9 @@ asn* parse_init_decl(token** tl, size_t* tnt, pv_root* symbol_map, atomic_type t
     asn* var = make_var_def_exp(ty, id, scope);
     pop_token(&tlp, tl, tnt);
 
-    if(tlp->type == token_semi_colon){
+    if(tlp != NULL && tlp->type == token_semi_colon){
         pop_token(&tlp, tl, tnt);
-    } else if(tlp->type == token_assign){
+    } else if(tlp != NULL && tlp->type == token_assign){
         pop_token(&tlp, tl, tnt);
         asn* val = parse_assign_exp(tl, tnt, symbol_map);
         var->op.var_def_exp.val = val;
