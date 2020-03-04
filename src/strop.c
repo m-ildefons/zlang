@@ -54,7 +54,7 @@ char* strrep(const char* str, const char* exp, const char* rep){
 
 char* strpad(const char* str, size_t len, const char* pad){
     int padlen = len - strlen(str);
-    char* new = (char*) malloc((len+1) * sizeof(char));
+    char* new = salloc((len+1));
     sprintf(new, "%*.*s%s", padlen, padlen, pad, str);
     return new;
 }
@@ -63,7 +63,7 @@ void strapp(char** str, const char* app){
     size_t str_len = strlen((*str));
     size_t app_len = strlen(app);
 
-    (*str) = (char*) realloc((*str), (str_len + app_len + 1) * sizeof(char));
+    (*str) = realloc((*str), (str_len + app_len + 1) * sizeof(char));
     assert((*str) != NULL);
 
     strcat((*str), app);
@@ -73,11 +73,22 @@ void strprp(char** str, const char* prp){
     size_t str_len = strlen((*str));
     size_t prp_len = strlen(prp);
 
-    char* new_str = (char*) malloc((str_len + prp_len + 1) * sizeof(char));
+    char* new_str = malloc((str_len + prp_len + 1) * sizeof(char));
     assert(new_str != NULL);
 
     strcpy(new_str, prp);
     strcat(new_str, (*str));
     (*str) = new_str;
+}
+
+char* strnew(void){
+    char* str = salloc(0);
+    return str;
+}
+
+char* salloc(size_t len){
+    char* str = calloc(len + 1, sizeof(char));
+    assert(str != NULL);
+    return str;
 }
 

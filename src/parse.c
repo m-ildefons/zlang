@@ -105,7 +105,6 @@ asn* parse_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
 asn* parse_cast_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("parsing cast expr. %zu, %s\n", (*tnt), (*tl)->str);
-    token* tlp = (*tl);
     asn* cast = parse_unary_exp(tl, tnt, symbol_map);
     return cast;
 }
@@ -114,7 +113,6 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("parsing postfix expr. %zu, %s\n", (*tnt), (*tl)->str);
 
     token* tlp = (*tl);
-    int tok_type = tlp->type;
 
     asn* primary_exp = parse_primary_exp(tl, tnt, symbol_map);
     asn* postfix_exp = primary_exp;

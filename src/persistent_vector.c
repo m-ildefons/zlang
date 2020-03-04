@@ -208,29 +208,41 @@ pv_root* pv_insert(pv_root* old_trie, char* key, pv_leaf* leaf){
 }
 
 pv_leaf* pv_search(pv_root* root, const char* key){
-    const char* next = key;
+    char* next = salloc(strlen(key));
+    char* next_handle = next;
+    strcpy(next, key);
     size_t idx;
     pv_node* trie = root->trie;
     pv_node* pos = trie;
 
     if(strlen(next) < root->depth){
+        free(next_handle);
         next = strpad(key, root->depth, " ");
+        next_handle = next;
     } else if(strlen(next) > root->depth){
+        free(next_handle);
         return NULL;
     }
 
     while(*next){
         idx = (size_t) (*next);
         if(*(next+1) == '\0'){
-            if(pos->children[idx] != NULL && pos->children[idx]->leaf != NULL)
+            if(pos->children[idx] != NULL && pos->children[idx]->leaf != NULL){
+                free(next_handle);
                 return pos->children[idx]->leaf;
+            }
+            free(next_handle);
             return NULL;
         }
-        if(pos->children[idx] == NULL)
+        if(pos->children[idx] == NULL){
+            free(next_handle);
             return NULL;
+        }
         pos = pos->children[idx];
         next++;
     }
+
+    free(next_handle);
     return NULL;
 }
 

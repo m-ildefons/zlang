@@ -11,28 +11,28 @@
 
 #include "asm_gen.h"
 
-const char* asm_gen_int_const(asn* int_const){
+char* asm_gen_int_const(asn* int_const){
     printf("generating const int\n");
     int num = int_const->op.int_exp;
 
-    char* buffer = (char*) malloc(80 * sizeof(char));
+    char* buffer = salloc(80);
     sprintf(buffer, "    movq   $%d, %%rax\n", num);
     return buffer;
 }
 
-const char* asm_gen_real_const(asn* real_const){
+char* asm_gen_real_const(asn* real_const){
     printf("generating const real\n");
     int idx = real_const->op.int_exp;
-    char* buffer = (char*) malloc(80 * sizeof(char));
+    char* buffer = salloc(80);
 
     sprintf(buffer, "    movsd  .FC%d(%%rip), %%xmm0\n", idx);
     return buffer;
 }
 
-const char* asm_gen_string_const(asn* str_const){
+char* asm_gen_string_const(asn* str_const){
     printf("generating const string\n");
     int idx = str_const->op.int_exp;
-    char* buffer = (char*) malloc(80 * sizeof(char));
+    char* buffer = salloc(80);
 
     sprintf(buffer, "    leaq   .SC%d(%%rip), %%rax\n", idx);
     return buffer;

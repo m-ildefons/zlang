@@ -23,41 +23,9 @@ typedef enum {
     at_char_ptr,
 } atomic_type;
 
-static const int atomic_type_size[] = {
-    [at_func] = 1,
-    [at_void] = 8,
-    [at_int] = 8,
-    [at_real] = 8,
-    [at_char] = 1,
-    [at_void_ptr] = 8,
-    [at_int_ptr] = 8,
-    [at_real_ptr] = 8,
-    [at_char_ptr] = 8,
-};
-
-static const char* atomic_type_cn[] = {
-    [at_func] = "func",
-    [at_void] = "void",
-    [at_int] = "int",
-    [at_real] = "real",
-    [at_char] = "char ptr",
-    [at_void_ptr] = "void ptr",
-    [at_int_ptr] = "int ptr",
-    [at_real_ptr] = "real ptr",
-    [at_char_ptr] = "char ptr",
-};
-
-static const atomic_type binary_cast_matrix[9][9] = {
-    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs func
-    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs void
-    {at_void, at_void, at_int, at_real, at_void, at_void, at_void, at_void, at_void}, // lhs int
-    {at_void, at_void, at_real, at_real, at_void, at_void, at_void, at_void, at_void}, // lhs real
-    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs char
-    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs void ptr
-    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs int ptr
-    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs real ptr
-    {at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void, at_void}, // lhs char ptr
-};
+extern const int atomic_type_size[];
+extern const char* atomic_type_cn[];
+extern const atomic_type binary_cast_matrix[9][9];
 
 #endif
 

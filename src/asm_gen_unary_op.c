@@ -10,13 +10,11 @@
 
 #include "asm_gen.h"
 
-const char* asm_gen_unary_minus(asn* u_minus){
+char* asm_gen_unary_minus(asn* u_minus){
     asn* e = u_minus->op.unary_exp.expr;
-    const char* inner = asm_gen(e);
+    char* inner = asm_gen(e);
 
-    char* src = (char*) malloc(2 * sizeof(char));
-    assert(src != NULL);
-    sprintf(src, "%c", '\0');
+    char* src = strnew();
 
     if(u_minus->op.unary_exp.type == at_real){
         strapp(&src, inner);
@@ -31,33 +29,27 @@ const char* asm_gen_unary_minus(asn* u_minus){
     return src;
 }
 
-const char* asm_gen_unary_not(asn* u_not){
-    char* lines = (char*) malloc(240 * sizeof(char));
+char* asm_gen_unary_not(asn* u_not){
+    char* src = strnew();
     asn* e = u_not->op.unary_exp.expr;
-    const char* inner = asm_gen(e);
-    strcpy(lines, "    cmpq   $0, %rax\n");
-    strcat(lines, "    movq   $0, %rax\n");
-    strcat(lines, "    sete   %al\n");
-    size_t inner_len = strlen(inner);
-    char* ret = (char*) malloc((240 + inner_len) * sizeof(char));
-    strcpy(ret, inner);
-    strcat(ret, lines);
-    return ret;
+    char* inner = asm_gen(e);
+    strapp(&src, inner);
+    strapp(&src, "    cmpq   $0, %rax\n");
+    strapp(&src, "    movq   $0, %rax\n");
+    strapp(&src, "    sete   %al\n");
+    return src;
 }
 
-const char* asm_gen_unary_compl(asn* u_compl){
-    char* line = (char*) malloc(80 * sizeof(char));
+char* asm_gen_unary_compl(asn* u_compl){
+    char* src = strnew();
     asn* e = u_compl->op.unary_exp.expr;
-    const char* inner = asm_gen(e);
-    sprintf(line, "    not    %%rax\n");
-    size_t inner_len = strlen(inner);
-    char* ret = (char*) malloc((80 + inner_len) * sizeof(char));
-    strcpy(ret, inner);
-    strcat(ret, line);
-    return ret;
+    char* inner = asm_gen(e);
+    strapp(&src, inner);
+    strapp(&src, "    not    %rax\n");
+    return src;
 }
 
-const char* asm_gen_reference(asn* ref){
+char* asm_gen_reference(asn* ref){
     printf("generating reference\n");
     asn* var = ref->op.unary_exp.expr;
     const char* id = var->op.var_ref_exp.ident;
@@ -70,7 +62,7 @@ const char* asm_gen_reference(asn* ref){
     return src;
 }
 
-const char* asm_gen_dereference(asn* deref){
+char* asm_gen_dereference(asn* deref){
     printf("generating dereference\n");
     asn* var = deref->op.unary_exp.expr;
     const char* id = var->op.var_ref_exp.ident;
@@ -85,9 +77,9 @@ const char* asm_gen_dereference(asn* deref){
     return src;
 }
 
-const char* asm_gen_inc(asn* inc){
+char* asm_gen_inc(asn* inc){
     asn* inner = inc->op.unary_exp.expr;
-    const char* inner_src = asm_gen(inner);
+    char* inner_src = asm_gen(inner);
     size_t inner_len = strlen(inner_src);
 
     char* src = (char*) malloc((inner_len + 80) * sizeof(char));
@@ -112,14 +104,14 @@ const char* asm_gen_inc(asn* inc){
     return src;
 }
 
-const char* asm_gen_dec(asn* dec){
+char* asm_gen_dec(asn* dec){
     printf("generating decrement\n");
     const char* id = "";
     pv_leaf* leaf = NULL;
     int off = 0;
     char* line = NULL;
     asn* inner = dec->op.unary_exp.expr;
-    const char* inner_src = asm_gen(inner);
+    char* inner_src = asm_gen(inner);
     size_t inner_len = strlen(inner_src);
 
     char* src = (char*) malloc((inner_len + 80) * sizeof(char));

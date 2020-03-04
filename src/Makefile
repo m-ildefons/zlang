@@ -32,7 +32,10 @@ C_WARN_FLAGS= -Wall \
 			-Wlogical-op \
 			-Wredundant-decls \
 			-Wswitch-default \
-			-Wno-unused \
+			-Wunused-function \
+			-Wunused-label \
+			-Wunused-value \
+			-Wunused-variable \
 			-Wnull-dereference
 			#-ansi
 LDFLAGS= -L/usr/lib/x86_64-linux-gnu/

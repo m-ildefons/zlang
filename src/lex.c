@@ -190,7 +190,7 @@ static void tokenize_line(char* line,
         if(t != const_string){
             (*tokens)[num_tokens - 1].str = strdup(tok);
         } else {
-            (*tokens)[num_tokens - 1].str = (char*) malloc((idx / 10 + 1) * sizeof(char));
+            (*tokens)[num_tokens - 1].str = (char*) malloc((idx / 10 + 2) * sizeof(char));
             sprintf((*tokens)[num_tokens - 1].str, "%u", (idx-1));
         }
         (*tokens)[num_tokens - 1].type = t;

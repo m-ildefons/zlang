@@ -103,8 +103,7 @@ int main(int argc, char* argv[]){
 
     print_separator("Generating Source");
 
-    char* asm_source;
-    asm_gen_prog(expr, &asm_source);
+    char* asm_source = asm_gen_prog(expr);
 
     fprintf(stdout, "%s\n", asm_source);
 

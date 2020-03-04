@@ -10,7 +10,7 @@
 
 #include "asm_gen.h"
 
-const char* asm_gen_assign(asn* assign){
+char* asm_gen_assign(asn* assign){
     const char* id;
     if(assign->op.assign_exp.lval->tag == var_ref_tag)
         id = assign->op.assign_exp.lval->op.var_ref_exp.ident;
@@ -20,10 +20,9 @@ const char* asm_gen_assign(asn* assign){
     asn* val = assign->op.assign_exp.val;
 
     int off = -(leaf->offset + leaf->size);
-    const char* rhs = asm_gen(val);
-    size_t rhs_len = strlen(rhs);
+    char* rhs = asm_gen(val);
 
-    char* put_line = (char*) malloc(80 * sizeof(char));
+    char* put_line = salloc(80);
     assert(put_line != NULL);
     if(assign->op.assign_exp.lval->tag == var_ref_tag){
         if(leaf->scope != 0)
@@ -34,12 +33,11 @@ const char* asm_gen_assign(asn* assign){
         sprintf(put_line, "    movq   %%rax, (%%rbx)\n");
     }
 
-    const char* get_line = asm_gen(assign->op.assign_exp.lval);
+    char* get_line = asm_gen(assign->op.assign_exp.lval);
 
-    char* code = (char*) malloc(rhs_len * sizeof(char));
-    assert(code != NULL);
+    char* code = strnew();
 
-    strcpy(code, rhs);
+    strapp(&code, rhs);
     if(assign->tag != assign_tag){
         strapp(&code, "    movq   %rax, %rcx\n");
         strapp(&code, get_line);
@@ -65,6 +63,8 @@ const char* asm_gen_assign(asn* assign){
     }
     strapp(&code, put_line);
 
+    free(rhs);
+    free(get_line);
     free(put_line);
     return code;
 }

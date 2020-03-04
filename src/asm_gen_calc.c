@@ -10,14 +10,12 @@
 
 #include "asm_gen.h"
 
-const char* asm_gen_binary_plus(asn* b_plus){
+char* asm_gen_binary_plus(asn* b_plus){
     asn* left_exp = b_plus->op.binary_exp.expr_l;
     asn* right_exp = b_plus->op.binary_exp.expr_r;
-    const char* left_str = asm_gen(left_exp);
-    const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(2 * sizeof(char));
-    assert(lines != NULL);
-    sprintf(lines, "%c", '\0');
+    char* left_str = asm_gen(left_exp);
+    char* right_str = asm_gen(right_exp);
+    char* lines = strnew();
 
     if(b_plus->op.binary_exp.type == at_real){
         strapp(&lines, left_str);
@@ -37,14 +35,12 @@ const char* asm_gen_binary_plus(asn* b_plus){
     return lines;
 }
 
-const char* asm_gen_binary_sub(asn* b_sub){
+char* asm_gen_binary_sub(asn* b_sub){
     asn* left_exp = b_sub->op.binary_exp.expr_l;
     asn* right_exp = b_sub->op.binary_exp.expr_r;
-    const char* left_str = asm_gen(left_exp);
-    const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(2 * sizeof(char));
-    assert(lines != NULL);
-    sprintf(lines, "%c", '\0');
+    char* left_str = asm_gen(left_exp);
+    char* right_str = asm_gen(right_exp);
+    char* lines = strnew();
 
     if(b_sub->op.binary_exp.type == at_real){
         strapp(&lines, left_str);
@@ -64,14 +60,12 @@ const char* asm_gen_binary_sub(asn* b_sub){
     return lines;
 }
 
-const char* asm_gen_binary_mult(asn* b_mult){
+char* asm_gen_binary_mult(asn* b_mult){
     asn* left_exp = b_mult->op.binary_exp.expr_l;
     asn* right_exp = b_mult->op.binary_exp.expr_r;
-    const char* left_str = asm_gen(left_exp);
-    const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(2 * sizeof(char));
-    assert(lines != NULL);
-    sprintf(lines, "%c", '\0');
+    char* left_str = asm_gen(left_exp);
+    char* right_str = asm_gen(right_exp);
+    char* lines = strnew();
 
     if(b_mult->op.binary_exp.type == at_real){
         strapp(&lines, left_str);
@@ -91,14 +85,12 @@ const char* asm_gen_binary_mult(asn* b_mult){
     return lines;
 }
 
-const char* asm_gen_binary_div(asn* b_div){
+char* asm_gen_binary_div(asn* b_div){
     asn* left_exp = b_div->op.binary_exp.expr_l;
     asn* right_exp = b_div->op.binary_exp.expr_r;
-    const char* left_str = asm_gen(left_exp);
-    const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(2 * sizeof(char));
-    assert(lines != NULL);
-    sprintf(lines, "%c", '\0');
+    char* left_str = asm_gen(left_exp);
+    char* right_str = asm_gen(right_exp);
+    char* lines = strnew();
 
     if(b_div->op.binary_exp.type == at_real){
         strapp(&lines, right_str);
@@ -119,14 +111,12 @@ const char* asm_gen_binary_div(asn* b_div){
     return lines;
 }
 
-const char* asm_gen_binary_mod(asn* b_mod){
+char* asm_gen_binary_mod(asn* b_mod){
     asn* left_exp = b_mod->op.binary_exp.expr_l;
     asn* right_exp = b_mod->op.binary_exp.expr_r;
-    const char* left_str = asm_gen(left_exp);
-    const char* right_str = asm_gen(right_exp);
-    char* lines = (char*) malloc(2 * sizeof(char));
-    assert(lines != NULL);
-    sprintf(lines, "%c", '\0');
+    char* left_str = asm_gen(left_exp);
+    char* right_str = asm_gen(right_exp);
+    char* lines = strnew();
 
     strapp(&lines, right_str);
     strapp(&lines, "    pushq  %rax\n");

@@ -182,7 +182,6 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
     int ty;
     _print_tabs(ws_stack);
 
-    asn_list* body = NULL;
     switch(tree->tag){
         case ret_tag:
             printf("[ return node ]\n");

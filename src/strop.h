@@ -49,5 +49,19 @@ void strapp(char** str, const char* app);
  */
 void strprp(char** str, const char* prp);
 
+/*
+ * strnew - create new empty string
+ *
+ * Allocates a new string containing nothing but '\0'
+ */
+char* strnew(void);
+
+/*
+ * salloc - create new string of given length
+ *
+ * Allocates new string of length 'len'.
+ */
+char* salloc(size_t len);
+
 #endif
 

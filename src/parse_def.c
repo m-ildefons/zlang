@@ -16,7 +16,6 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     int level;
     int scope;
     char* id;
-    asn* r;
     asn* f;
     asn* e;
     pv_leaf* leaf;

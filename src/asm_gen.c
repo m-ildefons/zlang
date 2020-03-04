@@ -10,40 +10,40 @@
 
 #include "asm_gen.h"
 
-const char* gen_label(const char* cust_str){
+static unsigned int label_counter;
+
+char* gen_label(const char* cust_str){
     /* printf("generating label %u\n", label_counter); */
     size_t len_cs = strlen(cust_str);
-    char* label = (char*) malloc((len_cs + 10) * sizeof(char));
-    assert(label != NULL);
+    char* label = salloc((len_cs + 10));
     sprintf(label, "_%s%.2x", cust_str, label_counter);
     label_counter++;
     return label;
 }
 
-void asm_gen_prog(asn* ast_tree, char** asm_src){
-    char* src = (char*) malloc(80 * sizeof(char));
-    assert(src != NULL);
-    char* line = (char*) malloc(80 * sizeof(char));
-    assert(line != NULL);
+char* asm_gen_prog(asn* ast_tree){
+    char* src = strnew();
+    char* line = salloc(80);
+    asn_list* prog = NULL;
+    asn* expr = NULL;
+    char* expr_src = NULL;
+    char* block_src = NULL;
+    unsigned int i;
 
     if(ast_tree->tag != prog_tag){
         printf("Error: Not a program!\n");
-        return;
+        return NULL;
     }
 
     sprintf(line, "    .file      \"%s\"\n", ast_tree->op.prog_exp.name);
-    strcpy(src, line);
+    strapp(&src, line);
 
-    asn_list* prog = NULL;
-    asn* expr = NULL;
-    const char* expr_src = NULL;
-    char* block_src = NULL;
     for(prog = ast_tree->op.prog_exp.prog; prog != NULL; prog = prog->next){
         expr = prog->expr;
         if(expr->tag == var_def_tag){
             expr_src = asm_gen_global_var(expr);
-            block_src = (char*) malloc((strlen(expr_src) + 5 * 80) * sizeof(char));
-            assert(block_src != NULL);
+            block_src = salloc((strlen(expr_src) + 5 * 80));
+
             sprintf(block_src, "%c", '\0');
             strcat(block_src, "    .text\n");
             sprintf(line, "    .global    %s\n", expr->op.var_def_exp.ident);
@@ -55,41 +55,44 @@ void asm_gen_prog(asn* ast_tree, char** asm_src){
             strcat(block_src, expr_src);
             strapp(&src, block_src);
 
+            free(expr_src);
             free(block_src);
         } else if(expr->tag == fun_def_tag){
             expr_src = asm_gen_fun_def(expr);
-            block_src = (char*) malloc((strlen(expr_src) + 3 * 80) * sizeof(char));
-            assert(block_src != NULL);
+            block_src = salloc((strlen(expr_src) + 3 * 80));
+
             sprintf(block_src, "%c", '\0');
             strcat(block_src, "    .text\n");
             sprintf(line, "    .global    %s\n", expr->op.fun_def_exp.ident);
             strcat(block_src, line);
             sprintf(line, "    .type      %s, @function\n", expr->op.fun_def_exp.ident);
             strcat(block_src, line);
-            strcat(block_src, expr_src);
+            strapp(&block_src, expr_src);
             strapp(&src, block_src);
 
             sprintf(line, "    .size   %s, .-%s\n", expr->op.fun_def_exp.ident, expr->op.fun_def_exp.ident);
             strapp(&src, line);
 
+            free(expr_src);
             free(block_src);
         }
     }
-    unsigned int i;
+
     for(i = 0; i < string_count; i++){
-        block_src = (char*) malloc(80 * sizeof(char));
-        assert(block_src != NULL);
+        block_src = salloc(80);
+
         sprintf(block_src, ".SC%u:\n", i);
         strapp(&src, "    .section    .rodata\n");
         strapp(&src, block_src);
         sprintf(block_src, "    .string \"%s\"\n", string_index[i]);
         strapp(&src, block_src);
+
         free(block_src);
     }
 
     for(i = 0; i < real_count; i++){
-        block_src = (char*) malloc(80 * sizeof(char));
-        assert(block_src != NULL);
+        block_src = salloc(80);
+
         sprintf(block_src, ".FC%u:\n", i);
         strapp(&src, "    .section    .rodata\n");
         strapp(&src, "    .align 8\n");
@@ -101,17 +104,18 @@ void asm_gen_prog(asn* ast_tree, char** asm_src){
         strapp(&src, block_src);
         sprintf(block_src, "    .long   %u\n", lower);
         strapp(&src, block_src);
+
         free(block_src);
     }
 
     strapp(&src, "    .ident  \"Boa Version 0.1\"\n");
-    (*asm_src) = src;
     free(line);
+    return src;
 }
 
-const char* asm_gen(asn* e){
+char* asm_gen(asn* e){
     printf("generating asm, tag: %u\n", e->tag);
-    const char* res = NULL;
+    char* res = NULL;
     switch(e->tag){
         case fun_def_tag: res = asm_gen_fun_def(e); break;
 		case call_tag: res = asm_gen_fun_call(e); break;
@@ -163,12 +167,13 @@ const char* asm_gen(asn* e){
         case cast_to_real_tag: res = asm_gen_int_to_real(e); break;
         default:
             printf("encountered unimplemented expression... skipping\n");
-            res = "\n";
+            res = strnew();
+            strapp(&res, "\n");
     }
     return res;
 }
 
-const char* asm_gen_fun_def(asn* fun_def){
+char* asm_gen_fun_def(asn* fun_def){
     pv_root* old_symbol_map_ptr = symbol_map_ptr;
     symbol_map_ptr = fun_def->op.fun_def_exp.symbol_map;
 
@@ -180,7 +185,6 @@ const char* asm_gen_fun_def(asn* fun_def){
     ca_list* key_list = symbol_map->key_list;
     pv_leaf* symbol;
     int num_vars = 0;
-    size_t num_chars = 480;
 
     for(; key_list != NULL; key_list = key_list->next){
         symbol = pv_search(symbol_map, key_list->key);
@@ -196,7 +200,8 @@ const char* asm_gen_fun_def(asn* fun_def){
     sprintf(src, "%s:\n", id);
     strapp(&src, "    pushq  %rbp\n");
     strapp(&src, "    movq   %rsp, %rbp\n");
-    const char* other_src = NULL;
+
+    char* other_src = NULL;
 	unsigned int i;
 	char* arg_src = NULL;
 	unsigned int c_xmm_regs = 0;
@@ -220,22 +225,17 @@ const char* asm_gen_fun_def(asn* fun_def){
 
 	if(arg_src != NULL)
 		free(arg_src);
-	arg_src = (char*) malloc(80 * sizeof(char));
-	assert(arg_src != NULL);
+	arg_src = salloc(80);
 	for(i = 0; i < c_xmm_regs; i++){
 		sprintf(arg_src, "    movsd  %%xmm%u, %%rax\n", i);
 		strapp(&src, arg_src);
 		strapp(&src, "    pushq  %rax\n");
 	}
+    free(arg_src);
 
-    for(; body != NULL; body = body->next){
-        if(body->expr->tag != ret_tag){
-            other_src = asm_gen(body->expr);
-        } else {
-            other_src = asm_gen_ret(body->expr, num_vars);
-		}
-        strapp(&src, other_src);
-    }
+    other_src = asm_gen_body(body, num_vars);
+    strapp(&src, other_src);
+    free(other_src);
 
     strapp(&src, "    movq   $0, %rax\n");
 	strapp(&src, "    movq   %rbp, %rsp\n");
@@ -246,20 +246,14 @@ const char* asm_gen_fun_def(asn* fun_def){
     return src;
 }
 
-const char* asm_gen_fun_call(asn* call){
+char* asm_gen_fun_call(asn* call){
     printf("generating function call\n");
 	const char* id = call->op.call_exp.ident;
 
-	char* src = (char*) malloc(2 * sizeof(char));
-    assert(src != NULL);
-	sprintf(src, "%c", '\0');
-    char* stack_args_src = (char*) malloc(2 * sizeof(char));
-    assert(stack_args_src != NULL);
-	sprintf(stack_args_src, "%c", '\0');
+    char* src = strnew();
+    char* stack_args_src = strnew();
 
-	const char* arg_ref;
-    const char* arg_ident;
-    pv_leaf* leaf;
+	char* arg_ref;
     unsigned int c_xmm_regs = 0;
 	int i = 0;
 	asn_list* args = call->op.call_exp.args;
@@ -300,11 +294,11 @@ const char* asm_gen_fun_call(asn* call){
                 strprp(&stack_args_src, arg_ref);
                 break;
 		}
+        free(arg_ref);
 	}
     strapp(&src, stack_args_src);
 
-    char* line = (char*) malloc(80 * sizeof(char));
-    assert(line != NULL);
+    char* line = salloc(80);
     sprintf(line, "    movq   $%u, %%rax\n", c_xmm_regs);
     strapp(&src, line);
 
@@ -326,6 +320,9 @@ const char* asm_gen_fun_call(asn* call){
 	for(i = 0; args != NULL; args = args->next, i++){
 		if(i < 6)
 			continue;
+        if(get_atomic_type(args->expr, symbol_map_ptr) == at_real)
+            continue;
+
         strapp(&src, "    popq   %rdx\n");
 	}
 
@@ -333,26 +330,23 @@ const char* asm_gen_fun_call(asn* call){
 	return src;
 }
 
-const char* asm_gen_var_def(asn* var_def){
+char* asm_gen_var_def(asn* var_def){
     printf("generating var def\n");
     asn* val = NULL;
-    const char* rhs = NULL;
-    size_t rhs_len = 0;
+    char* rhs = NULL;
     if(var_def->op.var_def_exp.val != NULL){
         val = var_def->op.var_def_exp.val;
         rhs = asm_gen(val);
     } else {
         rhs = asm_gen_int_const(make_int_exp(0));
     }
-    rhs_len = strlen(rhs);
-    char* code = (char*) malloc((80 + rhs_len) * sizeof(char));
-    assert(code != NULL);
-    strcpy(code, rhs);
+    char* code = strnew();
+    strapp(&code, rhs);
 
     const char* id;
     pv_leaf* leaf;
     int offset;
-    char* line = (char*) malloc(80 * sizeof(char));
+    char* line = salloc(80);
     if(var_def->op.var_def_exp.type == at_real){
         id = var_def->op.var_def_exp.ident;
         leaf = pv_search(symbol_map_ptr, id);
@@ -363,15 +357,17 @@ const char* asm_gen_var_def(asn* var_def){
     } else {
         strapp(&code, "    pushq  %rax\n");
     }
+
+    free(rhs);
+    free(line);
     return code;
 }
 
-const char* asm_gen_var_ref(asn* var_ref){
+char* asm_gen_var_ref(asn* var_ref){
     printf("generatin var ref\n");
     char* id = var_ref->op.var_ref_exp.ident;
     pv_leaf* leaf = pv_search(symbol_map_ptr, id);
-    char* src = (char*) malloc(80 * sizeof(char));
-    assert(src != NULL);
+    char* src = salloc(80);
 
     int off = -(leaf->offset+leaf->size);
     if(leaf->type == at_real){
@@ -388,9 +384,8 @@ const char* asm_gen_var_ref(asn* var_ref){
     return src;
 }
 
-const char* asm_gen_global_var(asn* e){
-    char* src = (char*) malloc(160 * sizeof(char));
-    assert(src != NULL);
+char* asm_gen_global_var(asn* e){
+    char* src = salloc(80);
     const char* id = e->op.var_def_exp.ident;
     asn* val = e->op.var_def_exp.val;
 
@@ -399,34 +394,25 @@ const char* asm_gen_global_var(asn* e){
 
     if(val->tag == const_int_tag)
         sprintf(src, "%s:\n    .long %d\n", id, val->op.int_exp);
+
     return src;
 }
 
-const char* asm_gen_ret(asn* ret_exp, int num_vars){
+char* asm_gen_ret(asn* ret_exp, int num_vars){
     asn* e = ret_exp->op.ret_exp.val;
-    const char* str = asm_gen(e);
-    size_t code_len = strlen(str);
-    size_t ret_code_str_len = (size_t) ((num_vars + 3) * 80);
-    int i;
-
-	size_t bufsize = code_len + ret_code_str_len;
-    char* expr_str = (char*) malloc(bufsize * sizeof(char));
-    assert(expr_str != NULL);
-    strcpy(expr_str, str);
-	strcat(expr_str, "    movq   %rbp, %rsp\n");
-    strcat(expr_str, "    popq   %rbp\n");
-    strcat(expr_str, "    ret\n");
+    char* str = asm_gen(e);
+    char* expr_str = strnew();
+    strapp(&expr_str, str);
+	strapp(&expr_str, "    movq   %rbp, %rsp\n");
+    strapp(&expr_str, "    popq   %rbp\n");
+    strapp(&expr_str, "    ret\n");
+    free(str);
     return expr_str;
 }
 
-const char* asm_gen_body(asn_list* body, int num_vars){
-	int i;
-	size_t num_chars = 2;
-	char* body_src = (char*) malloc(num_chars * sizeof(char));
-    assert(body_src != NULL);
-	strcpy(body_src, "");
-
-	const char* statement_src = NULL;
+char* asm_gen_body(asn_list* body, int num_vars){
+    char* body_src = strnew();
+	char* statement_src = NULL;
 
 	for(; body != NULL; body = body->next){
 		if(body->expr->tag == ret_tag){
@@ -439,12 +425,13 @@ const char* asm_gen_body(asn_list* body, int num_vars){
 			statement_src = asm_gen(body->expr);
 		}
         strapp(&body_src, statement_src);
+        free(statement_src);
 	}
 
 	return body_src;
 }
 
-const char* asm_gen_jump(asn* jump){
+char* asm_gen_jump(asn* jump){
 	char* src = (char*) malloc(80 * sizeof(char*));
     assert(src != NULL);
 
@@ -458,11 +445,9 @@ const char* asm_gen_jump(asn* jump){
 	return src;
 }
 
-const char* asm_gen_int_to_real(asn* cast){
-    const char* inner = asm_gen(cast->op.unary_exp.expr);
-    char* src = (char*) malloc(sizeof(char));
-    assert(src != NULL);
-    sprintf(src, "%c", '\0');
+char* asm_gen_int_to_real(asn* cast){
+    char* inner = asm_gen(cast->op.unary_exp.expr);
+    char* src = strnew();
     strapp(&src, inner);
     strapp(&src, "    cvtsi2sd   %rax, %xmm0\n");
     return src;
