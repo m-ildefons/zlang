@@ -101,10 +101,10 @@ const char* asm_gen_binary_div(asn* b_div){
     sprintf(lines, "%c", '\0');
 
     if(b_div->op.binary_exp.type == at_real){
-        strapp(&lines, left_str);
+        strapp(&lines, right_str);
         strapp(&lines, "    subq   $8, %rsp\n");
         strapp(&lines, "    movsd  %xmm0, (%rsp)\n");
-        strapp(&lines, right_str);
+        strapp(&lines, left_str);
         strapp(&lines, "    movsd  (%rsp), %xmm1\n");
         strapp(&lines, "    addq   $8, %rsp\n");
         strapp(&lines, "    divsd  %xmm1, %xmm0\n");

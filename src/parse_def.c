@@ -87,7 +87,6 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
 	asn_list* args = NULL;
 	asn* arg = NULL;
-	//for(i = 0; tlp->type == type_int_kw && (tlp+1)->type == ident; i++){
     for(i = 0; tlp->type != close_p && (tlp+1)->type != token_colon; i++){
         arg = parse_declaration(tl, tnt, symbol_map);
         arg->op.var_def_exp.scope += 1;
@@ -107,11 +106,13 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 		append_exp_list(&args, arg);
 	}
 
-    if(tlp->type != close_p)
+    if(tlp == NULL || tlp->type != close_p)
         return NULL;
+
     pop_token(&tlp, tl, tnt);
-    if(tlp->type != token_colon)
+    if(tlp == NULL || tlp->type != token_colon)
         return NULL;
+
     pop_token(&tlp, tl, tnt);
 
     f = make_fun_def_exp(ty, id, args, NULL, scope);

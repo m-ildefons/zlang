@@ -265,14 +265,10 @@ const char* asm_gen_fun_call(asn* call){
 	asn_list* args = call->op.call_exp.args;
 	for(; args != NULL; args = args->next, i++){
 		arg_ref = asm_gen(args->expr);
-        if(args->expr->tag == var_ref_tag){
-            arg_ident = args->expr->op.var_ref_exp.ident;
-            leaf = pv_search(symbol_map_ptr, arg_ident);
-            if(leaf->type == at_real){
-                //strapp(&src, arg_ref);
-                c_xmm_regs++;
-                continue;
-            }
+        if(get_atomic_type(args->expr, symbol_map_ptr) == at_real){
+            strprp(&src, arg_ref);
+            c_xmm_regs++;
+            continue;
         }
 		switch(i){
 			case 0:
@@ -376,10 +372,19 @@ const char* asm_gen_var_ref(asn* var_ref){
     pv_leaf* leaf = pv_search(symbol_map_ptr, id);
     char* src = (char*) malloc(80 * sizeof(char));
     assert(src != NULL);
-    if(leaf->scope != 0)
-        sprintf(src, "    movq   %d(%%rbp), %%rax\n", -(leaf->offset+leaf->size));
-    else
-        sprintf(src, "    movq   %s(%%rip), %%rax\n", leaf->ident);
+
+    int off = -(leaf->offset+leaf->size);
+    if(leaf->type == at_real){
+        if(leaf->scope != 0)
+            sprintf(src, "    movsd  %d(%%rbp), %%xmm0\n", off);
+        else
+            sprintf(src, "    movsd  %s(%%rip), %%xmm0\n", id);
+    } else {
+        if(leaf->scope != 0)
+            sprintf(src, "    movq   %d(%%rbp), %%rax\n", -(leaf->offset+leaf->size));
+        else
+            sprintf(src, "    movq   %s(%%rip), %%rax\n", leaf->ident);
+    }
     return src;
 }
 
