@@ -156,12 +156,26 @@ asn* make_while_exp(asn* cond, asn_list* body, int scope);
 asn* make_var_def_exp(atomic_type type, char* ident, int scope);
 asn* make_var_ref_exp(char* ident);
 asn* make_prog_exp(const char* name, asn_list* prog);
-void delete_prog_exp(asn* e);
 asn* make_unary_exp(atomic_type at_type, asn* expr, int type);
 asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type);
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type);
 asn* make_jump_exp(int type);
 asn* make_cast_to_real(asn* val);
+
+/* implemented in ast_del.c */
+void delete_exp(asn* e);
+void delete_asn_list(asn_list* l);
+void delete_var_def_exp(asn* e);
+void delete_fun_def_exp(asn* e);
+void delete_call_exp(asn* e);
+void delete_return_exp(asn* e);
+void delete_cond_exp(asn* e);
+void delete_while_loop_exp(asn* e);
+void delete_for_loop_exp(asn* e);
+void delete_unary_exp(asn* e);
+void delete_binary_exp(asn* e);
+void delete_assign_exp(asn* e);
+void delete_prog_exp(asn* e);
 
 atomic_type get_atomic_type(asn* expr, pv_root* symbol_map);
 #endif

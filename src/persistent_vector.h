@@ -60,8 +60,12 @@ pv_leaf* new_pv_leaf(char* ident,
                     int scope);
 pv_root* pv_insert(pv_root* old_trie, char* key, pv_leaf* leaf);
 pv_leaf* pv_search(pv_root* root, const char* key);
+void delete_trie(pv_root* t);
+void delete_trie_node(pv_node* n);
+void delete_trie_leaf(pv_leaf* l);
 
 ca_list* new_ca_list(const char* key);
+void delete_ca_list(ca_list* l);
 void cal_append(ca_list** list, const char* key);
 
 #endif

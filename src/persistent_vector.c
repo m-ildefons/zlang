@@ -234,12 +234,48 @@ pv_leaf* pv_search(pv_root* root, const char* key){
     return NULL;
 }
 
+void delete_trie(pv_root* t){
+    if(t == NULL)
+        return;
+
+    if(t->trie != NULL)
+        delete_trie_node(t->trie);
+
+    delete_ca_list(t->key_list);
+    free(t);
+}
+
+void delete_trie_node(pv_node* n){
+    if(n == NULL)
+        return;
+
+    delete_trie_leaf(n->leaf);
+    free(n);
+}
+
+void delete_trie_leaf(pv_leaf* l){
+    if(l == NULL)
+        return;
+
+    free(l);
+}
+
 ca_list* new_ca_list(const char* key){
     ca_list* l = (ca_list*) malloc(sizeof(ca_list));
     assert(l != NULL);
     l->next = NULL;
     l->key = key;
     return l;
+}
+
+void delete_ca_list(ca_list* l){
+    if(l == NULL)
+        return;
+
+    if(l->next != NULL)
+        delete_ca_list(l->next);
+
+    free(l);
 }
 
 void cal_append(ca_list** list, const char* key){

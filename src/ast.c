@@ -62,10 +62,6 @@ asn* make_string_exp(int idx){
     return e;
 }
 
-void delete_const_exp(asn* e){
-	free(e);
-}
-
 asn* make_call_exp(char* id, asn_list* args){
     asn* e = (asn*) malloc(sizeof(asn));
     assert(e != NULL);
@@ -172,10 +168,6 @@ asn* make_prog_exp(const char* name, asn_list* prog){
     e->op.prog_exp.prog = prog;
     e->op.prog_exp.symbol_map = new_trie();
     return e;
-}
-
-void delete_prog_exp(asn* e){
-	free(e);
 }
 
 asn* make_unary_exp(atomic_type at_type, asn* expr, int type){

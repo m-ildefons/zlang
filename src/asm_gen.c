@@ -250,10 +250,10 @@ const char* asm_gen_fun_call(asn* call){
     printf("generating function call\n");
 	const char* id = call->op.call_exp.ident;
 
-	char* src = (char*) malloc(sizeof(char));
+	char* src = (char*) malloc(2 * sizeof(char));
     assert(src != NULL);
 	sprintf(src, "%c", '\0');
-    char* stack_args_src = (char*) malloc(sizeof(char));
+    char* stack_args_src = (char*) malloc(2 * sizeof(char));
     assert(stack_args_src != NULL);
 	sprintf(stack_args_src, "%c", '\0');
 
