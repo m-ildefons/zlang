@@ -29,14 +29,8 @@ asn* parse_cond_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	}
 	pop_token(&tlp, tl, tnt);
 
-    pv_root* new_symbol_map = new_trie();
-    new_symbol_map->trie = symbol_map->trie;
-    new_symbol_map->size = symbol_map->size;
-    new_symbol_map->depth = symbol_map->depth;
-    new_symbol_map->mem_offset = symbol_map->mem_offset;
-    new_symbol_map->key_list = symbol_map->key_list;
-    new_symbol_map->scope = scope + 1;
-    symbol_map = new_symbol_map;
+	symbol_map = symbol_map_copy(symbol_map);
+	symbol_map->scope = scope + 1;
 
     parse_body(tl, tnt, &(cond_exp->op.cond_exp.if_body), &symbol_map, scope);
     cond_exp->op.cond_exp.if_symbol_map = symbol_map;

@@ -318,7 +318,9 @@ void symbol_map_insert(pv_root** symbol_map, asn* var_exp){
 
 pv_root* symbol_map_copy(pv_root* symbol_map){
     pv_root* new_symbol_map = new_trie();
+    free(new_symbol_map->trie);
     new_symbol_map->trie = symbol_map->trie;
+    symbol_map->trie->ref_count++;
     new_symbol_map->size = symbol_map->size;
     new_symbol_map->depth = symbol_map->depth;
     new_symbol_map->mem_offset = symbol_map->mem_offset;

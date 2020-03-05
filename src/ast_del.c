@@ -87,8 +87,8 @@ void delete_prog_exp(asn* e){
     if(e == NULL)
         return;
 
-    delete_trie(e->op.prog_exp.symbol_map);
     delete_asn_list(e->op.prog_exp.prog);
+    delete_trie(e->op.prog_exp.symbol_map);
 	free(e);
 }
 
@@ -106,6 +106,7 @@ void delete_fun_def_exp(asn* e){
 
     delete_asn_list(e->op.fun_def_exp.args);
     delete_asn_list(e->op.fun_def_exp.body);
+    delete_trie(e->op.fun_def_exp.symbol_map);
     free(e);
 }
 
@@ -132,13 +133,11 @@ void delete_cond_exp(asn* e){
     delete_exp(e->op.cond_exp.cond);
     delete_asn_list(e->op.cond_exp.if_body);
     delete_asn_list(e->op.cond_exp.else_body);
-/*
     if(e->op.cond_exp.if_symbol_map != NULL)
         delete_trie(e->op.cond_exp.if_symbol_map);
     if(e->op.cond_exp.else_symbol_map != NULL &&
         e->op.cond_exp.else_symbol_map != e->op.cond_exp.if_symbol_map)
         delete_trie(e->op.cond_exp.else_symbol_map);
-*/
     free(e);
 }
 

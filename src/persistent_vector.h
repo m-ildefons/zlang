@@ -37,6 +37,7 @@ typedef struct trie_leaf {
 
 typedef struct trie_node {
     struct trie_node* children[PV_BRANCHING_FACTOR];
+    size_t ref_count;
     char ident;
     pv_leaf* leaf;
 } pv_node;
