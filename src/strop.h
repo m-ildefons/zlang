@@ -22,11 +22,10 @@
 /*
  * strrep - String Replacement
  *
- * Returns a copy of string 'str' where every occurrence of string 'exp' is
- * replaced by the string 'rep'. Does not change 'str'.
+ * Replaces every occurrence of 'exp' with 'rep' in the string pointed to
+ * by 'str'.
  */
-char* strrep(const char* str, const char* exp, const char* rep);
-void strrepl(char** str, const char* exp, const char* rep);
+void strrep(char** str, const char* exp, const char* rep);
 
 /*
  * strpad - String Padding

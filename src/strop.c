@@ -10,49 +10,7 @@
 
 #include "strop.h"
 
-char* strrep(const char* str, const char* exp, const char* rep){
-    char *result;
-    const char *ins;
-    char *tmp;
-    size_t len_exp;
-    size_t len_rep;
-    size_t len_front;
-    size_t count;
-
-    /* sanity checks and initialization */
-    if(!str || !exp)
-        return NULL;
-    len_exp = strlen(exp);
-    if(len_exp == 0)
-        return NULL;
-    if(!rep)
-        rep = "";
-    len_rep = strlen(rep);
-
-    /* count the number of replacements needed */
-    ins = str;
-    for(count = 0; (tmp = strstr(ins, exp)); ++count) {
-        ins = tmp + len_exp;
-    }
-
-	size_t result_len = strlen(str) + (len_rep - len_exp) * count + 1;
-    tmp = result = malloc(result_len);
-
-    if(!result)
-        return NULL;
-
-    while(count--){
-        ins = strstr(str, exp);
-        len_front = (size_t) (ins - str);
-        tmp = strncpy(tmp, str, len_front) + len_front;
-        tmp = strcpy(tmp, rep) + len_rep;
-        str += len_front + len_exp;
-    }
-    strcpy(tmp, str);
-    return result;
-}
-
-void strrepl(char** str, const char* exp, const char* rep){
+void strrep(char** str, const char* exp, const char* rep){
     char* src = (*str);
 
     if(src == NULL)

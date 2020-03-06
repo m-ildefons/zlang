@@ -250,7 +250,7 @@ static void pre_lex_src(char** src){
             assert(string_index[string_count] != NULL);
             strcpy(string_index[string_count], tok);
             string_count++;
-            strrepl(src, tok, "%s");
+            strrep(src, tok, "%s");
         }
     }
     if(buffer != NULL)
@@ -258,51 +258,51 @@ static void pre_lex_src(char** src){
 }
 
 static void pre_lex_line(char** src){
-    strrepl(src, "(", " ( ");
-    strrepl(src, ")", " ) ");
-    strrepl(src, "[", " [ ");
-    strrepl(src, "]", " ] ");
-    strrepl(src, ":", " : ");
-    strrepl(src, ",", " , ");
-    strrepl(src, ";", " ; ");
-    strrepl(src, "-", " - ");
-    strrepl(src, "!", " ! ");
-    strrepl(src, "+", " + ");
-    strrepl(src, "*", " * ");
-    strrepl(src, "/", " / ");
-    strrepl(src, "%", " % ");
-    strrepl(src, "~", " ~ ");
-    strrepl(src, "=", " = ");
-    strrepl(src, "<", " < ");
-    strrepl(src, ">", " > ");
-	strrepl(src, "&", " & ");
-	strrepl(src, "|", " | ");
-	strrepl(src, "^", " ^ ");
-    strrepl(src, "<<", " << ");
-    strrepl(src, ">>", " >> ");
-    strrepl(src, "+  +", " ++ ");
-    strrepl(src, "-  -", " -- ");
-    strrepl(src, "*  *", " ** ");
-	strrepl(src, "<  <", " << ");
-	strrepl(src, ">  >", " >> ");
-    strrepl(src, "=  =", " == ");
-    strrepl(src, "!  =", " != ");
-    strrepl(src, "<  =", " <= ");
-    strrepl(src, ">  =", " >= ");
-    strrepl(src, ">  <", " >< ");
-    strrepl(src, "+  =", " += ");
-    strrepl(src, "-  =", " -= ");
-    strrepl(src, "*  =", " *= ");
-    strrepl(src, "/  =", " /= ");
-    strrepl(src, "%  =", " %= ");
-    strrepl(src, "<<   =", " <<= ");
-    strrepl(src, ">>   =", " >>= ");
-    strrepl(src, "&  =", " &= ");
-    strrepl(src, "|  =", " |= ");
-    strrepl(src, "^  =", " ^= ");
-    strrepl(src, "&  &", " && ");
-    strrepl(src, "|  |", " || ");
-    strrepl(src, "\" % s\"", "%s");
+    strrep(src, "(", " ( ");
+    strrep(src, ")", " ) ");
+    strrep(src, "[", " [ ");
+    strrep(src, "]", " ] ");
+    strrep(src, ":", " : ");
+    strrep(src, ",", " , ");
+    strrep(src, ";", " ; ");
+    strrep(src, "-", " - ");
+    strrep(src, "!", " ! ");
+    strrep(src, "+", " + ");
+    strrep(src, "*", " * ");
+    strrep(src, "/", " / ");
+    strrep(src, "%", " % ");
+    strrep(src, "~", " ~ ");
+    strrep(src, "=", " = ");
+    strrep(src, "<", " < ");
+    strrep(src, ">", " > ");
+	strrep(src, "&", " & ");
+	strrep(src, "|", " | ");
+	strrep(src, "^", " ^ ");
+    strrep(src, "<<", " << ");
+    strrep(src, ">>", " >> ");
+    strrep(src, "+  +", " ++ ");
+    strrep(src, "-  -", " -- ");
+    strrep(src, "*  *", " ** ");
+	strrep(src, "<  <", " << ");
+	strrep(src, ">  >", " >> ");
+    strrep(src, "=  =", " == ");
+    strrep(src, "!  =", " != ");
+    strrep(src, "<  =", " <= ");
+    strrep(src, ">  =", " >= ");
+    strrep(src, ">  <", " >< ");
+    strrep(src, "+  =", " += ");
+    strrep(src, "-  =", " -= ");
+    strrep(src, "*  =", " *= ");
+    strrep(src, "/  =", " /= ");
+    strrep(src, "%  =", " %= ");
+    strrep(src, "<<   =", " <<= ");
+    strrep(src, ">>   =", " >>= ");
+    strrep(src, "&  =", " &= ");
+    strrep(src, "|  =", " |= ");
+    strrep(src, "^  =", " ^= ");
+    strrep(src, "&  &", " && ");
+    strrep(src, "|  |", " || ");
+    strrep(src, "\" % s\"", "%s");
 }
 
 void lex(const char* filename,
