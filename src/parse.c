@@ -313,19 +313,14 @@ void symbol_map_insert(pv_root** symbol_map, asn* var_exp){
     int scope = var_exp->op.var_def_exp.scope;
 
     pv_leaf* leaf = new_pv_leaf(_id, _ty, _sz, offset, scope);
+
+    pv_root* osm = (*symbol_map);
     (*symbol_map) = pv_insert((*symbol_map), _id, leaf);
+    delete_trie(osm);
 }
 
 pv_root* symbol_map_copy(pv_root* symbol_map){
-    pv_root* new_symbol_map = new_trie();
-    free(new_symbol_map->trie);
-    new_symbol_map->trie = symbol_map->trie;
-    symbol_map->trie->ref_count++;
-    new_symbol_map->size = symbol_map->size;
-    new_symbol_map->depth = symbol_map->depth;
-    new_symbol_map->mem_offset = symbol_map->mem_offset;
-    new_symbol_map->key_list = symbol_map->key_list;
-    new_symbol_map->scope = symbol_map->scope;
+    pv_root* new_symbol_map = copy_trie(symbol_map);
 	return new_symbol_map;
 }
 

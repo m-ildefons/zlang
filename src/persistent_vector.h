@@ -28,6 +28,7 @@ typedef struct cal_node {
 } ca_list;
 
 typedef struct trie_leaf {
+    size_t ref_count;
     char* ident;
     atomic_type type;
     int size;
@@ -53,13 +54,14 @@ typedef struct trie_root_node {
 
 void pv_pretty_print(pv_root* trie);
 pv_root* new_trie(void);
+pv_root* copy_trie(pv_root* root);
 pv_node* new_pv_node(void);
 pv_leaf* new_pv_leaf(char* ident,
                     atomic_type type,
                     int size,
                     int offset,
                     int scope);
-pv_root* pv_insert(pv_root* old_trie, char* key, pv_leaf* leaf);
+pv_root* pv_insert(pv_root* old_trie, const char* key, pv_leaf* leaf);
 pv_leaf* pv_search(pv_root* root, const char* key);
 void delete_trie(pv_root* t);
 void delete_trie_node(pv_node* n);

@@ -37,13 +37,14 @@ static void _pv_pretty_print(pv_node* tree, int_stack* ws_stack){
     int last_idx;
 
     _pv_print_tabs(ws_stack);
-    printf("[ \"%c\" %X (%zu) ]", tree->ident, tree, tree->ref_count);
+    printf("[ \"%c\" %lx (%zu) ]", tree->ident, (size_t) tree, tree->ref_count);
     if(tree->leaf){
-        printf("\u2500[ (%d) %s (%d/%d) ]\n",
+        printf("\u2500[ (%d) %s (%d/%d) (%zu) ]\n",
                 tree->leaf->scope,
                 tree->leaf->ident,
                 tree->leaf->size,
-                tree->leaf->offset);
+                tree->leaf->offset,
+                tree->leaf->ref_count);
     } else {
         printf("\n");
     }
@@ -78,6 +79,11 @@ void pv_pretty_print(pv_root* trie){
             trie->depth,
             trie->mem_offset);
 
+    ca_list* l;
+    for(l = trie->key_list; l != NULL; l = l->next){
+        printf("[ %s ]\n", l->key);
+    }
+
     push_back(&ws_stack, 0);
     _pv_pretty_print(trie->trie, ws_stack);
     pop_back(&ws_stack);
@@ -89,7 +95,6 @@ pv_root* new_trie(){
     pv_root* root = (pv_root*) malloc(sizeof(pv_root));
     assert(root != NULL);
     root->trie = new_pv_node();
-    root->trie->ref_count++;
     root->size = 0;
     root->depth = 0;
     root->mem_offset = 0;
@@ -98,12 +103,34 @@ pv_root* new_trie(){
     return root;
 }
 
+pv_root* copy_trie(pv_root* root){
+    pv_root* trie = new_trie();
+    delete_trie_node(trie->trie);
+    trie->trie = new_pv_node();
+    size_t i;
+    for(i = 0; i < PV_BRANCHING_FACTOR; i++){
+        if(root->trie->children[i] != NULL){
+            trie->trie->children[i] = root->trie->children[i];
+            root->trie->children[i]->ref_count++;
+        }
+    }
+    trie->size = root->size;
+    trie->depth = root->depth;
+    trie->mem_offset = root->mem_offset;
+    ca_list* l;
+    for(l = root->key_list; l != NULL; l = l->next){
+        cal_append(&(trie->key_list), l->key);
+    }
+    trie->scope = root->scope;
+    return trie;
+}
+
 pv_node* new_pv_node(){
     unsigned int i;
     pv_node* n = (pv_node*) malloc(sizeof(pv_node));
     assert(n != NULL);
     n->ident = ' ';
-    n->ref_count = 0;
+    n->ref_count = 1;
     for(i = 0; i < PV_BRANCHING_FACTOR; i++)
         n->children[i] = NULL;
     n->leaf = NULL;
@@ -117,6 +144,7 @@ pv_leaf* new_pv_leaf(char* ident,
                     int scope){
     pv_leaf* l = (pv_leaf*) malloc(sizeof(pv_leaf));
     assert(l != NULL);
+    l->ref_count = 1;
     l->ident = ident;
     l->type = type;
     l->size = size;
@@ -125,138 +153,72 @@ pv_leaf* new_pv_leaf(char* ident,
     return l;
 }
 
-pv_root* pv_insert(pv_root* old_trie, char* key, pv_leaf* leaf){
-    pv_root* trie = new_trie();
+pv_root* pv_insert(pv_root* old_trie, const char* key, pv_leaf* leaf){
+    pv_root* trie = copy_trie(old_trie);
     pv_node* node = trie->trie;
-    char* next = key;
-    char* next_handle = next;
-    unsigned int idx;
+    const char* next = key;
+    int cidx;
     unsigned int i;
-    pv_node* child;
-    unsigned int new_depth = 0;
 
-    if(strlen(next) < old_trie->depth){
-        next = strpad(key, old_trie->depth, " ");
-        next_handle = next;
-    } else if(strlen(next) > old_trie->depth){
-        idx = ' ';
-        for(i = 1; i < (strlen(key) - old_trie->depth); i++){
-            if(node->children[idx] == NULL){
-                node->children[idx] = new_pv_node();
-                node->children[idx]->ref_count++;
-                node->children[idx]->ident = ' ';
-                new_depth++;
+    for(next = key; (*next) != '\0'; next++){
+        cidx = (int) (*next);
+        if(node->children[cidx] == NULL){
+            node->children[cidx] = new_pv_node();
+            node->children[cidx]->ident = cidx;
+        } else {
+            pv_node* old_node = node->children[cidx];
+            node->children[cidx] = new_pv_node();
+            node->children[cidx]->ident = cidx;
+            for(i = 0; i < PV_BRANCHING_FACTOR; i++){
+                if(old_node->children[i] != NULL){
+                    node->children[cidx]->children[i] = old_node->children[i];
+                    old_node->children[i]->ref_count++;
+                }
             }
-            node = node->children[idx];
-        }
-        node->children[idx] = old_trie->trie;
-        old_trie->trie->ref_count++;
-
-        trie->depth = new_depth;
-        new_depth = 0;
-        node = trie->trie;
-    }
-
-    if(strlen(next) <= old_trie->depth){
-        char* ptr = next;
-        idx = (unsigned int) (*ptr);
-        for(i = 0; i < PV_BRANCHING_FACTOR; i++){
-            trie->trie->children[i] = old_trie->trie->children[i];
-            if(old_trie->trie->children[i] != NULL && i != idx)
-                old_trie->trie->children[i]->ref_count++;
-        }
-        trie->depth = old_trie->depth;
-    }
-
-    trie->size = old_trie->size;
-    trie->mem_offset = old_trie->mem_offset;
-    trie->scope = old_trie->scope;
-
-    ca_list* old_list = old_trie->key_list;
-    if(old_list){
-        for(; old_list != NULL; old_list = old_list->next){
-            cal_append(&(trie->key_list), old_list->key);
-        }
-    }
-    cal_append(&(trie->key_list), key);
-
-    node = trie->trie;
-    while(*next){
-        idx = (unsigned int) (*next);
-        child = node->children[idx];
-
-        node->children[idx] = new_pv_node();
-        node->children[idx]->ident = (*next);
-        node->children[idx]->ref_count++;
-
-        for(i = 0; i < PV_BRANCHING_FACTOR; i++){
-            if(child != NULL){
-                node->children[idx]->children[i] = child->children[i];
-                if(child->children[i] != NULL && child->ref_count > 1)
-                    child->children[i]->ref_count++;
+            if(old_node->leaf != NULL){
+                node->children[cidx]->leaf = old_node->leaf;
+                old_node->leaf->ref_count++;
             }
+            old_node->ref_count--;
         }
+        node = node->children[cidx];
 
-        child = node->children[idx];
-        new_depth++;
-
-        if(*(next+1) == '\0'){
-            if(child != NULL && child->leaf == NULL)
-                trie->size++;
+        if((*(next+1)) == '\0'){
+            if(node->leaf != NULL)
+                delete_trie_leaf(node->leaf);
             else
-                printf("creating leaf\n");
-            child->leaf = leaf;
+                cal_append(&(trie->key_list), key);
+
             if(leaf->size > 0)
                 trie->mem_offset += leaf->size;
+
+            node->leaf = leaf;
         }
-
-        node = child;
-        next++;
     }
-    if(new_depth > trie->depth)
-        trie->depth = new_depth;
 
-    if(next_handle != key)
-        free(next_handle);
     return trie;
 }
 
 pv_leaf* pv_search(pv_root* root, const char* key){
-    char* next = salloc(strlen(key));
-    char* next_handle = next;
-    strcpy(next, key);
+    const char* next;
     size_t idx;
     pv_node* trie = root->trie;
     pv_node* pos = trie;
 
-    if(strlen(next) < root->depth){
-        free(next_handle);
-        next = strpad(key, root->depth, " ");
-        next_handle = next;
-    } else if(strlen(next) > root->depth){
-        free(next_handle);
-        return NULL;
-    }
-
-    while(*next){
+    for(next = key; (*next) != '\0'; next++){
         idx = (size_t) (*next);
         if(*(next+1) == '\0'){
             if(pos->children[idx] != NULL && pos->children[idx]->leaf != NULL){
-                free(next_handle);
                 return pos->children[idx]->leaf;
             }
-            free(next_handle);
             return NULL;
         }
         if(pos->children[idx] == NULL){
-            free(next_handle);
             return NULL;
         }
         pos = pos->children[idx];
-        next++;
     }
 
-    free(next_handle);
     return NULL;
 }
 
@@ -266,14 +228,10 @@ void delete_trie(pv_root* t){
 
     pv_pretty_print(t);
 
-    if(t->trie != NULL){
-        if(t->trie->ref_count < 2)
-            delete_trie_node(t->trie);
-        else
-            t->trie->ref_count--;
-    }
+    if(t->trie != NULL && t->trie->ref_count < 2)
+        delete_trie_node(t->trie);
 
-//    delete_ca_list(t->key_list);
+    delete_ca_list(t->key_list);
     free(t);
     t = NULL;
 }
@@ -282,7 +240,6 @@ void delete_trie_node(pv_node* n){
     if(n == NULL)
         return;
 
-    printf("node \"%c\"\n", n->ident);
     unsigned int i;
     for(i = 0; i < PV_BRANCHING_FACTOR; i++){
         if(n->children[i] != NULL && n->children[i]->ref_count > 1){
@@ -300,6 +257,11 @@ void delete_trie_node(pv_node* n){
 void delete_trie_leaf(pv_leaf* l){
     if(l == NULL)
         return;
+
+    if(l->ref_count > 1){
+        l->ref_count--;
+        return;
+    }
 
     free(l);
     l = NULL;

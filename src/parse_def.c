@@ -84,6 +84,8 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	(*tl) = tlp;
 	(*tnt) -= i;
 
+    symbol_map = copy_trie(symbol_map);
+
 	asn_list* args = NULL;
 	asn* arg = NULL;
     for(i = 0; tlp->type != close_p && (tlp+1)->type != token_colon; i++){
@@ -117,7 +119,9 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     f = make_fun_def_exp(ty, id, args, NULL, scope);
     f->op.fun_def_exp.symbol_map = symbol_map;
     leaf = new_pv_leaf(id, ty, -1, symbol_map->mem_offset, scope);
+    pv_root* osm = symbol_map;
     symbol_map = pv_insert(symbol_map, id, leaf);
+    delete_trie(osm);
     symbol_map->scope = scope + 1;
 
     while(*tnt > 0 && tlp->level > level){
