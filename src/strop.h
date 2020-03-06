@@ -26,6 +26,7 @@
  * replaced by the string 'rep'. Does not change 'str'.
  */
 char* strrep(const char* str, const char* exp, const char* rep);
+void strrepl(char** str, const char* exp, const char* rep);
 
 /*
  * strpad - String Padding

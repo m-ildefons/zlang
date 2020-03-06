@@ -226,7 +226,7 @@ void delete_trie(pv_root* t){
     if(t == NULL)
         return;
 
-    pv_pretty_print(t);
+//    pv_pretty_print(t);
 
     if(t->trie != NULL && t->trie->ref_count < 2)
         delete_trie_node(t->trie);

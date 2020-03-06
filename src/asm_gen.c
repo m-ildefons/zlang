@@ -326,6 +326,7 @@ char* asm_gen_fun_call(asn* call){
         strapp(&src, "    popq   %rdx\n");
 	}
 
+    free(stack_args_src);
     free(line);
 	return src;
 }

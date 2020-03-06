@@ -25,6 +25,9 @@ char* asm_gen_less(asn* less){
     strapp(&lines, "    cmpq   %rax, %rdx\n");
     strapp(&lines, "    movq   $0, %rax\n");
     strapp(&lines, "    setl   %al\n");
+
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -43,6 +46,9 @@ char* asm_gen_less_or_equal(asn* leq){
     strapp(&lines, "    cmpq   %rax, %rdx\n");
     strapp(&lines, "    movq   $0, %rax\n");
     strapp(&lines, "    setle  %al\n");
+
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -61,6 +67,9 @@ char* asm_gen_greater(asn* greater){
     strapp(&lines, "    cmpq   %rax, %rdx\n");
     strapp(&lines, "    movq   $0, %rax\n");
     strapp(&lines, "    setg   %al\n");
+
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -79,6 +88,9 @@ char* asm_gen_greater_or_equal(asn* geq){
     strapp(&lines, "    cmpq   %rax, %rdx\n");
     strapp(&lines, "    movq   $0, %rax\n");
     strapp(&lines, "    setge  %al\n");
+
+    free(left_str);
+    free(right_str);
     return lines;
 
 }
@@ -98,6 +110,9 @@ char* asm_gen_equal(asn* eq){
     strapp(&lines, "    cmpq   %rax, %rdx\n");
     strapp(&lines, "    movq   $0, %rax\n");
     strapp(&lines, "    sete   %al\n");
+
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -116,6 +131,9 @@ char* asm_gen_not_equal(asn* neq){
     strapp(&lines, "    cmpq   %rax, %rdx\n");
     strapp(&lines, "    movq   $0, %rax\n");
     strapp(&lines, "    setne  %al\n");
+
+    free(left_str);
+    free(right_str);
     return lines;
 }
 

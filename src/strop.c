@@ -52,6 +52,41 @@ char* strrep(const char* str, const char* exp, const char* rep){
     return result;
 }
 
+void strrepl(char** str, const char* exp, const char* rep){
+    char* src = (*str);
+
+    if(src == NULL)
+        return;
+    if(exp == NULL)
+        return;
+    if(rep == NULL)
+        return;
+    if(strstr(src, exp) == NULL)
+        return;
+
+    size_t exp_len = strlen(exp);
+    size_t src_len = strlen(src);
+    char* dest = strnew();
+    char* tok;
+    char* tmp = salloc(src_len);
+    char* res = src;
+    unsigned int i;
+    for(tok = strstr(res, exp); tok != NULL; tok = strstr(res, exp)){
+        strncpy(tmp, res, (size_t) (tok - res));
+        strapp(&dest, tmp);
+        strapp(&dest, rep);
+        for(i = 0; i < src_len; i++)
+            tmp[i] = '\0';
+        res = tok + exp_len;
+    }
+
+    strapp(&dest, res);
+
+    free((*str));
+    (*str) = dest;
+    free(tmp);
+}
+
 char* strpad(const char* str, size_t len, const char* pad){
     int padlen = len - strlen(str);
     char* new = salloc((len+1));

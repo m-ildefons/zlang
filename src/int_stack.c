@@ -10,6 +10,23 @@
 
 #include "int_stack.h"
 
+int_stack* make_int_stack(){
+    int_stack* s = malloc(sizeof(int_stack));
+    s->next = NULL;
+    return s;
+}
+
+void delete_int_stack(int_stack* s){
+    if(s == NULL)
+        return;
+
+    if(s != NULL && s->next != NULL)
+        delete_int_stack(s->next);
+
+    free(s);
+    s = NULL;
+}
+
 void push(int_stack** s, int i){
     int_stack* top = (int_stack*) malloc(sizeof(int_stack));
     top->next = (*s);

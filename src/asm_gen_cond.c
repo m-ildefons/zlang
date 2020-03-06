@@ -69,6 +69,7 @@ char* asm_gen_cond(asn* cond){
 
 	symbol_map_ptr = old_symbol_map_ptr;
 
+    free(condition_src);
     free(body_src);
     if(else_body != NULL)
         free(else_body_src);

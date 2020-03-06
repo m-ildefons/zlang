@@ -26,7 +26,10 @@ asn* parse_prog(token** tl, size_t* tnt, const char* filename){
                 abort();
             pv_leaf* l = new_pv_leaf(e->op.fun_def_exp.ident,
 								e->op.fun_def_exp.type, -1, 0, 0);
+
+            pv_root* osm = symbol_map;
             symbol_map = pv_insert(symbol_map, l->ident, l);
+            delete_trie(osm);
         }
 
         if(e->tag == var_def_tag){

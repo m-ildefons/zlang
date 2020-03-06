@@ -87,9 +87,11 @@ int main(int argc, char* argv[]){
 
     print_separator("Lexing");
 
-	unsigned long tnt = 0;
+	size_t tnt = 0;
 	token* tl = NULL;
     lex(filename, &tl, &tnt);
+    token* tlh = tl; // save token list for free later
+    size_t tlhnt = tnt;
 
     print_separator("Parsing");
 
@@ -106,20 +108,17 @@ int main(int argc, char* argv[]){
     char* asm_source = asm_gen_prog(expr);
 
     fprintf(stdout, "%s\n", asm_source);
-
-    char* fn;
-    if(argv[2])
-        fn = argv[2];
-    else {
-        fn = (char*) malloc(6 * sizeof(char));
-        sprintf(fn, "out.s");
-    }
-
-    write_file(fn, asm_source);
+    write_file("out.s", asm_source);
 
     delete_prog_exp(expr);
-    free(tl);
     free(asm_source);
+    token* tlp = tlh;
+    while(tlhnt > 0){
+        free(tlp->str);
+        tlp++;
+        tlhnt--;
+    }
+    free(tlh);
     return 0;
 }
 

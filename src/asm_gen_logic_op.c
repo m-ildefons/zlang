@@ -23,6 +23,7 @@ char* asm_gen_log_and(asn* l_and){
     sprintf(la_1_l, "%s:\n", la_1);
     char* jump_line = (char*) malloc(80 * sizeof(char));
     sprintf(jump_line, "    jne    %s\n", la_1);
+
     char* la_end = gen_label("end");
     char* la_end_l = (char*) malloc(80 * sizeof(char));
     sprintf(la_end_l, "%s:\n", la_end);
@@ -39,6 +40,15 @@ char* asm_gen_log_and(asn* l_and){
     strapp(&lines, "    movq   $0, %rax\n");
     strapp(&lines, "    setne  %al\n");
     strapp(&lines, la_end_l);
+
+    free(left_str);
+    free(jump_line);
+    free(jump_line2);
+    free(la_1_l);
+    free(right_str);
+    free(la_end_l);
+    free(la_end);
+    free(la_1);
     return lines;
 }
 
@@ -79,10 +89,14 @@ char* asm_gen_log_xor(asn* l_xor){
     strapp(&lines, "    sete   %al\n");
     strapp(&lines, label_end_line);
 
+    free(left_str);
+    free(right_str);
     free(label_rt_line);
     free(line_rt_jmp);
     free(label_end_line);
     free(line_end_jmp);
+    free(label_end);
+    free(label_rt);
 
     return lines;
 }
@@ -119,10 +133,14 @@ char* asm_gen_log_or(asn* l_or){
     strapp(&lines, "    setne  %al\n");
     strapp(&lines, label_end_line);
 
+    free(left_str);
+    free(right_str);
     free(label_c2_line);
     free(label_end_line);
     free(line_jmp1);
     free(line_jmp2);
+    free(label_c2);
+    free(label_end);
 
     return lines;
 }

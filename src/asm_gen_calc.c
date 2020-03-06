@@ -32,6 +32,8 @@ char* asm_gen_binary_plus(asn* b_plus){
         strapp(&lines, "    popq   %rdx\n");
         strapp(&lines, "    addq   %rdx, %rax\n");
     }
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -57,6 +59,8 @@ char* asm_gen_binary_sub(asn* b_sub){
         strapp(&lines, "    popq   %rdx\n");
         strapp(&lines, "    subq   %rdx, %rax\n");
     }
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -82,6 +86,8 @@ char* asm_gen_binary_mult(asn* b_mult){
         strapp(&lines, "    popq   %rdx\n");
         strapp(&lines, "    imulq  %rdx, %rax\n");
     }
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -108,6 +114,8 @@ char* asm_gen_binary_div(asn* b_div){
         strapp(&lines, "    cqo\n");
         strapp(&lines, "    idivq  %rbx\n");
     }
+    free(left_str);
+    free(right_str);
     return lines;
 }
 
@@ -125,6 +133,8 @@ char* asm_gen_binary_mod(asn* b_mod){
     strapp(&lines, "    cqo\n");
     strapp(&lines, "    idivq  %rbx\n");
     strapp(&lines, "    movq   %rdx, %rax\n");
+    free(left_str);
+    free(right_str);
     return lines;
 }
 

@@ -18,6 +18,9 @@ typedef struct int_stack_s {
     int val;
 } int_stack;
 
+int_stack* make_int_stack(void);
+void delete_int_stack(int_stack* s);
+
 void push(int_stack** s, int i);
 void push_back(int_stack** s, int i);
 int pop(int_stack** s);

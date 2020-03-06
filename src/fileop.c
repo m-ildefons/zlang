@@ -25,7 +25,7 @@ char* read_file(const char* filename){
 		str_size = (size_t) tell;
         rewind(fd);
 
-        buffer = (char*) malloc((str_size + 1)* sizeof(char));
+        buffer = malloc((str_size + 1)* sizeof(char));
         read_size = fread(buffer, sizeof(char), str_size, fd);
         buffer[str_size] = '\0';
 

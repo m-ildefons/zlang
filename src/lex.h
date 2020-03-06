@@ -91,12 +91,15 @@ typedef struct token_struct {
     int line;
 } token;
 
+
 size_t string_count;
 char** string_index;
 
 size_t real_count;
 double* real_index;
 
+token* make_token(int t, char* str, int level, int line);
+void delete_token(token* t);
 void init_regex(void);
 void lex(const char* filename,
         token** full_token_list,

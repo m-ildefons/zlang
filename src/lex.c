@@ -23,6 +23,27 @@ static void tokenize_line(char* line,
 static void pre_lex_src(char** src);
 static void pre_lex_line(char** src);
 
+
+token* make_token(int t, char* str, int level, int line){
+    token* tok = malloc(sizeof(token));
+    tok->type = t;
+    tok->str = str;
+    tok->level = level;
+    tok->line = line;
+    return tok;
+}
+
+void delete_token(token* t){
+    if(t == NULL)
+        return;
+
+//    if(t->str != NULL)
+//        free(t->str);
+
+    free(t);
+    t = NULL;
+}
+
 void init_regex(){
     char err[1024];
     int regret = regcomp(&int_regex, int_regex_str, REG_EXTENDED);
@@ -50,12 +71,13 @@ static void tokenize_line(char* line,
 	enum token_type t;
     const char* sep = " ";
     char* tok;
+    line = strdup(line);
     pre_lex_line(&line);
 
     unsigned long num_tokens;
     static unsigned int idx = 0;
     if(*tokens == NULL)
-        *tokens = (token*) malloc(sizeof(token));
+        *tokens = malloc(sizeof(token));
 
     for(tok = strtok(line, sep), num_tokens = 1;
         tok != NULL;
@@ -205,6 +227,7 @@ static void tokenize_line(char* line,
     }
 
     *num = num_tokens - 1;
+    free(line);
 }
 
 static void pre_lex_src(char** src){
@@ -227,57 +250,59 @@ static void pre_lex_src(char** src){
             assert(string_index[string_count] != NULL);
             strcpy(string_index[string_count], tok);
             string_count++;
-            (*src) = strrep((*src), tok, "%s");
+            strrepl(src, tok, "%s");
         }
     }
+    if(buffer != NULL)
+        free(buffer);
 }
 
 static void pre_lex_line(char** src){
-    (*src) = strrep((*src), "(", " ( ");
-    (*src) = strrep((*src), ")", " ) ");
-    (*src) = strrep((*src), "[", " [ ");
-    (*src) = strrep((*src), "]", " ] ");
-    (*src) = strrep((*src), ":", " : ");
-    (*src) = strrep((*src), ",", " , ");
-    (*src) = strrep((*src), ";", " ; ");
-    (*src) = strrep((*src), "-", " - ");
-    (*src) = strrep((*src), "!", " ! ");
-    (*src) = strrep((*src), "+", " + ");
-    (*src) = strrep((*src), "*", " * ");
-    (*src) = strrep((*src), "/", " / ");
-    (*src) = strrep((*src), "%", " % ");
-    (*src) = strrep((*src), "~", " ~ ");
-    (*src) = strrep((*src), "=", " = ");
-    (*src) = strrep((*src), "<", " < ");
-    (*src) = strrep((*src), ">", " > ");
-	(*src) = strrep((*src), "&", " & ");
-	(*src) = strrep((*src), "|", " | ");
-	(*src) = strrep((*src), "^", " ^ ");
-    (*src) = strrep((*src), "<<", " << ");
-    (*src) = strrep((*src), ">>", " >> ");
-    (*src) = strrep((*src), "+  +", " ++ ");
-    (*src) = strrep((*src), "-  -", " -- ");
-    (*src) = strrep((*src), "*  *", " ** ");
-	(*src) = strrep((*src), "<  <", " << ");
-	(*src) = strrep((*src), ">  >", " >> ");
-    (*src) = strrep((*src), "=  =", " == ");
-    (*src) = strrep((*src), "!  =", " != ");
-    (*src) = strrep((*src), "<  =", " <= ");
-    (*src) = strrep((*src), ">  =", " >= ");
-    (*src) = strrep((*src), ">  <", " >< ");
-    (*src) = strrep((*src), "+  =", " += ");
-    (*src) = strrep((*src), "-  =", " -= ");
-    (*src) = strrep((*src), "*  =", " *= ");
-    (*src) = strrep((*src), "/  =", " /= ");
-    (*src) = strrep((*src), "%  =", " %= ");
-    (*src) = strrep((*src), "<<   =", " <<= ");
-    (*src) = strrep((*src), ">>   =", " >>= ");
-    (*src) = strrep((*src), "&  =", " &= ");
-    (*src) = strrep((*src), "|  =", " |= ");
-    (*src) = strrep((*src), "^  =", " ^= ");
-    (*src) = strrep((*src), "&  &", " && ");
-    (*src) = strrep((*src), "|  |", " || ");
-    (*src) = strrep((*src), "\" % s\"", "%s");
+    strrepl(src, "(", " ( ");
+    strrepl(src, ")", " ) ");
+    strrepl(src, "[", " [ ");
+    strrepl(src, "]", " ] ");
+    strrepl(src, ":", " : ");
+    strrepl(src, ",", " , ");
+    strrepl(src, ";", " ; ");
+    strrepl(src, "-", " - ");
+    strrepl(src, "!", " ! ");
+    strrepl(src, "+", " + ");
+    strrepl(src, "*", " * ");
+    strrepl(src, "/", " / ");
+    strrepl(src, "%", " % ");
+    strrepl(src, "~", " ~ ");
+    strrepl(src, "=", " = ");
+    strrepl(src, "<", " < ");
+    strrepl(src, ">", " > ");
+	strrepl(src, "&", " & ");
+	strrepl(src, "|", " | ");
+	strrepl(src, "^", " ^ ");
+    strrepl(src, "<<", " << ");
+    strrepl(src, ">>", " >> ");
+    strrepl(src, "+  +", " ++ ");
+    strrepl(src, "-  -", " -- ");
+    strrepl(src, "*  *", " ** ");
+	strrepl(src, "<  <", " << ");
+	strrepl(src, ">  >", " >> ");
+    strrepl(src, "=  =", " == ");
+    strrepl(src, "!  =", " != ");
+    strrepl(src, "<  =", " <= ");
+    strrepl(src, ">  =", " >= ");
+    strrepl(src, ">  <", " >< ");
+    strrepl(src, "+  =", " += ");
+    strrepl(src, "-  =", " -= ");
+    strrepl(src, "*  =", " *= ");
+    strrepl(src, "/  =", " /= ");
+    strrepl(src, "%  =", " %= ");
+    strrepl(src, "<<   =", " <<= ");
+    strrepl(src, ">>   =", " >>= ");
+    strrepl(src, "&  =", " &= ");
+    strrepl(src, "|  =", " |= ");
+    strrepl(src, "^  =", " ^= ");
+    strrepl(src, "&  &", " && ");
+    strrepl(src, "|  |", " || ");
+    strrepl(src, "\" % s\"", "%s");
 }
 
 void lex(const char* filename,
@@ -290,22 +315,28 @@ void lex(const char* filename,
     pre_lex_src(&buffer);
     char* tok;
     char* rest = strdup(buffer);
+    char* rest_handle = rest;
 
     unsigned long num_t = 0;
     unsigned long* num_tp = &num_t;
     token* token_list = NULL;
-    (*full_token_list) = (token*) malloc(sizeof(token));
+    (*full_token_list) = malloc(sizeof(token));
     assert((*full_token_list) != NULL);
 
     int indent_depth = 0;
     int num_ws = 0;
     unsigned long i;
     int line_num = 1;
-    int_stack* indent_stack = (int_stack*) malloc(sizeof(int_stack));
+    int_stack* indent_stack = make_int_stack();
     assert(indent_stack != NULL);
     indent_stack->val = 0;
 
-    while((tok = strtok_r(rest, tokens, &rest))){
+    for(tok = strtok_r(rest, tokens, &rest);
+        tok != NULL;
+        tok = strtok_r(NULL, tokens, &rest)){
+//    for(tok = strtok(rest, tokens);
+//        tok != NULL;
+//        tok = strtok(NULL, tokens)){
         line_num++;
         num_ws = 0;
         while(tok[0] == ' ' || tok[0] == '\t'){
@@ -339,9 +370,14 @@ void lex(const char* filename,
         printf("recognized tokens: %lu (%lu total)\n", num_t, (*total_num_tokens));
     }
 
-    if(indent_stack != NULL){
-        free(indent_stack);
-        indent_stack = NULL;
+    delete_int_stack(indent_stack);
+
+    if(buffer != NULL){
+        printf("free buffer\n");
+        free(buffer);
+        buffer = NULL;
     }
+    free(rest_handle);
+    free(token_list);
 }
 
