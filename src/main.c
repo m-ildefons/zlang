@@ -96,7 +96,7 @@ int main(int argc, char* argv[]){
     print_separator("Parsing");
 
     asn* expr;
-    expr = parse_prog(&tl, &tnt, filename);
+    expr = parse_translation_unit(&tl, &tnt, filename);
 
     print_separator("Abstract Syntax Tree");
 

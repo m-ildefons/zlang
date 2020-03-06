@@ -11,53 +11,33 @@
 
 #include "parse.h"
 
-asn* parse_prog(token** tl, size_t* tnt, const char* filename){
-    printf("parsing prog. %zu tokens left.\n", *tnt);
+/*
+ * <translation-unit> ::= {<external-declaration>}*
+ */
+asn* parse_translation_unit(token** tl, size_t* tnt, const char* filename){
+    printf("[%zu (%s)] parsing translation unit\n", (*tnt), (*tl)->str);
 
     asn* prog = make_prog_exp(filename, NULL);
     pv_root* symbol_map = prog->op.prog_exp.symbol_map;
     while(*tnt > 0){
-        asn* e = parse_exp(tl, tnt, symbol_map);
+        asn* e = parse_external_declaration(tl, tnt, &symbol_map);
         if(e == NULL)
             break;
 
-        if(e->tag == fun_def_tag){
-            if(pv_search(symbol_map, e->op.fun_def_exp.ident) != NULL)
-                abort();
-            pv_leaf* l = new_pv_leaf(e->op.fun_def_exp.ident,
-								e->op.fun_def_exp.type, -1, 0, 0);
-
-            pv_root* osm = symbol_map;
-            symbol_map = pv_insert(symbol_map, l->ident, l);
-            delete_trie(osm);
-        }
-
-        if(e->tag == var_def_tag){
-            if(pv_search(symbol_map, e->op.var_def_exp.ident) != NULL)
-                abort();
-            symbol_map_insert(&symbol_map, e);
-            symbol_map->mem_offset -= 8;
-        }
-
-		append_exp_list(&(prog->op.prog_exp.prog), e);
+        append_exp_list(&(prog->op.prog_exp.prog), e);
     }
     prog->op.prog_exp.symbol_map = symbol_map;
     return prog;
 }
 
 asn* parse_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing expr. %zu tokens left.\n", *tnt);
+    printf("[%zu] parsing expression\n", *tnt);
 
     if(*tnt <= 0){
         return NULL;
     }
     asn* expr;
     int level = (*tl)->level;
-    expr = parse_fun_def_exp(tl, tnt, symbol_map);
-    if(expr != NULL){
-        printf("\033[92mfound\033[39m function definition at level %d.\n", level);
-        return expr;
-    }
     expr = parse_ret_exp(tl, tnt, symbol_map);
     if(expr != NULL){
         printf("\033[92mfound\033[39m return expression at level %d.\n", level);
@@ -99,21 +79,18 @@ asn* parse_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         return expr;
     }
 
-    fprintf(stderr,
-            "Line %d: \033[91mInvalid Expression\033[39m: %s\n",
-            (*tl)->line,
-            (*tl)->str);
+    parse_error("Invalid Expression", (*tl));
     return NULL;
 }
 
 asn* parse_cast_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing cast expr. %zu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing cast expr\n", (*tnt), (*tl)->str);
     asn* cast = parse_unary_exp(tl, tnt, symbol_map);
     return cast;
 }
 
 asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing postfix expr. %zu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing postfix expr\n", (*tnt), (*tl)->str);
 
     token* tlp = (*tl);
 
@@ -137,7 +114,7 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 }
 
 asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing primary expr. %zu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing primary expr\n", (*tnt), (*tl)->str);
 
     token* tlp = *tl;
     int tok_type = tlp->type;
@@ -160,8 +137,7 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
             primary = parse_assign_exp(tl, tnt, symbol_map);
             tlp = (*tl);
             if(tlp->type != close_p){
-                fprintf(stderr, "unbalanced parenthesis\n");
-                printf("next token: %s\n", tlp->str);
+                parse_error("Unbalanced Parenthesis", (*tl));
                 abort();
             }
 		    pop_token(&tlp, tl, tnt);
@@ -191,8 +167,7 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
 
     pv_leaf* leaf = pv_search(symbol_map, tlp->str);
     if(leaf == NULL){
-        printf("\033[91mError\033[39m: Reference to undeclared symbol: %s\n",
-                tlp->str);
+        parse_error("Reference to undeclared symbol", (*tl));
         return NULL;
     }
 
@@ -204,84 +179,6 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
 		pop_token(&tlp, tl, tnt);
 
     printf("found var ref expr\n");
-    return var;
-}
-
-asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing declaration. %zu, %s\n", (*tnt), (*tl)->str);
-
-    token* tlp = (*tl);
-    atomic_type ty;
-
-    switch(tlp->type){
-        case type_void_kw:
-            if((tlp+1)->type == token_asterisk){
-                ty = at_void_ptr;
-                pop_token(&tlp, tl, tnt);
-            } else {
-                ty = at_void;
-            }
-            break;
-        case type_int_kw:
-            if((tlp+1)->type == token_asterisk){
-                ty = at_int_ptr;
-                pop_token(&tlp, tl, tnt);
-            } else {
-                ty = at_int;
-            }
-            break;
-        case type_real_kw:
-            if((tlp+1)->type == token_asterisk){
-                ty = at_real_ptr;
-                pop_token(&tlp, tl, tnt);
-            } else {
-                ty = at_real;
-            }
-            break;
-        case type_char_kw:
-            if((tlp+1)->type == token_asterisk){
-                ty = at_char_ptr;
-                pop_token(&tlp, tl, tnt);
-            } else {
-                ty = at_char;
-            }
-            break;
-        default:
-            return NULL;
-    }
-
-    pop_token(&tlp, tl, tnt);
-    asn* decl = parse_init_decl(tl, tnt, symbol_map, ty);
-
-    return decl;
-}
-
-/*
- * <init-declarator> ::= <declarator>
- *                     | <declarator> = <initializer>
- */
-asn* parse_init_decl(token** tl, size_t* tnt, pv_root* symbol_map, atomic_type ty){
-    printf("parsing init declarator. %zu, %s\n", (*tnt), (*tl)->str);
-
-    token* tlp = (*tl);
-    int scope = tlp->level;
-
-    if(tlp->type != ident){
-        return NULL;
-    }
-
-    char* id = tlp->str;
-    asn* var = make_var_def_exp(ty, id, scope);
-    pop_token(&tlp, tl, tnt);
-
-    if(tlp != NULL && tlp->type == token_semi_colon){
-        pop_token(&tlp, tl, tnt);
-    } else if(tlp != NULL && tlp->type == token_assign){
-        pop_token(&tlp, tl, tnt);
-        asn* val = parse_assign_exp(tl, tnt, symbol_map);
-        var->op.var_def_exp.val = val;
-    }
-
     return var;
 }
 
@@ -333,5 +230,13 @@ void pop_token(token** tlp, token** tl, size_t* tnt){
 	if((*tnt) == 0)
 		(*tlp) = NULL;
 	(*tl) = (*tlp);
+}
+
+void parse_error(const char* err, token* tok){
+    fprintf(stderr,
+            "Line %d: \033[91m%s\033[39m: %s\n",
+            tok->line,
+            err,
+            tok->str);
 }
 

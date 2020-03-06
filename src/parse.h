@@ -18,14 +18,12 @@
 #include "persistent_vector.h"
 
 /* implemented in parse.c */
-asn* parse_prog(token** tl, size_t* tnt, const char* filename);
+asn* parse_translation_unit(token** tl, size_t* tnt, const char* filename);
 asn* parse_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_cast_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map);
-asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map);
-asn* parse_init_decl(token** tl, size_t* tnt, pv_root* symbol_map, atomic_type ty);
 
 void parse_body(token** tl,
             size_t* tnt,
@@ -35,6 +33,12 @@ void parse_body(token** tl,
 void symbol_map_insert(pv_root** symbol_map, asn* var_exp);
 pv_root* symbol_map_copy(pv_root* symbol_map);
 void pop_token(token** tlp, token** tl, size_t* tnt);
+void parse_error(const char* err, token* tok);
+
+/* implemented in parse_decl.c */
+asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map);
+asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map);
+asn* parse_init_decl(token** tl, size_t* tnt, pv_root* symbol_map, atomic_type ty);
 
 /* implemented in parse_const.c */
 asn* parse_const_exp(token** tl, size_t* tnt);
