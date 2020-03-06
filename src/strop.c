@@ -63,15 +63,12 @@ void strapp(char** str, const char* app){
 }
 
 void strprp(char** str, const char* prp){
-    size_t str_len = strlen((*str));
-    size_t prp_len = strlen(prp);
-
-    char* new_str = malloc((str_len + prp_len + 1) * sizeof(char));
-    assert(new_str != NULL);
-
-    strcpy(new_str, prp);
-    strcat(new_str, (*str));
-    (*str) = new_str;
+    char* src = strnew();
+    char* handle = (*str);
+    strapp(&src, prp);
+    strapp(&src, (*str));
+    (*str) = src;
+    free(handle);
 }
 
 char* strnew(void){
