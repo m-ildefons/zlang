@@ -268,6 +268,21 @@ asn* make_cast_to_real(asn* val){
 	return e;
 }
 
+asn* make_struct_exp(int tag, char* id, int scope){
+	asn* e = (asn*) malloc(sizeof(asn));
+    assert(e != NULL);
+    if(tag != struct_tag && tag != union_tag)
+        abort();
+
+    e->tag = tag;
+    e->op.struct_exp.ident = id;
+    e->op.struct_exp.body = NULL;
+    e->op.struct_exp.size = 0;
+    e->op.struct_exp.symbol_map = new_trie();
+    e->op.struct_exp.scope = scope;
+	return e;
+}
+
 atomic_type get_atomic_type(asn* expr, pv_root* symbol_map){
     pv_leaf* leaf;
     if(expr == NULL)

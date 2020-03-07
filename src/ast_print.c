@@ -121,6 +121,14 @@ static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
             body = tree->op.call_exp.args;
             symbol_map = NULL;
             break;
+        case struct_tag:
+            body = tree->op.struct_exp.body;
+            symbol_map = tree->op.struct_exp.symbol_map;
+            break;
+        case union_tag:
+            body = tree->op.struct_exp.body;
+            symbol_map = tree->op.struct_exp.symbol_map;
+            break;
         default: abort();
     }
 
@@ -387,6 +395,18 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             break;
         case prog_tag:
             printf("[ program node (%s) ]\n", tree->op.prog_exp.name);
+            _pretty_print_body(tree, level, ws_stack);
+            break;
+        case struct_tag:
+            printf("[ struct node (%s, %d) ]\n",
+                    tree->op.struct_exp.ident,
+                    tree->op.struct_exp.size);
+            _pretty_print_body(tree, level, ws_stack);
+            break;
+        case union_tag:
+            printf("[ union node (%s, %d) ]\n",
+                    tree->op.struct_exp.ident,
+                    tree->op.struct_exp.size);
             _pretty_print_body(tree, level, ws_stack);
             break;
         default:

@@ -17,7 +17,7 @@ asn* parse_ret_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         return NULL;
     }
 
-    printf("parsing return expr. %lu tokens left.\n", *tnt);
+    printf("[%zu (%s)] parsing return\n", (*tnt), (*tl)->str);
 
 	pop_token(&tlp, tl, tnt);
 
@@ -44,7 +44,7 @@ asn* parse_fun_call_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	if((tlp+1)->type != open_p)
 		return NULL;
 
-	printf("parsing function call expr. %lu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing function call\n", (*tnt), (*tl)->str);
 
 	pop_token(&tlp, tl, tnt);
 	pop_token(&tlp, tl, tnt);
@@ -75,7 +75,7 @@ asn* parse_jump_exp(token** tl, size_t* tnt){
 	token* tlp = (*tl);
 	asn* jump = NULL;
 	if(tlp->type == break_kw || tlp->type == continue_kw){
-	    printf("parsing jump expr. %lu tokens left.\n", (*tnt));
+        printf("[%zu (%s)] parsing jump\n", (*tnt), (*tl)->str);
 		jump = make_jump_exp(tlp->type);
 		pop_token(&tlp, tl, tnt);
 		if(tlp->type == token_semi_colon)

@@ -206,16 +206,31 @@ void parse_body(token** tl,
 }
 
 void symbol_map_insert(pv_root** symbol_map, asn* var_exp){
-    char* _id = var_exp->op.var_def_exp.ident;
-    atomic_type _ty = var_exp->op.var_def_exp.type;
-    int _sz = atomic_type_size[_ty];
-    int offset = (*symbol_map)->mem_offset;
-    int scope = var_exp->op.var_def_exp.scope;
+    char* id;
+    int sz;
+    int offset;
+    int scope;
+    atomic_type ty;
 
-    pv_leaf* leaf = new_pv_leaf(_id, _ty, _sz, offset, scope);
+    pv_leaf* leaf;
+    pv_root* osm;
+    if(var_exp->tag == var_def_tag){
+        id = var_exp->op.var_def_exp.ident;
+        ty = var_exp->op.var_def_exp.type;
+        sz = atomic_type_size[ty];
+        offset = (*symbol_map)->mem_offset;
+        scope = var_exp->op.var_def_exp.scope;
+    } else if(var_exp->tag == struct_tag || var_exp->tag == union_tag){
+        id = var_exp->op.struct_exp.ident;
+        ty = at_struct;
+        sz = var_exp->op.struct_exp.size;
+        offset = 0;
+        scope = var_exp->op.struct_exp.scope;
+    }
 
-    pv_root* osm = (*symbol_map);
-    (*symbol_map) = pv_insert((*symbol_map), _id, leaf);
+    leaf = new_pv_leaf(id, ty, sz, offset, scope);
+    osm = (*symbol_map);
+    (*symbol_map) = pv_insert((*symbol_map), id, leaf);
     delete_trie(osm);
 }
 

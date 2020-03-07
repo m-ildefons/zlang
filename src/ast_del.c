@@ -68,6 +68,8 @@ void delete_exp(asn* e){
         case for_loop_tag: delete_for_loop_exp(e); break;
         case while_loop_tag: delete_while_loop_exp(e); break;
         case cast_to_real_tag: delete_unary_exp(e); break;
+        case struct_tag: delete_struct_exp(e); break;
+        case union_tag: delete_struct_exp(e); break;
         default: free(e); return;
     }
 }
@@ -186,6 +188,15 @@ void delete_assign_exp(asn* e){
 
     delete_exp(e->op.assign_exp.lval);
     delete_exp(e->op.assign_exp.val);
+    free(e);
+}
+
+void delete_struct_exp(asn* e){
+    if(e == NULL)
+        return;
+
+    delete_asn_list(e->op.struct_exp.body);
+    delete_trie(e->op.struct_exp.symbol_map);
     free(e);
 }
 

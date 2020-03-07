@@ -11,7 +11,7 @@
 #include "parse.h"
 
 asn* parse_const_exp(token** tl, size_t* tnt){
-    printf("parsing const expr. %lu tokens\n", *tnt);
+    printf("[%zu (%s)] parsing const\n", (*tnt), (*tl)->str);
     token* tlp = *tl;
     asn* r = NULL;
     int i_val;

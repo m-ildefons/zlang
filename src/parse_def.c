@@ -80,7 +80,7 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     tlp++;
     i++;
 
-    printf("parsing function expr. %zu tokens\n", (*tnt));
+    printf("[%zu (%s)] parsing function\n", (*tnt), (*tl)->str);
 	(*tl) = tlp;
 	(*tnt) -= i;
 

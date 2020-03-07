@@ -12,6 +12,7 @@
 #ifndef __PARSE_H__
 #define __PARSE_H__
 
+#include "util.h"
 #include "ast.h"
 #include "lex.h"
 #include "int_stack.h"
@@ -77,6 +78,9 @@ asn* parse_bin_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 /* implemented in parse_loop.c */
 asn* parse_for_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_while_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map);
+
+/* implemented in parse_struct.c */
+asn* parse_struct_specifier(token** tl, size_t* tnt, pv_root* symbol_map);
 
 #endif
 

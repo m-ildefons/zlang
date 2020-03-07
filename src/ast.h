@@ -74,50 +74,97 @@ typedef struct ast_node {
         for_loop_tag,
         while_loop_tag,
         cast_to_real_tag,
+        struct_tag,
+        union_tag,
     } tag;
     union {
         int int_exp;
+
         char char_exp;
-        struct {atomic_type type;
-                char* ident;
-                struct ast_node* val;
-                int scope;} var_def_exp;
-        struct {char* ident;} var_ref_exp;
-        struct {char* ident;
-            struct ast_node_list* args;} call_exp;
-        struct {struct ast_node* val;} ret_exp;
-        struct {atomic_type type;
+
+        struct {
+            atomic_type type;
+            char* ident;
+            struct ast_node* val;
+            int scope;
+        } var_def_exp;
+
+        struct {
+            char* ident;
+        } var_ref_exp;
+
+        struct {
+            char* ident;
+            struct ast_node_list* args;
+        } call_exp;
+
+        struct {
+            struct ast_node* val;
+        } ret_exp;
+
+        struct {
+            atomic_type type;
             char* ident;
             struct ast_node_list* args;
             struct ast_node_list* body;
             struct trie_root_node* symbol_map;
-            int scope;} fun_def_exp;
-        struct {struct ast_node* cond;
+            int scope;
+        } fun_def_exp;
+
+        struct {
+            struct ast_node* cond;
             struct ast_node_list* if_body;
 			struct ast_node_list* else_body;
             struct trie_root_node* if_symbol_map;
-			struct trie_root_node* else_symbol_map;
-            int scope;} cond_exp;
-        struct {struct ast_node* init;
+            struct trie_root_node* else_symbol_map;
+            int scope;
+        } cond_exp;
+
+        struct {
+            struct ast_node* init;
             struct ast_node* cond;
             struct ast_node* move;
             struct ast_node_list* body;
             struct trie_root_node* symbol_map;
-            int scope;} for_loop_exp;
-        struct {struct ast_node* cond;
+            int scope;
+        } for_loop_exp;
+
+        struct {
+            struct ast_node* cond;
             struct ast_node_list* body;
             struct trie_root_node* symbol_map;
-            int scope;} while_loop_exp;
-        struct {const char* name;
+            int scope;
+        } while_loop_exp;
+
+        struct {
+            const char* name;
             struct ast_node_list* prog;
-            struct trie_root_node* symbol_map;} prog_exp;
-        struct {atomic_type type;
-            struct ast_node* expr;} unary_exp;
-        struct {atomic_type type;
+            struct trie_root_node* symbol_map;
+        } prog_exp;
+
+        struct {
+            atomic_type type;
+            struct ast_node* expr;
+        } unary_exp;
+
+        struct {
+            atomic_type type;
             struct ast_node* expr_l;
-            struct ast_node* expr_r;} binary_exp;
-        struct {struct ast_node* lval;
-            struct ast_node* val;} assign_exp;
+            struct ast_node* expr_r;
+        } binary_exp;
+
+        struct {
+            struct ast_node* lval;
+            struct ast_node* val;
+        } assign_exp;
+
+        struct {
+            char* ident;
+            int size;
+            struct ast_node_list* body;
+            struct trie_root_node* symbol_map;
+            int scope;
+        } struct_exp;
     } op;
 } asn;
 
@@ -161,6 +208,7 @@ asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type);
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type);
 asn* make_jump_exp(int type);
 asn* make_cast_to_real(asn* val);
+asn* make_struct_exp(int tag, char* id, int scope);
 
 /* implemented in ast_del.c */
 void delete_exp(asn* e);
@@ -176,6 +224,7 @@ void delete_unary_exp(asn* e);
 void delete_binary_exp(asn* e);
 void delete_assign_exp(asn* e);
 void delete_prog_exp(asn* e);
+void delete_struct_exp(asn* e);
 
 atomic_type get_atomic_type(asn* expr, pv_root* symbol_map);
 #endif

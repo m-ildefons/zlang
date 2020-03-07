@@ -13,6 +13,7 @@
 
 typedef enum {
     at_func,
+    at_struct,
     at_void,
     at_int,
     at_real,
@@ -25,7 +26,7 @@ typedef enum {
 
 extern const int atomic_type_size[];
 extern const char* atomic_type_cn[];
-extern const atomic_type binary_cast_matrix[9][9];
+extern const atomic_type binary_cast_matrix[10][10];
 
 #endif
 

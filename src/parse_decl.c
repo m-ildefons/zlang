@@ -34,18 +34,27 @@ asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map){
         return exp;
     }
 
-    exp = parse_declaration(tl, tnt,(*symbol_map));
+    exp = parse_declaration(tl, tnt, (*symbol_map));
     if(exp != NULL){
-        if(pv_search((*symbol_map), exp->op.var_def_exp.ident) != NULL){
-            parse_error("Error, symbol already declared.", (*tl));
-            abort();
+        if(exp->tag == struct_tag || exp->tag == union_tag){
+            if(pv_search((*symbol_map), exp->op.struct_exp.ident) != NULL){
+                parse_error("Error, symbol already declared.", (*tl));
+                abort();
+            }
+            symbol_map_insert(symbol_map, exp);
+            (*symbol_map)->mem_offset -= exp->op.struct_exp.size;
+        } else if(exp->tag == var_def_tag){
+            if(pv_search((*symbol_map), exp->op.var_def_exp.ident) != NULL){
+                parse_error("Error, symbol already declared.", (*tl));
+                abort();
+            }
+            symbol_map_insert(symbol_map, exp);
+            (*symbol_map)->mem_offset -= 8;
         }
-        symbol_map_insert(symbol_map, exp);
-        (*symbol_map)->mem_offset -= 8;
         return exp;
     }
 
-    parse_error("Error, invalid token", (*tl));
+    parse_error("invalid token", (*tl));
     return NULL;
 }
 
@@ -58,6 +67,7 @@ asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp = (*tl);
     atomic_type ty;
 
+    asn* decl = NULL;
     switch(tlp->type){
         case type_void_kw:
             if((tlp+1)->type == token_asterisk){
@@ -91,12 +101,18 @@ asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map){
                 ty = at_char;
             }
             break;
+        case token_struct:
+            decl = parse_struct_specifier(tl, tnt, symbol_map);
+            return decl;
+        case token_union:
+            decl = parse_struct_specifier(tl, tnt, symbol_map);
+            return decl;
         default:
             return NULL;
     }
 
     pop_token(&tlp, tl, tnt);
-    asn* decl = parse_init_decl(tl, tnt, symbol_map, ty);
+    decl = parse_init_decl(tl, tnt, symbol_map, ty);
 
     return decl;
 }
