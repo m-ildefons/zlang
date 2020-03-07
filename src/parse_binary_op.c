@@ -21,7 +21,7 @@ asn* parse_bin_term(token** tl, size_t* tnt, pv_root* symbol_map){
 			(tlp->type == token_asterisk ||
 			tlp->type == token_div ||
 			tlp->type == token_mod)){
-        printf("parsing term expression. %zu tokens left.\n", *tnt);
+        printf("[%zu (%s)] parsing term expr\n", (*tnt), (*tl)->str);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_factor = parse_cast_exp(tl, tnt, symbol_map);
@@ -52,7 +52,7 @@ asn* parse_bin_sum_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     while(expr != NULL && tlp != NULL &&
 			(tlp->type == token_plus ||
 			tlp->type == token_minus)){
-        printf("parsing binary expression. %zu tokens left\n", *tnt);
+        printf("[%zu (%s)] parsing sum expr\n", (*tnt), (*tl)->str);
         tok_type = tlp->type;
 		pop_token(&tlp, tl, tnt);
         next_term = parse_bin_term(tl, tnt, symbol_map);
@@ -237,7 +237,7 @@ asn* parse_bin_log_or_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 }
 
 asn* parse_bin_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing binary expression. %zu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing binary expression\n", (*tnt), (*tl)->str);
     asn* bin_log_or = parse_bin_log_or_exp(tl, tnt, symbol_map);
     return bin_log_or;
 }

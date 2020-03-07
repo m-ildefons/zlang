@@ -24,10 +24,20 @@
 
 
 static int verbosity;
+static int verbosity_lex;
+static int verbosity_parse;
+static int verbosity_ast;
+static int verbosity_asmgen;
+static int verbosity_asm;
 
 static struct option long_options[] = {
 	{"verbose", no_argument, &verbosity, 1},
 	{"quiet", no_argument, &verbosity, 0},
+    {"Vlex", no_argument, &verbosity_lex, 0},
+    {"Vparse", no_argument, &verbosity_parse, 0},
+    {"Vast", no_argument, &verbosity_ast, 0},
+    {"Vasmgen", no_argument, &verbosity_asmgen, 0},
+    {"Vasm", no_argument, &verbosity_asm, 0},
 	{"output", required_argument, 0, 'o'},
     {NULL, 0, NULL, 0},
 };
@@ -106,6 +116,8 @@ int main(int argc, char* argv[]){
     print_separator("Generating Source");
 
     char* asm_source = asm_gen_prog(expr);
+
+    print_separator("Assembly Source");
 
     fprintf(stdout, "%s\n", asm_source);
     write_file("out.s", asm_source);

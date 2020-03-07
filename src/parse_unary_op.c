@@ -11,7 +11,7 @@
 #include "parse.h"
 
 asn* parse_unary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing unary expr. %lu tokens left\n", *tnt);
+    printf("[%zu (%s)] parsing unary expr\n", (*tnt), (*tl)->str);
 
     token* tlp = *tl;
     int tok_type = tlp->type;

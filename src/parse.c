@@ -31,7 +31,7 @@ asn* parse_translation_unit(token** tl, size_t* tnt, const char* filename){
 }
 
 asn* parse_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("[%zu] parsing expression\n", *tnt);
+    printf("[%zu (%s)] parsing expression\n", (*tnt), (*tl)->str);
 
     if(*tnt <= 0){
         return NULL;
@@ -163,7 +163,7 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
 		return NULL;
     }
 
-    printf("parsing var ref expression. %zu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing var ref expr\n", (*tnt), (*tl)->str);
 
     pv_leaf* leaf = pv_search(symbol_map, tlp->str);
     if(leaf == NULL){
@@ -234,7 +234,7 @@ void pop_token(token** tlp, token** tl, size_t* tnt){
 
 void parse_error(const char* err, token* tok){
     fprintf(stderr,
-            "Line %d: \033[91m%s\033[39m: %s\n",
+            "Line %d: \033[91mError\033[39m: %s: %s\n",
             tok->line,
             err,
             tok->str);

@@ -106,7 +106,7 @@ asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map){
  *                     | <declarator> = <initializer>
  */
 asn* parse_init_decl(token** tl, size_t* tnt, pv_root* symbol_map, atomic_type ty){
-    printf("parsing init declarator. %zu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing init declarator\n", (*tnt), (*tl)->str);
 
     token* tlp = (*tl);
     int scope = tlp->level;

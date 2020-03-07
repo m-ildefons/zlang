@@ -219,11 +219,11 @@ static void tokenize_line(char* line,
         (*tokens)[num_tokens - 1].level = indent_depth;
         (*tokens)[num_tokens - 1].line = line_number;
 
-        printf("- token[%lu]: %s\ttype: %u\tdepth: %d\n",
+        printf("[%lu] depth %3d type %3u: %s\n",
             num_tokens,
-            (*tokens)[num_tokens - 1].str,
+            (*tokens)[num_tokens - 1].level,
             (*tokens)[num_tokens - 1].type,
-            (*tokens)[num_tokens - 1].level);
+            (*tokens)[num_tokens - 1].str);
     }
 
     *num = num_tokens - 1;
@@ -334,9 +334,6 @@ void lex(const char* filename,
     for(tok = strtok_r(rest, tokens, &rest);
         tok != NULL;
         tok = strtok_r(NULL, tokens, &rest)){
-//    for(tok = strtok(rest, tokens);
-//        tok != NULL;
-//        tok = strtok(NULL, tokens)){
         line_num++;
         num_ws = 0;
         while(tok[0] == ' ' || tok[0] == '\t'){
@@ -359,7 +356,7 @@ void lex(const char* filename,
             exit(101);
         }
 
-        printf("line[%d]: %s\n", indent_depth, tok);
+        printf("line %3d, depth %3d: %s\n", line_num, indent_depth, tok);
         tokenize_line(tok, indent_depth, &token_list, num_tp, line_num);
         (*total_num_tokens) += num_t;
         (*full_token_list) = realloc((*full_token_list), (*total_num_tokens) * sizeof(token));
@@ -367,13 +364,12 @@ void lex(const char* filename,
         for(i = 0; i < num_t; i++){
             (*full_token_list)[((*total_num_tokens)-1-i)] = token_list[(num_t-1-i)];
         }
-        printf("recognized tokens: %lu (%lu total)\n", num_t, (*total_num_tokens));
     }
 
+    printf("\033[92mRecognized %lu tokens.\033[39m\n", (*total_num_tokens));
     delete_int_stack(indent_stack);
 
     if(buffer != NULL){
-        printf("free buffer\n");
         free(buffer);
         buffer = NULL;
     }
