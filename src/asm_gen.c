@@ -261,6 +261,7 @@ char* asm_gen_fun_call(asn* call){
 		arg_ref = asm_gen(args->expr);
         if(get_atomic_type(args->expr, symbol_map_ptr) == at_real){
             strprp(&src, arg_ref);
+            free(arg_ref);
             c_xmm_regs++;
             continue;
         }

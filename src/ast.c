@@ -104,7 +104,9 @@ asn* make_cond_exp(asn* cond,
     e->tag = cond_tag;
     e->op.cond_exp.cond = cond;
     e->op.cond_exp.if_body = if_body;
+    e->op.cond_exp.if_symbol_map = NULL;
 	e->op.cond_exp.else_body = else_body;
+    e->op.cond_exp.else_symbol_map = NULL;
     e->op.cond_exp.scope = scope;
     return e;
 }

@@ -26,6 +26,7 @@ char* asm_gen_unary_minus(asn* u_minus){
         strapp(&src, "    negq   %rax\n");
     }
 
+    free(inner);
     return src;
 }
 

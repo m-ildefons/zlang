@@ -12,6 +12,8 @@
 #ifndef __PARSE_H__
 #define __PARSE_H__
 
+#include <stddef.h>
+
 #include "util.h"
 #include "ast.h"
 #include "lex.h"
