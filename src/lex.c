@@ -10,11 +10,6 @@
 
 #include "lex.h"
 
-static regex_t int_regex;
-static regex_t real_regex;
-static const char* int_regex_str = "^([1-9][0-9]*|0)$";
-static const char* real_regex_str = "^([0-9]*[.][0-9]+)$";
-
 static void tokenize_line(char* line,
                 int indent_depth,
                 token** tokens,
@@ -43,25 +38,6 @@ void delete_token(token* t){
     free(t);
     t = NULL;
 }
-
-void init_regex(){
-    char err[1024];
-    int regret = regcomp(&int_regex, int_regex_str, REG_EXTENDED);
-    if(regret != 0){
-        fprintf(stderr, "Could not compile regex\n");
-        regerror(regret, &int_regex, err, 1024);
-        printf("%s\n", err);
-        exit(1);
-    }
-    regret = regcomp(&real_regex, real_regex_str, REG_EXTENDED);
-    if(regret != 0){
-        fprintf(stderr, "Could not compile regex\n");
-        regerror(regret, &real_regex, err, 1024);
-        printf("%s\n", err);
-        exit(1);
-    }
-}
-
 
 static void tokenize_line(char* line,
                 int indent_depth,
@@ -94,6 +70,8 @@ static void tokenize_line(char* line,
             t = type_int_kw;
         } else if(strcmp(tok, "real") == 0){
             t = type_real_kw;
+        } else if(strcmp(tok, "complex") == 0){
+            t = type_complex_kw;
         } else if(strcmp(tok, "char") == 0){
             t = type_char_kw;
         } else if(strcmp(tok, "(") == 0){
@@ -122,6 +100,8 @@ static void tokenize_line(char* line,
             t = const_int;
         } else if(regexec(&real_regex, tok, 0, NULL, 0) == 0){
             t = const_real;
+        } else if(regexec(&complex_regex, tok, 0, NULL, 0) == 0){
+            t = const_complex;
         } else if(strcmp(tok, "%s") == 0){
             idx++;
             t = const_string;
@@ -303,6 +283,9 @@ static void pre_lex_line(char** src){
     strrep(src, "&  &", " && ");
     strrep(src, "|  |", " || ");
     strrep(src, "\" % s\"", "%s");
+
+    regrep(src, "[0-9]+[E][ ][+-][ ][0-9]+", "E - ", "E-");
+    regrep(src, "[0-9]+[e][ ][+-][ ][0-9]+", "e - ", "e-");
 }
 
 void lex(const char* filename,

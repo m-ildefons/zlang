@@ -15,12 +15,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <regex.h>
 #include <assert.h>
 
 #include "fileop.h"
 #include "strop.h"
 #include "int_stack.h"
+#include "regexp.h"
 
 typedef struct token_struct {
     enum token_type {
@@ -28,9 +28,11 @@ typedef struct token_struct {
         type_void_kw,
     	type_int_kw,
         type_real_kw,
+        type_complex_kw,
         type_char_kw,
         const_int,
         const_real,
+        const_complex,
         const_char,
         const_string,
     	ident,
@@ -100,7 +102,6 @@ double* real_index;
 
 token* make_token(int t, char* str, int level, int line);
 void delete_token(token* t);
-void init_regex(void);
 void lex(const char* filename,
         token** full_token_list,
         unsigned long* total_num_tokens);

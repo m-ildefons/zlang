@@ -23,7 +23,7 @@
  * strrep - String Replacement
  *
  * Replaces every occurrence of 'exp' with 'rep' in the string pointed to
- * by 'str'.
+ * by 'str'. Only exact matches are replaced.
  */
 void strrep(char** str, const char* exp, const char* rep);
 
