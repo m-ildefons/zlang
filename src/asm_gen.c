@@ -119,6 +119,7 @@ char* asm_gen(asn* e){
     switch(e->tag){
         case fun_def_tag: res = asm_gen_fun_def(e); break;
 		case call_tag: res = asm_gen_fun_call(e); break;
+//        case ret_tag: res = asm_gen_ret(e); break;
         case var_def_tag: res = asm_gen_var_def(e); break;
         case var_ref_tag: res = asm_gen_var_ref(e); break;
         case const_int_tag: res = asm_gen_int_const(e); break;
@@ -336,13 +337,15 @@ char* asm_gen_var_def(asn* var_def){
     printf("generating var def\n");
     asn* val = NULL;
     char* rhs = NULL;
+    char* code = strnew();
     if(var_def->op.var_def_exp.val != NULL){
         val = var_def->op.var_def_exp.val;
         rhs = asm_gen(val);
     } else {
-        rhs = asm_gen_int_const(make_int_exp(0));
+        asn* tmp_null = make_int_exp(0);
+        rhs = asm_gen_int_const(tmp_null);
+        delete_exp(tmp_null);
     }
-    char* code = strnew();
     strapp(&code, rhs);
 
     const char* id;

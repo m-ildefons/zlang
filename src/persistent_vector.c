@@ -145,7 +145,7 @@ pv_leaf* new_pv_leaf(char* ident,
     pv_leaf* l = (pv_leaf*) malloc(sizeof(pv_leaf));
     assert(l != NULL);
     l->ref_count = 1;
-    l->ident = ident;
+    l->ident = strdup(ident);
     l->type = type;
     l->size = size;
     l->offset = offset;
@@ -226,7 +226,7 @@ void delete_trie(pv_root* t){
     if(t == NULL)
         return;
 
-//    pv_pretty_print(t);
+    // pv_pretty_print(t);
 
     if(t->trie != NULL && t->trie->ref_count < 2)
         delete_trie_node(t->trie);
@@ -263,6 +263,7 @@ void delete_trie_leaf(pv_leaf* l){
         return;
     }
 
+    free(l->ident);
     free(l);
     l = NULL;
 }

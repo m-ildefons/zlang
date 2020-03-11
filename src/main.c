@@ -21,6 +21,7 @@
 #include "ast.h"
 #include "parse.h"
 #include "asm_gen.h"
+#include "ic_gen.h"
 
 
 static int verbosity;
@@ -113,6 +114,11 @@ int main(int argc, char* argv[]){
     if(expr != NULL)
         pretty_print(expr);
 
+    print_separator("Generating Intermediate Code");
+
+    quad_list* IC = ic_gen_translation_unit(expr);
+    print_quad_list(IC);
+
     print_separator("Generating Source");
 
     char* asm_source = asm_gen_prog(expr);
@@ -123,6 +129,7 @@ int main(int argc, char* argv[]){
     write_file("out.s", asm_source);
 
     delete_prog_exp(expr);
+    delete_quad_list(IC);
     free(asm_source);
     token* tlp = tlh;
     while(tlhnt > 0){
