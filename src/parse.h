@@ -55,9 +55,6 @@ asn* parse_jump_statement(token** tl, size_t* tnt, pv_root* symbol_map);
 /* implemented in parse_const.c */
 asn* parse_const_exp(token** tl, size_t* tnt);
 
-/* implemented in parse_cond.c */
-asn* parse_cond_exp(token** tl, size_t* tnt, pv_root* symbol_map);
-
 /* implemented in parse_def.c */
 asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 

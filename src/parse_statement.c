@@ -116,20 +116,56 @@ asn* parse_expression_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 }
 
 /*
- * <selection-statement> ::= if ( <expression> ) <compound-statement>
- *                         | if ( <expression> ) <compound-statement>
-                             else <compund-statement>
+ * <selection-statement> ::= if ( <expression> ) : <compound-statement>
+ *                         | if ( <expression> ) : <compound-statement>
+ *                           else : <compund-statement>
  */
 asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing selection statement\n", (*tnt), (*tl)->str);
-    asn* statement = NULL;
-    statement = parse_cond_exp(tl, tnt, symbol_map);
-    if(statement != NULL){
-        printf("\033[92mfound\033[39m conditional expression\n");
-        return statement;
-    }
-    parse_error("Invalid Selection Statement", (*tl));
-    return NULL;
+    token* tlp = (*tl);
+    int scope = tlp->level;
+
+    if(tlp->type != token_cond_if && tlp->type != token_cond_else){
+        return NULL;
+	}
+	pop_token(&tlp, tl, tnt);
+
+    asn* condition = parse_bin_exp(tl, tnt, symbol_map);
+    asn* cond_exp = make_cond_exp(condition, NULL, NULL, scope);
+
+    tlp = (*tl);
+    if(tlp->type != token_colon){
+        return NULL;
+	}
+	pop_token(&tlp, tl, tnt);
+
+	symbol_map = symbol_map_copy(symbol_map);
+	symbol_map->scope = scope + 1;
+
+    parse_compound_statement(tl,
+							tnt,
+							&(cond_exp->op.cond_exp.if_body),
+							&symbol_map, scope);
+    cond_exp->op.cond_exp.if_symbol_map = symbol_map;
+
+	tlp = (*tl);
+	if(tlp != NULL && tlp->type == token_cond_else && tlp->level == scope){
+		pop_token(&tlp, tl, tnt);
+
+        if(tlp->type == token_colon){
+			pop_token(&tlp, tl, tnt);
+		} else if(tlp->type != token_cond_if){
+			return NULL;
+		}
+
+    	parse_compound_statement(tl,
+								tnt,
+								&(cond_exp->op.cond_exp.else_body),
+								&symbol_map,
+								scope);
+    	cond_exp->op.cond_exp.else_symbol_map = symbol_map;
+	}
+    return cond_exp;
 }
 
 /*
