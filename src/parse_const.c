@@ -10,6 +10,13 @@
 
 #include "parse.h"
 
+/*
+ * <constant> ::= <integer-constant>
+ *              | <character-constant>
+ *              | <floating-constant>
+ *              | <string-constant>
+ *              | <enumeration-constant>
+ */
 asn* parse_const_exp(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing const\n", (*tnt), (*tl)->str);
     token* tlp = *tl;
@@ -27,9 +34,9 @@ asn* parse_const_exp(token** tl, size_t* tnt){
         case const_real:
             f_val = atof(tlp->str);
             if(real_count == 0)
-                real_index = (double*) malloc(sizeof(double));
+                real_index = malloc(sizeof(double));
             else
-                real_index = (double*) realloc(real_index, (real_count + 1) * sizeof(double));
+                real_index = realloc(real_index, (real_count + 1) * sizeof(double));
             real_index[real_count] = f_val;
             r = make_real_exp(real_count);
             real_count++;
@@ -44,7 +51,9 @@ asn* parse_const_exp(token** tl, size_t* tnt){
             i_val = atoi(s_val);
             r = make_string_exp(i_val);
             break;
-        default: return NULL;
+        default:
+			parse_error("Constant of unkown type", (*tl));
+			return NULL;
     }
 
     pop_token(&tlp, tl, tnt);
