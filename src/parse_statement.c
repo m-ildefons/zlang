@@ -116,9 +116,12 @@ asn* parse_expression_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 }
 
 /*
- * <selection-statement> ::= if ( <expression> ) : <compound-statement>
- *                         | if ( <expression> ) : <compound-statement>
- *                           else : <compund-statement>
+ * <selection-statement> ::= if ( <expression> ) :
+ *                               <compound-statement>
+ *                         | if ( <expression> ) :
+ *                               <compound-statement>
+ *                           else :
+ *                               <compound-statement>
  */
 asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing selection statement\n", (*tnt), (*tl)->str);
@@ -169,10 +172,12 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 }
 
 /*
- * <iteration-statement> ::= while ( <expression> ) <compound-statement>
+ * <iteration-statement> ::= while ( <expression> ) :
+ *                               <compound-statement>
  *                         | for ( {<expression>}? ;
  *                                 {<expression>}? ;
- *                                 {<expression>}? ) <compound-statement>
+ *                                 {<expression>}? ) :
+ *                               <compound-statement>
  */
 asn* parse_iteration_statement(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing iteration statement\n", (*tnt), (*tl)->str);

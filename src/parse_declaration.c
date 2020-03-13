@@ -1,5 +1,5 @@
 /*
- * FILENAME: parse_decl.c
+ * FILENAME: parse_declaration.c
  *
  * DESCRIPTION:
  *     Implementation of functions for parsing declarations.

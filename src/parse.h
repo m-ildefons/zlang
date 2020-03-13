@@ -35,7 +35,7 @@ asn* parse_cast_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map);
 
-/* implemented in parse_decl.c */
+/* implemented in parse_declaration.c */
 asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map);
 asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map);
 asn* parse_init_decl(token** tl, size_t* tnt, pv_root* symbol_map, atomic_type ty);
