@@ -79,10 +79,16 @@ static void _pretty_print_unary_node(asn* tree, int level, int_stack* ws_stack){
         next = tree->op.assign_exp.rval;
     else if(tree->tag == xor_assign_tag)
         next = tree->op.assign_exp.rval;
-    else if(tree->tag == or_assign_tag)
+    else if(tree->tag == or_assign_tag){
         next = tree->op.assign_exp.rval;
-    else
+    } else {
         next = tree->op.unary_exp.val;
+	}
+
+	if(next == NULL){
+		return;
+	}
+
     push_back(&ws_stack, 2);
     _pretty_print(next, level+1, ws_stack);
     pop_back(&ws_stack);
