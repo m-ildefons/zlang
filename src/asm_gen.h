@@ -13,11 +13,12 @@
 
 #include "ast.h"
 #include "strop.h"
+#include "ic_gen.h"
 
-pv_root* symbol_map_ptr;
 
 const char* loop_start_label;
 const char* loop_end_label;
+
 
 /* implemented in asm_gen.c */
 char* gen_label(const char* cust_str);

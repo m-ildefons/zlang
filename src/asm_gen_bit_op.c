@@ -11,8 +11,8 @@
 #include "asm_gen.h"
 
 char* asm_gen_bit_op(asn* e){
-    asn* left_exp = e->op.binary_exp.expr_l;
-    asn* right_exp = e->op.binary_exp.expr_r;
+    asn* left_exp = e->op.binary_exp.lval;
+    asn* right_exp = e->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 

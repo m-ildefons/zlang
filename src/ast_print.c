@@ -40,8 +40,8 @@ void _print_tabs(int_stack* ws_stack){
 }
 
 static void _pretty_print_binary_node(asn* tree, int level, int_stack* ws_stack){
-    asn* left = tree->op.binary_exp.expr_l;
-    asn* right = tree->op.binary_exp.expr_r;
+    asn* left = tree->op.binary_exp.lval;
+    asn* right = tree->op.binary_exp.rval;
     push_back(&ws_stack, 1);
     _pretty_print(left, level+1, ws_stack);
     pop_back(&ws_stack);
@@ -59,30 +59,30 @@ static void _pretty_print_unary_node(asn* tree, int level, int_stack* ws_stack){
         next = tree->op.var_def_exp.val;
     else if(tree->tag == assign_tag){ /* or an assignment */
         push_back(&ws_stack, 1);
-        _pretty_print(tree->op.assign_exp.val, level+1, ws_stack);
+        _pretty_print(tree->op.assign_exp.rval, level+1, ws_stack);
         pop_back(&ws_stack);
         push_back(&ws_stack, 2);
         _pretty_print(tree->op.assign_exp.lval, level+1, ws_stack);
         pop_back(&ws_stack);
         return;
     } else if(tree->tag == add_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else if(tree->tag == sub_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else if(tree->tag == mul_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else if(tree->tag == div_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else if(tree->tag == mod_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else if(tree->tag == and_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else if(tree->tag == xor_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else if(tree->tag == or_assign_tag)
-        next = tree->op.assign_exp.val;
+        next = tree->op.assign_exp.rval;
     else
-        next = tree->op.unary_exp.expr;
+        next = tree->op.unary_exp.val;
     push_back(&ws_stack, 2);
     _pretty_print(next, level+1, ws_stack);
     pop_back(&ws_stack);

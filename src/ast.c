@@ -187,7 +187,7 @@ asn* make_unary_exp(atomic_type at_type, asn* expr, int type){
         default: abort();
     }
     e->op.unary_exp.type = at_type;
-    e->op.unary_exp.expr = expr;
+    e->op.unary_exp.val = expr;
     return e;
 }
 
@@ -218,8 +218,8 @@ asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type){
             abort();
     }
     e->op.binary_exp.type = at_type;
-    e->op.binary_exp.expr_l = expr_l;
-    e->op.binary_exp.expr_r = expr_r;
+    e->op.binary_exp.lval = expr_l;
+    e->op.binary_exp.rval = expr_r;
     return e;
 }
 
@@ -245,7 +245,7 @@ asn* make_assign_exp(asn* lhs, asn* val, int assign_type){
             abort();
     }
     e->op.assign_exp.lval = lhs;
-    e->op.assign_exp.val = val;
+    e->op.assign_exp.rval = val;
     return e;
 }
 
@@ -266,7 +266,7 @@ asn* make_cast_to_real(asn* val){
     assert(e != NULL);
     e->tag = cast_to_real_tag;
     e->op.unary_exp.type = at_real;
-    e->op.unary_exp.expr = val;
+    e->op.unary_exp.val = val;
 	return e;
 }
 

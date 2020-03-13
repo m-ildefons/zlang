@@ -11,8 +11,8 @@
 #include "asm_gen.h"
 
 char* asm_gen_log_and(asn* l_and){
-    asn* left_exp = l_and->op.binary_exp.expr_l;
-    asn* right_exp = l_and->op.binary_exp.expr_r;
+    asn* left_exp = l_and->op.binary_exp.lval;
+    asn* right_exp = l_and->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 
@@ -53,8 +53,8 @@ char* asm_gen_log_and(asn* l_and){
 }
 
 char* asm_gen_log_xor(asn* l_xor){
-    asn* left_exp = l_xor->op.binary_exp.expr_l;
-    asn* right_exp = l_xor->op.binary_exp.expr_r;
+    asn* left_exp = l_xor->op.binary_exp.lval;
+    asn* right_exp = l_xor->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 
@@ -102,8 +102,8 @@ char* asm_gen_log_xor(asn* l_xor){
 }
 
 char* asm_gen_log_or(asn* l_or){
-    asn* left_exp = l_or->op.binary_exp.expr_l;
-    asn* right_exp = l_or->op.binary_exp.expr_r;
+    asn* left_exp = l_or->op.binary_exp.lval;
+    asn* right_exp = l_or->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 

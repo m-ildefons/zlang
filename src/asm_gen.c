@@ -395,7 +395,7 @@ char* asm_gen_global_var(asn* e){
     asn* val = e->op.var_def_exp.val;
 
     if(val->tag == assign_tag)
-        val = val->op.assign_exp.val;
+        val = val->op.assign_exp.rval;
 
     if(val->tag == const_int_tag)
         sprintf(src, "%s:\n    .long %d\n", id, val->op.int_exp);
@@ -451,7 +451,7 @@ char* asm_gen_jump(asn* jump){
 }
 
 char* asm_gen_int_to_real(asn* cast){
-    char* inner = asm_gen(cast->op.unary_exp.expr);
+    char* inner = asm_gen(cast->op.unary_exp.val);
     char* src = strnew();
     strapp(&src, inner);
     strapp(&src, "    cvtsi2sd   %rax, %xmm0\n");

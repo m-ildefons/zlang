@@ -174,7 +174,7 @@ void delete_unary_exp(asn* e){
     if(e == NULL)
         return;
 
-    delete_exp(e->op.unary_exp.expr);
+    delete_exp(e->op.unary_exp.val);
     free(e);
 }
 
@@ -182,8 +182,8 @@ void delete_binary_exp(asn* e){
     if(e == NULL)
         return;
 
-    delete_exp(e->op.binary_exp.expr_l);
-    delete_exp(e->op.binary_exp.expr_r);
+    delete_exp(e->op.binary_exp.lval);
+    delete_exp(e->op.binary_exp.rval);
     free(e);
 }
 
@@ -192,7 +192,7 @@ void delete_assign_exp(asn* e){
         return;
 
     delete_exp(e->op.assign_exp.lval);
-    delete_exp(e->op.assign_exp.val);
+    delete_exp(e->op.assign_exp.rval);
     free(e);
 }
 

@@ -11,8 +11,8 @@
 #include "asm_gen.h"
 
 char* asm_gen_binary_plus(asn* b_plus){
-    asn* left_exp = b_plus->op.binary_exp.expr_l;
-    asn* right_exp = b_plus->op.binary_exp.expr_r;
+    asn* left_exp = b_plus->op.binary_exp.lval;
+    asn* right_exp = b_plus->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
     char* lines = strnew();
@@ -38,8 +38,8 @@ char* asm_gen_binary_plus(asn* b_plus){
 }
 
 char* asm_gen_binary_sub(asn* b_sub){
-    asn* left_exp = b_sub->op.binary_exp.expr_l;
-    asn* right_exp = b_sub->op.binary_exp.expr_r;
+    asn* left_exp = b_sub->op.binary_exp.lval;
+    asn* right_exp = b_sub->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
     char* lines = strnew();
@@ -65,8 +65,8 @@ char* asm_gen_binary_sub(asn* b_sub){
 }
 
 char* asm_gen_binary_mult(asn* b_mult){
-    asn* left_exp = b_mult->op.binary_exp.expr_l;
-    asn* right_exp = b_mult->op.binary_exp.expr_r;
+    asn* left_exp = b_mult->op.binary_exp.lval;
+    asn* right_exp = b_mult->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
     char* lines = strnew();
@@ -92,8 +92,8 @@ char* asm_gen_binary_mult(asn* b_mult){
 }
 
 char* asm_gen_binary_div(asn* b_div){
-    asn* left_exp = b_div->op.binary_exp.expr_l;
-    asn* right_exp = b_div->op.binary_exp.expr_r;
+    asn* left_exp = b_div->op.binary_exp.lval;
+    asn* right_exp = b_div->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
     char* lines = strnew();
@@ -120,8 +120,8 @@ char* asm_gen_binary_div(asn* b_div){
 }
 
 char* asm_gen_binary_mod(asn* b_mod){
-    asn* left_exp = b_mod->op.binary_exp.expr_l;
-    asn* right_exp = b_mod->op.binary_exp.expr_r;
+    asn* left_exp = b_mod->op.binary_exp.lval;
+    asn* right_exp = b_mod->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
     char* lines = strnew();

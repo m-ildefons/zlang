@@ -15,9 +15,9 @@ char* asm_gen_assign(asn* assign){
     if(assign->op.assign_exp.lval->tag == var_ref_tag)
         id = assign->op.assign_exp.lval->op.var_ref_exp.ident;
     else if(assign->op.assign_exp.lval->tag == deref_tag)
-        id = assign->op.assign_exp.lval->op.unary_exp.expr->op.var_ref_exp.ident;
+        id = assign->op.assign_exp.lval->op.unary_exp.val->op.var_ref_exp.ident;
     pv_leaf* leaf = pv_search(symbol_map_ptr, id);
-    asn* val = assign->op.assign_exp.val;
+    asn* val = assign->op.assign_exp.rval;
 
     int off = -(leaf->offset + leaf->size);
     char* rhs = asm_gen(val);

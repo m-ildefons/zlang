@@ -11,8 +11,8 @@
 #include "asm_gen.h"
 
 char* asm_gen_less(asn* less){
-    asn* left_exp = less->op.binary_exp.expr_l;
-    asn* right_exp = less->op.binary_exp.expr_r;
+    asn* left_exp = less->op.binary_exp.lval;
+    asn* right_exp = less->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 
@@ -32,8 +32,8 @@ char* asm_gen_less(asn* less){
 }
 
 char* asm_gen_less_or_equal(asn* leq){
-    asn* left_exp = leq->op.binary_exp.expr_l;
-    asn* right_exp = leq->op.binary_exp.expr_r;
+    asn* left_exp = leq->op.binary_exp.lval;
+    asn* right_exp = leq->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 
@@ -53,8 +53,8 @@ char* asm_gen_less_or_equal(asn* leq){
 }
 
 char* asm_gen_greater(asn* greater){
-    asn* left_exp = greater->op.binary_exp.expr_l;
-    asn* right_exp = greater->op.binary_exp.expr_r;
+    asn* left_exp = greater->op.binary_exp.lval;
+    asn* right_exp = greater->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 
@@ -74,8 +74,8 @@ char* asm_gen_greater(asn* greater){
 }
 
 char* asm_gen_greater_or_equal(asn* geq){
-    asn* left_exp = geq->op.binary_exp.expr_l;
-    asn* right_exp = geq->op.binary_exp.expr_r;
+    asn* left_exp = geq->op.binary_exp.lval;
+    asn* right_exp = geq->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 
@@ -96,8 +96,8 @@ char* asm_gen_greater_or_equal(asn* geq){
 }
 
 char* asm_gen_equal(asn* eq){
-    asn* left_exp = eq->op.binary_exp.expr_l;
-    asn* right_exp = eq->op.binary_exp.expr_r;
+    asn* left_exp = eq->op.binary_exp.lval;
+    asn* right_exp = eq->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 
@@ -117,8 +117,8 @@ char* asm_gen_equal(asn* eq){
 }
 
 char* asm_gen_not_equal(asn* neq){
-    asn* left_exp = neq->op.binary_exp.expr_l;
-    asn* right_exp = neq->op.binary_exp.expr_r;
+    asn* left_exp = neq->op.binary_exp.lval;
+    asn* right_exp = neq->op.binary_exp.rval;
     char* left_str = asm_gen(left_exp);
     char* right_str = asm_gen(right_exp);
 

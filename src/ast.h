@@ -144,18 +144,18 @@ typedef struct ast_node {
 
         struct {
             atomic_type type;
-            struct ast_node* expr;
+            struct ast_node* val;
         } unary_exp;
 
         struct {
             atomic_type type;
-            struct ast_node* expr_l;
-            struct ast_node* expr_r;
+            struct ast_node* lval;
+            struct ast_node* rval;
         } binary_exp;
 
         struct {
             struct ast_node* lval;
-            struct ast_node* val;
+            struct ast_node* rval;
         } assign_exp;
 
         struct {
