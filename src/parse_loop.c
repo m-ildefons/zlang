@@ -36,7 +36,11 @@ asn* parse_for_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 		return NULL;
 	pop_token(&tlp, tl, tnt);
 
-	parse_body(tl, tnt, &(for_exp->op.for_loop_exp.body), &symbol_map, scope);
+	parse_compound_statement(tl,
+                            tnt,
+                            &(for_exp->op.for_loop_exp.body),
+                            &symbol_map,
+                            scope);
 	for_exp->op.for_loop_exp.symbol_map = symbol_map;
 
 	return for_exp;
@@ -64,7 +68,11 @@ asn* parse_while_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	symbol_map = symbol_map_copy(symbol_map);
 	symbol_map->scope = scope + 1;
 
-	parse_body(tl, tnt, &(while_exp->op.while_loop_exp.body), &symbol_map, scope);
+	parse_compound_statement(tl,
+                            tnt,
+                            &(while_exp->op.while_loop_exp.body),
+                            &symbol_map,
+                            scope);
 	while_exp->op.while_loop_exp.symbol_map = symbol_map;
 
 	return while_exp;

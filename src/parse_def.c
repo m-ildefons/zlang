@@ -13,17 +13,14 @@
 
 asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     token* tlp;
-    int level;
     int scope;
     char* id;
     asn* f;
-    asn* e;
     pv_leaf* leaf;
 	unsigned int i;
     atomic_type ty;
 
     tlp = *tl;
-    level = tlp->level;
 
     i = 0;
     switch(tlp->type){
@@ -124,20 +121,7 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     delete_trie(osm);
     symbol_map->scope = scope + 1;
 
-    while(*tnt > 0 && tlp->level > level){
-        e = parse_exp(tl, tnt, symbol_map);
-        if(e == NULL)
-            break;
-
-        if(e->tag == var_def_tag){
-            if(pv_search(symbol_map, e->op.var_def_exp.ident) != NULL)
-                abort();
-            symbol_map_insert(&symbol_map, e);
-        }
-        append_exp_list(&(f->op.fun_def_exp.body), e);
-        if(*tnt > 0)
-            tlp = *tl;
-    }
+	parse_compound_statement(tl, tnt, &(f->op.fun_def_exp.body), &symbol_map, scope);
     f->op.fun_def_exp.symbol_map = symbol_map;
     return f;
 }

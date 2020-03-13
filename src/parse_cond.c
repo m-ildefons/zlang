@@ -32,7 +32,10 @@ asn* parse_cond_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	symbol_map = symbol_map_copy(symbol_map);
 	symbol_map->scope = scope + 1;
 
-    parse_body(tl, tnt, &(cond_exp->op.cond_exp.if_body), &symbol_map, scope);
+    parse_compound_statement(tl,
+							tnt,
+							&(cond_exp->op.cond_exp.if_body),
+							&symbol_map, scope);
     cond_exp->op.cond_exp.if_symbol_map = symbol_map;
 
 	tlp = (*tl);
@@ -45,7 +48,11 @@ asn* parse_cond_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 			return NULL;
 		}
 
-    	parse_body(tl, tnt, &(cond_exp->op.cond_exp.else_body), &symbol_map, scope);
+    	parse_compound_statement(tl,
+								tnt,
+								&(cond_exp->op.cond_exp.else_body),
+								&symbol_map,
+								scope);
     	cond_exp->op.cond_exp.else_symbol_map = symbol_map;
 	}
     return cond_exp;
