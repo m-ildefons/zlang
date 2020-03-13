@@ -404,14 +404,23 @@ char* asm_gen_global_var(asn* e){
 }
 
 char* asm_gen_ret(asn* ret_exp){
-    asn* e = ret_exp->op.ret_exp.val;
-    char* str = asm_gen(e);
     char* expr_str = strnew();
-    strapp(&expr_str, str);
+
+    asn* e = ret_exp->op.ret_exp.val;
+	if(e != NULL){
+        char* str = asm_gen(e);
+        strapp(&expr_str, str);
+        free(str);
+	} else {
+		// Return statement in void function/without value
+		// nulls rax by default.
+		strapp(&expr_str, "    movq   $0, %rax\n");
+	}
+
 	strapp(&expr_str, "    movq   %rbp, %rsp\n");
     strapp(&expr_str, "    popq   %rbp\n");
     strapp(&expr_str, "    ret\n");
-    free(str);
+
     return expr_str;
 }
 
