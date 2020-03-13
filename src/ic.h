@@ -25,6 +25,8 @@ typedef struct four_address_code {
         fac_func_end,
         fac_call,
         fac_ret,
+        fac_label,
+        fac_goto,
         fac_load,
         fac_store,
         fac_assign,

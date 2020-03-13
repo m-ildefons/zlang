@@ -14,7 +14,7 @@
 #include "ast.h"
 #include "ic.h"
 
-//pv_root* symbol_map_ptr;
+pv_root* symbol_map_ptr;
 
 /* implemented in ic_gen.c */
 char* get_tmp_name(void);

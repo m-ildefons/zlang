@@ -14,11 +14,11 @@
 quad_list* ic_gen_binary(asn* node){
     quad_list* IC = NULL;
 
-    quad_list* lhs_ic = ic_gen(node->op.binary_exp.expr_l);
+    quad_list* lhs_ic = ic_gen(node->op.binary_exp.lval);
     char* t1_id = get_tmp_name();
     pv_leaf* t1 = new_pv_leaf(t1_id, at_void, 0, 0, 0);
 
-    quad_list* rhs_ic = ic_gen(node->op.binary_exp.expr_r);
+    quad_list* rhs_ic = ic_gen(node->op.binary_exp.rval);
     char* t2_id = get_tmp_name();
     pv_leaf* t2 = new_pv_leaf(t2_id, at_void, 0, 0, 0);
 

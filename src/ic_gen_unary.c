@@ -43,6 +43,8 @@ quad_list* ic_gen_inc(asn* node){
 
 quad_list* ic_gen_dec(asn* node){
     quad_list* IC = NULL;
+    quad_list* inner = ic_gen(node->op.unary_exp.val);
+    quad_list_app_quad_list(&IC, inner);
     return IC;
 }
 
