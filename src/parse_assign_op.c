@@ -28,7 +28,7 @@
  */
 
 asn* parse_assign_exp(token** tl, size_t* tnt, pv_root* symbol_map){
-    printf("parsing lhs assign assign. %zu, %s\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing assignment\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
     asn* lhs = NULL;
 
