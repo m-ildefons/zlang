@@ -89,6 +89,15 @@ asn* parse_cast_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     return cast;
 }
 
+/*
+ * <postfix-expression> ::= <primary-expression>
+ *                        | <postfix-expression> [ <expression> ]
+ *                        | <postfix-expression> ( {<assignment-expression>}* )
+ *                        | <postfix-expression> . <identifier>
+ *                        | <postfix-expression> -> <identifier>
+ *                        | <postfix-expression> ++
+ *                        | <postfix-expression> --
+ */
 asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing postfix expr\n", (*tnt), (*tl)->str);
 
@@ -98,7 +107,8 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     asn* postfix_exp = primary_exp;
 
     tlp = (*tl);
-    if(tlp != NULL && tlp->type == token_inc){
+    if(tlp != NULL && tlp->type == token_dot){
+	} else if(tlp != NULL && tlp->type == token_inc){
         pop_token(&tlp, tl, tnt);
         postfix_exp = make_unary_exp(at_int, primary_exp, token_inc);
     } else if(tlp != NULL && tlp->type == token_dec){
@@ -113,6 +123,11 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     return postfix_exp;
 }
 
+/*
+ * <primary-expression> ::= <identifier>
+ *                        | <constant>
+ *                        | ( <expression> )
+ */
 asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing primary expr\n", (*tnt), (*tl)->str);
 
