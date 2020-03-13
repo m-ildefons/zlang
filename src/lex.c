@@ -88,6 +88,10 @@ static void tokenize_line(char* line,
             t = continue_kw;
         } else if(strcmp(tok, "break") == 0){
             t = break_kw;
+		} else if(strcmp(tok, ".") == 0){
+			t = token_dot;
+        } else if(strcmp(tok, ",") == 0){
+            t = token_comma;
         } else if(strcmp(tok, ":") == 0){
             t = token_colon;
         } else if(strcmp(tok, ";") == 0){
@@ -105,8 +109,6 @@ static void tokenize_line(char* line,
         } else if(strcmp(tok, "%s") == 0){
             idx++;
             t = const_string;
-        } else if(strcmp(tok, ",") == 0){
-            t = token_comma;
         } else if(strcmp(tok, "-") == 0){
             t = token_minus;
         } else if(strcmp(tok, "!") == 0 || strcmp(tok, "not") == 0){
@@ -284,6 +286,7 @@ static void pre_lex_line(char** src){
     strrep(src, "|  |", " || ");
     strrep(src, "\" % s\"", "%s");
 
+	regrep(src, "[a-zA-Z_][a-zA-Z0-9_]*[.][a-zA-Z_][a-zA-Z0-9_]*", ".", " . ");
     regrep(src, "[0-9]+[E][ ][+-][ ][0-9]+", "E - ", "E-");
     regrep(src, "[0-9]+[e][ ][+-][ ][0-9]+", "e - ", "e-");
 }
