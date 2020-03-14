@@ -17,7 +17,7 @@ asn* parse_for_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	if(tlp->type != token_loop_for)
 		return NULL;
 
-	printf("parsing for loop expr. %lu tokens left.\n", (*tnt));
+	printf("[%zu (%s)] parsing for loop\n", (*tnt), (*tl)->str);
 	pop_token(&tlp, tl, tnt);
 
 	symbol_map = symbol_map_copy(symbol_map);
@@ -26,7 +26,17 @@ asn* parse_for_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	asn* init = parse_exp(tl, tnt, symbol_map);
 	if(init->tag == var_def_tag)
 		symbol_map_insert(&symbol_map, init);
+
+	tlp = (*tl);
+	if(tlp != NULL && tlp->type == token_semi_colon)
+		pop_token(&tlp, tl, tnt);
+
 	asn* cond = parse_exp(tl, tnt, symbol_map);
+
+	tlp = (*tl);
+	if(tlp != NULL && tlp->type == token_semi_colon)
+		pop_token(&tlp, tl, tnt);
+
 	asn* move = parse_exp(tl, tnt, symbol_map);
 
 	asn* for_exp = make_for_exp(init, cond, move, NULL, scope);
@@ -53,7 +63,7 @@ asn* parse_while_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 	if(tlp->type != token_loop_while)
 		return NULL;
 
-	printf("parsing while loop expr. %lu tokens left\n", (*tnt));
+	printf("[%zu (%s)] parsing while loop\n", (*tnt), (*tl)->str);
 	pop_token(&tlp, tl, tnt);
 
 	asn* condition = parse_bin_exp(tl, tnt, symbol_map);

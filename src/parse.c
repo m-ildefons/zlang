@@ -51,8 +51,8 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
 
 	pop_token(&tlp, tl, tnt);
 
-	if(tlp != NULL && tlp->type == token_semi_colon)
-		pop_token(&tlp, tl, tnt);
+//	if(tlp != NULL && tlp->type == token_semi_colon)
+//		pop_token(&tlp, tl, tnt);
 
     printf("found var ref expr\n");
     return var;

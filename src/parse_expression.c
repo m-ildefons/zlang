@@ -50,7 +50,6 @@ asn* parse_cast_exp(token** tl, size_t* tnt, pv_root* symbol_map){
  *                        | <postfix-expression> [ <expression> ]
  *                        | <postfix-expression> ( {<assignment-expression>}* )
  *                        | <postfix-expression> . <identifier>
- *                        | <postfix-expression> -> <identifier>
  *                        | <postfix-expression> ++
  *                        | <postfix-expression> --
  */
@@ -61,19 +60,29 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
     asn* primary_exp = parse_primary_exp(tl, tnt, symbol_map);
     asn* postfix_exp = primary_exp;
-
     tlp = (*tl);
-    if(tlp != NULL && tlp->type == token_dot){
-	} else if(tlp != NULL && tlp->type == token_inc){
+
+	while(primary_exp != NULL && tlp != NULL && tlp->type == open_square_bracket){
+		printf("Parsing Array Index\n");
+	}
+	while(primary_exp != NULL && tlp != NULL && tlp->type == open_p){
+		printf("Parsing Function Call\n");
+		break;
+	}
+	while(primary_exp != NULL && tlp != NULL && tlp->type == token_dot){
+		printf("Parsing Struct Member Access\n");
+	}
+	while(primary_exp != NULL && tlp != NULL && tlp->type == token_inc){
         pop_token(&tlp, tl, tnt);
         postfix_exp = make_unary_exp(at_int, primary_exp, token_inc);
-    } else if(tlp != NULL && tlp->type == token_dec){
+	}
+	while(primary_exp != NULL && tlp != NULL && tlp->type == token_dec){
         pop_token(&tlp, tl, tnt);
         postfix_exp = make_unary_exp(at_int, primary_exp, token_dec);
-    }
+	}
 
-    if(tlp != NULL && tlp->type == token_semi_colon)
-        pop_token(&tlp, tl, tnt);
+//    if(tlp != NULL && tlp->type == token_semi_colon)
+//        pop_token(&tlp, tl, tnt);
 
     printf("found postfix expr.\n");
     return postfix_exp;
@@ -112,8 +121,8 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
                 abort();
             }
 		    pop_token(&tlp, tl, tnt);
-            if(tlp != NULL && tlp->type == token_semi_colon)
-		    	pop_token(&tlp, tl, tnt);
+//            if(tlp != NULL && tlp->type == token_semi_colon)
+//		    	pop_token(&tlp, tl, tnt);
             break;
         case close_p: pop_token(&tlp, tl, tnt); break;
         default:

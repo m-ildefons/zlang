@@ -65,11 +65,17 @@ char* asm_gen_reference(asn* ref){
 char* asm_gen_dereference(asn* deref){
     printf("generating dereference\n");
     asn* var = deref->op.unary_exp.val;
-    const char* id = var->op.var_ref_exp.ident;
-    pv_leaf* leaf = pv_search(symbol_map_ptr, id);
 
+	int off = 0;
     char* src = salloc(80);
-    sprintf(src, "    movq   %d(%%rbp), %%rbx\n", -(leaf->offset+leaf->size));
+
+	if(var->tag == var_ref_tag){
+	    const char* id = var->op.var_ref_exp.ident;
+	    pv_leaf* leaf = pv_search(symbol_map_ptr, id);
+		off = -(leaf->offset+leaf->size);
+	} else {
+	}
+    sprintf(src, "    movq   %d(%%rbp), %%rbx\n", off);
     strapp(&src, "    movq   (%rbx), %rax\n");
     return src;
 }

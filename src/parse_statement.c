@@ -102,12 +102,13 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 }
 
 /*
- * <expression-statement> ::= {<expression>}? ;
+ * <expression-statement> ::= {<expression>}? ;?
  */
 asn* parse_expression_statement(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing expression statement\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
     asn* exp = parse_exp(tl, tnt, symbol_map);
+
     tlp = (*tl);
     if(tlp->type == token_semi_colon)
         pop_token(&tlp, tl, tnt);
@@ -214,15 +215,16 @@ asn* parse_jump_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 	if(tlp->type == break_kw || tlp->type == continue_kw){
 		jump = make_jump_exp(tlp->type);
 		pop_token(&tlp, tl, tnt);
-		if(tlp->type == token_semi_colon)
+		if(tlp != NULL && tlp->type == token_semi_colon)
 			pop_token(&tlp, tl, tnt);
 	} else if(tlp->type == return_kw){
         pop_token(&tlp, tl, tnt);
         asn* inner = NULL;
-        if(tlp->type != token_semi_colon){
+        if(tlp != NULL && tlp->type != token_semi_colon){
             inner = parse_bin_exp(tl, tnt, symbol_map);
+			tlp = (*tl);
         }
-        if(tlp->type == token_semi_colon){
+        if(tlp != NULL && tlp->type == token_semi_colon){
             pop_token(&tlp, tl, tnt);
         }
         jump = make_ret_exp(inner);
