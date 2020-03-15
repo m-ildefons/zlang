@@ -108,7 +108,7 @@ char* asm_gen_prog(asn* ast_tree){
         free(block_src);
     }
 
-    strapp(&src, "    .ident  \"Boa Version 0.1\"\n");
+    strapp(&src, "    .ident  \"ZLang Version 0.1\"\n");
     free(line);
     return src;
 }

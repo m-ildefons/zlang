@@ -14,19 +14,25 @@
 quad_list* ic_gen_fun_def(asn* node){
     quad_list* IC = NULL;
 
-    pv_leaf* fun_start = new_pv_leaf(node->op.fun_def_exp.ident, at_func, 0, 0, 0);
-    pv_leaf* fun_label = new_pv_leaf(node->op.fun_def_exp.ident, at_func, 0, 0, 0);
-    pv_leaf* fun_end = new_pv_leaf(node->op.fun_def_exp.ident, at_func, 0, 0, 0);
+	pv_root* old_symbol_map_ptr = symbol_map_ptr;
+	symbol_map_ptr = node->op.fun_def_exp.symbol_map;
 
-    quadruple* q1 = make_quad(fac_func_start, fun_start, NULL, NULL);
-    quadruple* q2 = make_quad(fac_label, fun_label, NULL, NULL);
-    quadruple* q3 = make_quad(fac_func_end, fun_end, NULL, NULL);
+	pv_leaf* func = pv_search(symbol_map_ptr, node->op.fun_def_exp.ident);
+
+    quadruple* q1 = make_quad(fac_func_start, func, NULL, NULL);
+	func->ref_count++;
+    quadruple* q2 = make_quad(fac_label, func, NULL, NULL);
+	func->ref_count++;
+    quadruple* q3 = make_quad(fac_func_end, func, NULL, NULL);
+	func->ref_count++;
 
     quad_list_app_quad(&IC, q1);
     quad_list_app_quad(&IC, q2);
     quad_list* body = ic_gen_body(node->op.fun_def_exp.body);
     quad_list_app_quad_list(&IC, body);
     quad_list_app_quad(&IC, q3);
+
+	symbol_map_ptr = old_symbol_map_ptr;
 
     return IC;
 }

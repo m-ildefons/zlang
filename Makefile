@@ -1,5 +1,5 @@
 PWD=$(shell pwd)
-BOA=$(PWD)/bin/boa
+BOA=$(PWD)/bin/zlang
 export
 BIN_DIR=bin
 MKDIR_P=mkdir -p

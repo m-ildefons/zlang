@@ -64,6 +64,17 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
 	while(primary_exp != NULL && tlp != NULL && tlp->type == open_square_bracket){
 		printf("Parsing Array Index\n");
+		if(tlp != NULL && tlp->type == open_square_bracket)
+			pop_token(&tlp, tl, tnt);
+
+		asn* exp = parse_exp(tl, tnt, symbol_map);
+
+		if(tlp != NULL && tlp->type == close_square_bracket){
+			pop_token(&tlp, tl, tnt);
+		} else {
+			parse_error("Unbalances Square Brackets", (*tl));
+			abort();
+		}
 	}
 	while(primary_exp != NULL && tlp != NULL && tlp->type == open_p){
 		printf("Parsing Function Call\n");
@@ -80,9 +91,6 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         pop_token(&tlp, tl, tnt);
         postfix_exp = make_unary_exp(at_int, primary_exp, token_dec);
 	}
-
-//    if(tlp != NULL && tlp->type == token_semi_colon)
-//        pop_token(&tlp, tl, tnt);
 
     printf("found postfix expr.\n");
     return postfix_exp;
@@ -121,8 +129,6 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
                 abort();
             }
 		    pop_token(&tlp, tl, tnt);
-//            if(tlp != NULL && tlp->type == token_semi_colon)
-//		    	pop_token(&tlp, tl, tnt);
             break;
         case close_p: pop_token(&tlp, tl, tnt); break;
         default:

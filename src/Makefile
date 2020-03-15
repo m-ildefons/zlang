@@ -40,8 +40,8 @@ C_WARN_FLAGS= -Wall \
 			#-ansi
 LDFLAGS= -L/usr/lib/x86_64-linux-gnu/
 LD_DEBUG_FLAGS= -lasan -fno-omit-frame-pointer -fsanitize=address
-OUT=../bin/boa
-OUT_DEBUG=../bin/boa_debug
+OUT=../bin/zlang
+OUT_DEBUG=../bin/zlang-debug
 
 SRC=$(notdir $(wildcard ./*.c))
 HEADER=$(notdir $(wildcard ./*.h))

@@ -57,9 +57,6 @@ asn* parse_const_exp(token** tl, size_t* tnt){
     }
 
     pop_token(&tlp, tl, tnt);
-//    if(tlp != NULL && tlp->type == token_semi_colon){
-//        pop_token(&tlp, tl, tnt);
-//    }
 
     return r;
 }

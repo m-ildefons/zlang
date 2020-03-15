@@ -41,8 +41,6 @@ asn* parse_fun_call_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     }
 
 	pop_token(&tlp, tl, tnt);
-//	if(tlp->type == token_semi_colon)
-//		pop_token(&tlp, tl, tnt);
 
 	asn* call = make_call_exp(id, args);
 

@@ -2,7 +2,7 @@
  * FILENAME: main.c
  *
  * DESCRIPTION:
- *     Entry point for the Boa compiler. Also various global declarations and
+ *     Entry point for the ZLang compiler. Also various global declarations and
  *     miscelanious functions.
  *
  * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
