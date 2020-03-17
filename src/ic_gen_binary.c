@@ -42,8 +42,11 @@ quad_list* ic_gen_binary(asn* node){
     quad_list_app_quad(&IC, q);
 
     free(t1_id);
+    delete_trie_leaf(t1);
     free(t2_id);
+    delete_trie_leaf(t2);
     free(res_id);
+    delete_trie_leaf(res);
     return IC;
 }
 

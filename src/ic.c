@@ -37,9 +37,19 @@ quadruple* make_quad(int op,
     quadruple* q = malloc(sizeof(quadruple));
     assert(q != NULL);
     q->op = op;
+
     q->arg1 = arg1;
+    if(q->arg1 != NULL) // take ownership of the pointer since we are deleting.
+        q->arg1->ref_count++;
+
     q->arg2 = arg2;
+    if(q->arg2 != NULL)
+        q->arg2->ref_count++;
+
     q->res = res;
+    if(q->res != NULL)
+        q->res->ref_count++;
+
     return q;
 }
 
@@ -182,6 +192,17 @@ void print_quad_list(quad_list* list){
     quad_list* qlp = NULL;
     for(qlp = list; qlp != NULL; qlp = qlp->next){
         print_quad(qlp->quad);
+        if(qlp->quad->op == fac_func_end && qlp->next != NULL){
+            printf("\u2502");
+            printf("                  ");
+            printf("\u2551");
+            printf("                  ");
+            printf("\u2502");
+            printf("                  ");
+            printf("\u2502");
+            printf("                  ");
+            printf("\u2502\n");
+        }
     }
     printf("\u2558");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
