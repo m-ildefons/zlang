@@ -1,5 +1,5 @@
 " Vim syntax file
-" Language: Boa general purpose programming language
+" Language: ZLang general purpose programming language
 " Maintainer: Moritz Röhrich
 " Latest Revision: 03 Mar 2020
 

@@ -1,4 +1,4 @@
-CC=$(BOA)
+CC=$(ZLANG)
 DIR=$(sort $(dir $(wildcard */)))
 SUBDIR=$(DIR:%/=%_subdir)
 SRC=$(notdir $(wildcard ./*.x))
