@@ -55,7 +55,7 @@ typedef struct trie_root_node {
 void pv_pretty_print(pv_root* trie);
 pv_root* new_trie(void);
 pv_root* copy_trie(pv_root* root);
-pv_node* new_pv_node(void);
+pv_node* new_pv_node(char ident);
 pv_leaf* new_pv_leaf(char* ident,
                     atomic_type type,
                     int size,

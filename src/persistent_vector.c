@@ -69,7 +69,7 @@ static void _pv_pretty_print(pv_node* tree, int_stack* ws_stack){
 }
 
 void pv_pretty_print(pv_root* trie){
-    int_stack* ws_stack = (int_stack*) malloc(sizeof(int_stack));
+    int_stack* ws_stack = malloc(sizeof(int_stack));
     assert(ws_stack != NULL);
     ws_stack->next = NULL;
     ws_stack->val = 0;
@@ -92,9 +92,9 @@ void pv_pretty_print(pv_root* trie){
 }
 
 pv_root* new_trie(){
-    pv_root* root = (pv_root*) malloc(sizeof(pv_root));
+    pv_root* root = malloc(sizeof(pv_root));
     assert(root != NULL);
-    root->trie = new_pv_node();
+    root->trie = new_pv_node(' ');
     root->size = 0;
     root->depth = 0;
     root->mem_offset = 0;
@@ -105,8 +105,6 @@ pv_root* new_trie(){
 
 pv_root* copy_trie(pv_root* root){
     pv_root* trie = new_trie();
-    delete_trie_node(trie->trie);
-    trie->trie = new_pv_node();
     size_t i;
     for(i = 0; i < PV_BRANCHING_FACTOR; i++){
         if(root->trie->children[i] != NULL){
@@ -125,11 +123,11 @@ pv_root* copy_trie(pv_root* root){
     return trie;
 }
 
-pv_node* new_pv_node(){
+pv_node* new_pv_node(char ident){
     unsigned int i;
-    pv_node* n = (pv_node*) malloc(sizeof(pv_node));
+    pv_node* n = malloc(sizeof(pv_node));
     assert(n != NULL);
-    n->ident = ' ';
+    n->ident = ident;
     n->ref_count = 1;
     for(i = 0; i < PV_BRANCHING_FACTOR; i++)
         n->children[i] = NULL;
@@ -142,7 +140,7 @@ pv_leaf* new_pv_leaf(char* ident,
                     int size,
                     int offset,
                     int scope){
-    pv_leaf* l = (pv_leaf*) malloc(sizeof(pv_leaf));
+    pv_leaf* l = malloc(sizeof(pv_leaf));
     assert(l != NULL);
     l->ref_count = 1;
     l->ident = strdup(ident);
@@ -163,12 +161,10 @@ pv_root* pv_insert(pv_root* old_trie, const char* key, pv_leaf* leaf){
     for(next = key; (*next) != '\0'; next++){
         cidx = (int) (*next);
         if(node->children[cidx] == NULL){
-            node->children[cidx] = new_pv_node();
-            node->children[cidx]->ident = cidx;
+            node->children[cidx] = new_pv_node(cidx);
         } else {
             pv_node* old_node = node->children[cidx];
-            node->children[cidx] = new_pv_node();
-            node->children[cidx]->ident = cidx;
+            node->children[cidx] = new_pv_node(cidx);
             for(i = 0; i < PV_BRANCHING_FACTOR; i++){
                 if(old_node->children[i] != NULL){
                     node->children[cidx]->children[i] = old_node->children[i];
@@ -269,7 +265,7 @@ void delete_trie_leaf(pv_leaf* l){
 }
 
 ca_list* new_ca_list(const char* key){
-    ca_list* l = (ca_list*) malloc(sizeof(ca_list));
+    ca_list* l = malloc(sizeof(ca_list));
     assert(l != NULL);
     l->next = NULL;
     l->key = key;
