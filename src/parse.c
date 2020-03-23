@@ -19,8 +19,11 @@ asn* parse_translation_unit(token** tl, size_t* tnt, const char* filename){
 
     asn* prog = make_prog_exp(filename, NULL);
     pv_root* symbol_map = prog->op.prog_exp.symbol_map;
+
+    symbol_list* symbols = prog->op.prog_exp.symbols;
+
     while(*tnt > 0){
-        asn* e = parse_external_declaration(tl, tnt, &symbol_map);
+        asn* e = parse_external_declaration(tl, tnt, &symbol_map, &symbols);
         if(e == NULL)
             break;
 
@@ -41,11 +44,11 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing var ref expr\n", (*tnt), (*tl)->str);
 
     pv_leaf* leaf = pv_search(symbol_map, tlp->str);
-    if(leaf == NULL){
-        parse_error("Reference to undeclared symbol", (*tl));
-		pv_pretty_print(symbol_map);
-        return NULL;
-    }
+    //if(leaf == NULL){
+    //    parse_error("Reference to undeclared symbol", (*tl));
+	//	pv_pretty_print(symbol_map);
+    //    return NULL;
+    //}
 
 	var = make_var_ref_exp(tlp->str);
 

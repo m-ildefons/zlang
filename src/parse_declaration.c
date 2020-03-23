@@ -15,12 +15,12 @@
  * <external-declaration> ::= <function-definition>
  *                          | <declaration>
  */
-asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map){
+asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map, symbol_list** symbols){
     printf("[%zu (%s)] parsing external declaration\n", (*tnt), (*tl)->str);
 
     asn* exp;
 
-    exp = parse_fun_def_exp(tl, tnt, (*symbol_map));
+    exp = parse_fun_def_exp(tl, tnt, (*symbol_map), symbols);
     if(exp != NULL){
         if(pv_search((*symbol_map), exp->op.fun_def_exp.ident) != NULL){
             parse_error("Error, symbol already declared.", (*tl));
@@ -31,6 +31,12 @@ asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map){
         pv_root* osm =(*symbol_map);
         (*symbol_map)= pv_insert((*symbol_map), l->ident, l);
         delete_trie(osm);
+
+        symbol* s = new_symbol(exp->op.fun_def_exp.ident,
+                            at_func);
+        symbol_list_append(symbols, &s);
+        delete_symbol(&s);
+
         return exp;
     }
 
@@ -43,6 +49,11 @@ asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map){
             }
             symbol_map_insert(symbol_map, exp);
             (*symbol_map)->mem_offset -= exp->op.struct_exp.size;
+
+            symbol* s = new_symbol(exp->op.struct_exp.ident,
+                                at_struct);
+            symbol_list_append(symbols, &s);
+            delete_symbol(&s);
         } else if(exp->tag == var_def_tag){
             if(pv_search((*symbol_map), exp->op.var_def_exp.ident) != NULL){
                 parse_error("Error, symbol already declared.", (*tl));
@@ -50,6 +61,11 @@ asn* parse_external_declaration(token** tl, size_t* tnt, pv_root** symbol_map){
             }
             symbol_map_insert(symbol_map, exp);
             (*symbol_map)->mem_offset -= 8;
+
+            symbol* s = new_symbol(exp->op.var_def_exp.ident,
+                                exp->op.var_def_exp.type);
+            symbol_list_append(symbols, &s);
+            delete_symbol(&s);
         }
         return exp;
     }
@@ -102,10 +118,10 @@ asn* parse_declaration(token** tl, size_t* tnt, pv_root* symbol_map){
             }
             break;
         case token_struct:
-            decl = parse_struct_specifier(tl, tnt, symbol_map);
+            decl = parse_struct_specifier(tl, tnt);
             return decl;
         case token_union:
-            decl = parse_struct_specifier(tl, tnt, symbol_map);
+            decl = parse_struct_specifier(tl, tnt);
             return decl;
         default:
             return NULL;

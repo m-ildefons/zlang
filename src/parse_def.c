@@ -11,7 +11,7 @@
 
 #include "parse.h"
 
-asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list** symbols){
     token* tlp;
     int scope;
     char* id;
@@ -83,8 +83,15 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
     symbol_map = copy_trie(symbol_map);
 
+    symbol_list* symbols_fun = new_symbol_list((size_t) scope + 1);
+    symbols_fun->bottom->next = (*symbols)->top;
+    if((*symbols)->top != NULL){
+        (*symbols)->top->ref_count++;
+    }
+
 	asn_list* args = NULL;
 	asn* arg = NULL;
+    symbol* sym_arg = NULL;
     for(i = 0; tlp->type != close_p && (tlp+1)->type != token_colon; i++){
         arg = parse_declaration(tl, tnt, symbol_map);
         arg->op.var_def_exp.scope += 1;
@@ -93,6 +100,13 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 		tlp = (*tl);
 
 		symbol_map_insert(&symbol_map, arg);
+
+        sym_arg = new_symbol(arg->op.var_def_exp.ident,
+                            arg->op.var_def_exp.type);
+        sym_arg->scope = (size_t) arg->op.var_def_exp.scope;
+        symbol_list_append(&symbols_fun, &sym_arg);
+        delete_symbol(&sym_arg);
+
 		if(i >= 6){
 			symbol_map->mem_offset -= 8;
 			leaf = pv_search(symbol_map, arg->op.var_def_exp.ident);
@@ -115,13 +129,14 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 
     f = make_fun_def_exp(ty, id, args, NULL, scope);
     f->op.fun_def_exp.symbol_map = symbol_map;
+    f->op.fun_def_exp.symbols = symbols_fun;
     leaf = new_pv_leaf(id, ty, -1, symbol_map->mem_offset, scope);
     pv_root* osm = symbol_map;
     symbol_map = pv_insert(symbol_map, id, leaf);
     delete_trie(osm);
     symbol_map->scope = scope + 1;
 
-	parse_compound_statement(tl, tnt, &(f->op.fun_def_exp.body), &symbol_map, scope);
+	parse_compound_statement(tl, tnt, &(f->op.fun_def_exp.body), &symbol_map, &symbols_fun, scope);
     f->op.fun_def_exp.symbol_map = symbol_map;
     return f;
 }

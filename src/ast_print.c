@@ -10,6 +10,7 @@
 
 #include "ast.h"
 
+static void _pretty_print_symbol_list(symbol_list* list, int_stack* ws_stack);
 static void _pretty_print_binary_node(asn* tree, int level, int_stack* ws_stack);
 static void _pretty_print_unary_node(asn* tree, int level, int_stack* ws_stack);
 static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack);
@@ -37,6 +38,32 @@ void _print_tabs(int_stack* ws_stack){
         printf(" \u2502 ");
     else
         printf("   ");
+}
+
+static void _pretty_print_symbol_list(symbol_list* list, int_stack* ws_stack){
+    if(list != NULL){
+        push_back(&ws_stack, -1);
+        _print_tabs(ws_stack);
+        printf("\033[90m[ symbol list (%zu) ]\033[39m\n", list->scope);
+        pop_back(&ws_stack);
+
+        symbol_list_entry* e = list->top;
+        for(; e != NULL; e = e->next){
+            push_back(&ws_stack, -1);
+            _print_tabs(ws_stack);
+            if(e == list->top && e == list->bottom)
+                printf("\033[90mt/b ->");
+            else if(e == list->top)
+                printf("\033[90m t  ->");
+            else if(e == list->bottom)
+                printf("\033[90m b  ->");
+            else
+                printf("\033[90m      ");
+            print_symbol_list_entry(e);
+            printf("\033[39m");
+            pop_back(&ws_stack);
+        }
+    }
 }
 
 static void _pretty_print_binary_node(asn* tree, int level, int_stack* ws_stack){
@@ -97,6 +124,7 @@ static void _pretty_print_unary_node(asn* tree, int level, int_stack* ws_stack){
 static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
     asn_list* body = NULL;
     pv_root* symbol_map = NULL;
+    symbol_list* symbols = NULL;
     ca_list* key_list = NULL;
     int else_body = 0;
 
@@ -104,36 +132,39 @@ static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
         case prog_tag:
             body = tree->op.prog_exp.prog;
             symbol_map = tree->op.prog_exp.symbol_map;
+            symbols = tree->op.prog_exp.symbols;
             break;
         case fun_def_tag:
             body = tree->op.fun_def_exp.body;
             symbol_map = tree->op.fun_def_exp.symbol_map;
+            symbols = tree->op.fun_def_exp.symbols;
             break;
         case cond_tag:
             body = tree->op.cond_exp.if_body;
             symbol_map = tree->op.cond_exp.if_symbol_map;
+            symbols = tree->op.cond_exp.if_symbols;
             if(tree->op.cond_exp.else_body != NULL)
                 else_body = 1;
             break;
         case for_loop_tag:
             body = tree->op.for_loop_exp.body;
             symbol_map = tree->op.for_loop_exp.symbol_map;
+            symbols = tree->op.for_loop_exp.symbols;
             break;
         case while_loop_tag:
             body = tree->op.while_loop_exp.body;
             symbol_map = tree->op.while_loop_exp.symbol_map;
+            symbols = tree->op.while_loop_exp.symbols;
             break;
         case call_tag:
             body = tree->op.call_exp.args;
             symbol_map = NULL;
             break;
         case struct_tag:
-            body = tree->op.struct_exp.body;
-            symbol_map = tree->op.struct_exp.symbol_map;
-            break;
         case union_tag:
             body = tree->op.struct_exp.body;
             symbol_map = tree->op.struct_exp.symbol_map;
+            symbols = tree->op.struct_exp.symbols;
             break;
         default: abort();
     }
@@ -165,6 +196,11 @@ static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
             pop_back(&ws_stack);
         }
     }
+
+    if(symbols != NULL){
+        _pretty_print_symbol_list(symbols, ws_stack);
+    }
+
     for(; body != NULL; body = body->next){
         if(body->next != NULL || else_body != 0)
             push_back(&ws_stack, 1);
@@ -181,6 +217,9 @@ static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
         _print_tabs(ws_stack); printf("[ else ]\n");
         pop_back(&ws_stack);
         push_back(&ws_stack, tmp_val);
+        if(tree->op.cond_exp.else_symbols != NULL){
+            _pretty_print_symbol_list(tree->op.cond_exp.else_symbols, ws_stack);
+        }
         for(; body != NULL; body = body->next){
             if(body->next != NULL)
                 push_back(&ws_stack, 1);
@@ -422,7 +461,7 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
 }
 
 void pretty_print(asn* tree){
-    int_stack* ws_stack = (int_stack*) malloc(sizeof(int_stack));
+    int_stack* ws_stack = malloc(sizeof(int_stack));
     assert(ws_stack != NULL);
     ws_stack->next = NULL;
     ws_stack->val = 0;

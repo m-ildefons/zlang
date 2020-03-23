@@ -14,7 +14,7 @@
  * <struct-specifier> ::= struct <identifier> : {<declaration>}+
  *                      | union <identifier> : {<declaration>}+
  */
-asn* parse_struct_specifier(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_struct_specifier(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing struct\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
 
@@ -41,9 +41,12 @@ asn* parse_struct_specifier(token** tl, size_t* tnt, pv_root* symbol_map){
     pop_token(&tlp, tl, tnt);
 
     asn* str = make_struct_exp(tag, id, level);
-    symbol_map = str->op.struct_exp.symbol_map;
+    pv_root* symbol_map = str->op.struct_exp.symbol_map;
+    symbol_list* symbols = str->op.struct_exp.symbols;
+    str->op.struct_exp.symbols = symbols;
 
     asn* decl;
+    symbol* sym = NULL;
     while(tlp->level == (level + 1)){
         printf("[%zu (%s)] parsing struct member\n", (*tnt), (*tl)->str);
         decl = parse_declaration(tl, tnt, symbol_map);
@@ -54,6 +57,12 @@ asn* parse_struct_specifier(token** tl, size_t* tnt, pv_root* symbol_map){
                 parse_error("struct member already declared.", (*tl));
                 abort();
             }
+
+            sym = new_symbol(decl->op.var_def_exp.ident,
+                            decl->op.var_def_exp.type);
+            sym->scope = (size_t) level + 1;
+            symbol_list_append(&symbols, &sym);
+            delete_symbol(&sym);
 
             symbol_map_insert(&symbol_map, decl);
             append_exp_list(&(str->op.struct_exp.body), decl);
@@ -68,6 +77,12 @@ asn* parse_struct_specifier(token** tl, size_t* tnt, pv_root* symbol_map){
                 parse_error("struct member already declared.", (*tl));
                 abort();
             }
+
+            sym = new_symbol(decl->op.struct_exp.ident,
+                            at_struct);
+            sym->scope = (size_t) level + 1;
+            symbol_list_append(&symbols, &sym);
+            delete_symbol(&sym);
 
             symbol_map_insert(&symbol_map, decl);
             append_exp_list(&(str->op.struct_exp.body), decl);

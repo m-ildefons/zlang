@@ -17,6 +17,7 @@
 #include "strop.h"
 #include "int_stack.h"
 #include "persistent_vector.h"
+#include "symbol_list.h"
 #include "atomic_type.h"
 
 typedef struct ast_node {
@@ -108,6 +109,7 @@ typedef struct ast_node {
             struct ast_node_list* args;
             struct ast_node_list* body;
             struct trie_root_node* symbol_map;
+            struct s_symbol_list_t* symbols;
             int scope;
         } fun_def_exp;
 
@@ -116,7 +118,9 @@ typedef struct ast_node {
             struct ast_node_list* if_body;
 			struct ast_node_list* else_body;
             struct trie_root_node* if_symbol_map;
+            struct s_symbol_list_t* if_symbols;
             struct trie_root_node* else_symbol_map;
+            struct s_symbol_list_t* else_symbols;
             int scope;
         } cond_exp;
 
@@ -126,6 +130,7 @@ typedef struct ast_node {
             struct ast_node* move;
             struct ast_node_list* body;
             struct trie_root_node* symbol_map;
+            struct s_symbol_list_t* symbols;
             int scope;
         } for_loop_exp;
 
@@ -133,6 +138,7 @@ typedef struct ast_node {
             struct ast_node* cond;
             struct ast_node_list* body;
             struct trie_root_node* symbol_map;
+            struct s_symbol_list_t* symbols;
             int scope;
         } while_loop_exp;
 
@@ -140,6 +146,7 @@ typedef struct ast_node {
             const char* name;
             struct ast_node_list* prog;
             struct trie_root_node* symbol_map;
+            struct s_symbol_list_t* symbols;
         } prog_exp;
 
         struct {
@@ -163,6 +170,7 @@ typedef struct ast_node {
             int size;
             struct ast_node_list* body;
             struct trie_root_node* symbol_map;
+            struct s_symbol_list_t* symbols;
             int scope;
         } struct_exp;
     } op;
@@ -227,5 +235,6 @@ void delete_prog_exp(asn* e);
 void delete_struct_exp(asn* e);
 
 atomic_type get_atomic_type(asn* expr, pv_root* symbol_map);
+
 #endif
 

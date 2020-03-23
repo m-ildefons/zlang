@@ -12,7 +12,7 @@
 
 void append_exp_list(asn_list** list, asn* e){
 	if((*list) == NULL){
-		(*list) = (asn_list*) malloc(sizeof(asn_list));
+		(*list) = malloc(sizeof(asn_list));
         assert((*list) != NULL);
 		(*list)->expr = e;
 		(*list)->next = NULL;
@@ -23,7 +23,7 @@ void append_exp_list(asn_list** list, asn* e){
     while(lp->next)
         lp = lp->next;
 
-    asn_list* el = (asn_list*) malloc(sizeof(asn_list));
+    asn_list* el = malloc(sizeof(asn_list));
     assert(el != NULL);
     el->expr = e;
     el->next = NULL;
@@ -31,7 +31,7 @@ void append_exp_list(asn_list** list, asn* e){
 }
 
 asn* make_int_exp(int val){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = const_int_tag;
     e->op.int_exp = val;
@@ -39,7 +39,7 @@ asn* make_int_exp(int val){
 }
 
 asn* make_real_exp(int idx){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = const_real_tag;
     e->op.int_exp = idx;
@@ -47,7 +47,7 @@ asn* make_real_exp(int idx){
 }
 
 asn* make_char_exp(char val){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = const_char_tag;
     e->op.char_exp = val;
@@ -55,7 +55,7 @@ asn* make_char_exp(char val){
 }
 
 asn* make_string_exp(int idx){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = const_string_tag;
     e->op.int_exp = idx;
@@ -63,7 +63,7 @@ asn* make_string_exp(int idx){
 }
 
 asn* make_call_exp(char* id, asn_list* args){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = call_tag;
     e->op.call_exp.ident = id;
@@ -72,7 +72,7 @@ asn* make_call_exp(char* id, asn_list* args){
 }
 
 asn* make_ret_exp(asn* v){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = ret_tag;
     e->op.ret_exp.val = v;
@@ -84,7 +84,7 @@ asn* make_fun_def_exp(atomic_type type,
 					asn_list* args,
 					asn_list* body,
 					int scope){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = fun_def_tag;
     e->op.fun_def_exp.type = type;
@@ -99,14 +99,16 @@ asn* make_cond_exp(asn* cond,
 				asn_list* if_body,
 				asn_list* else_body,
 				int scope){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = cond_tag;
     e->op.cond_exp.cond = cond;
     e->op.cond_exp.if_body = if_body;
     e->op.cond_exp.if_symbol_map = NULL;
+    e->op.cond_exp.if_symbols = NULL;
 	e->op.cond_exp.else_body = else_body;
     e->op.cond_exp.else_symbol_map = NULL;
+    e->op.cond_exp.else_symbols = NULL;
     e->op.cond_exp.scope = scope;
     return e;
 }
@@ -116,24 +118,28 @@ asn* make_for_exp(asn* init,
                 asn* move,
                 asn_list* body,
                 int scope){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = for_loop_tag;
     e->op.for_loop_exp.init = init;
     e->op.for_loop_exp.cond = cond;
     e->op.for_loop_exp.move = move;
     e->op.for_loop_exp.body = body;
+    e->op.for_loop_exp.symbol_map = NULL;
+    e->op.for_loop_exp.symbols = NULL;
     e->op.for_loop_exp.scope = scope;
     return e;
 }
 
 asn* make_while_exp(asn* cond, asn_list* body, int scope){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
 
     e->tag = while_loop_tag;
     e->op.while_loop_exp.cond = cond;
     e->op.while_loop_exp.body = body;
+    e->op.while_loop_exp.symbol_map = NULL;
+    e->op.while_loop_exp.symbols = NULL;
     e->op.while_loop_exp.scope = scope;
     return e;
 }
@@ -141,7 +147,7 @@ asn* make_while_exp(asn* cond, asn_list* body, int scope){
 asn* make_var_def_exp(atomic_type type,
                     char* id,
                     int scope){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
 
     e->tag = var_def_tag;
@@ -153,7 +159,7 @@ asn* make_var_def_exp(atomic_type type,
 }
 
 asn* make_var_ref_exp(char* id){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
 
     e->tag = var_ref_tag;
@@ -162,18 +168,19 @@ asn* make_var_ref_exp(char* id){
 }
 
 asn* make_prog_exp(const char* name, asn_list* prog){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
 
     e->tag = prog_tag;
     e->op.prog_exp.name = name;
     e->op.prog_exp.prog = prog;
     e->op.prog_exp.symbol_map = new_trie();
+    e->op.prog_exp.symbols = new_symbol_list(0);
     return e;
 }
 
 asn* make_unary_exp(atomic_type at_type, asn* expr, int type){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
 
     switch(type){
@@ -192,7 +199,7 @@ asn* make_unary_exp(atomic_type at_type, asn* expr, int type){
 }
 
 asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     switch(type){
         case token_minus: e->tag = bin_sub_tag; break;
@@ -224,7 +231,7 @@ asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type){
 }
 
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type){
-    asn* e = (asn*) malloc(sizeof(asn));
+    asn* e = malloc(sizeof(asn));
     assert(e != NULL);
 
     switch(assign_type){
@@ -250,7 +257,7 @@ asn* make_assign_exp(asn* lhs, asn* val, int assign_type){
 }
 
 asn* make_jump_exp(int type){
-	asn* e = (asn*) malloc(sizeof(asn));
+	asn* e = malloc(sizeof(asn));
     assert(e != NULL);
 
 	switch(type){
@@ -262,7 +269,7 @@ asn* make_jump_exp(int type){
 }
 
 asn* make_cast_to_real(asn* val){
-	asn* e = (asn*) malloc(sizeof(asn));
+	asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     e->tag = cast_to_real_tag;
     e->op.unary_exp.type = at_real;
@@ -271,7 +278,7 @@ asn* make_cast_to_real(asn* val){
 }
 
 asn* make_struct_exp(int tag, char* id, int scope){
-	asn* e = (asn*) malloc(sizeof(asn));
+	asn* e = malloc(sizeof(asn));
     assert(e != NULL);
     if(tag != struct_tag && tag != union_tag)
         abort();
@@ -281,6 +288,7 @@ asn* make_struct_exp(int tag, char* id, int scope){
     e->op.struct_exp.body = NULL;
     e->op.struct_exp.size = 0;
     e->op.struct_exp.symbol_map = new_trie();
+    e->op.struct_exp.symbols = new_symbol_list(0);
     e->op.struct_exp.scope = scope;
 	return e;
 }

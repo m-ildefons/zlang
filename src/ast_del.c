@@ -91,6 +91,7 @@ void delete_prog_exp(asn* e){
 
     delete_asn_list(e->op.prog_exp.prog);
     delete_trie(e->op.prog_exp.symbol_map);
+    delete_symbol_list(e->op.prog_exp.symbols);
 	free(e);
 }
 
@@ -109,6 +110,7 @@ void delete_fun_def_exp(asn* e){
     delete_asn_list(e->op.fun_def_exp.args);
     delete_asn_list(e->op.fun_def_exp.body);
     delete_trie(e->op.fun_def_exp.symbol_map);
+    delete_symbol_list(e->op.fun_def_exp.symbols);
     free(e);
 }
 
@@ -145,6 +147,8 @@ void delete_cond_exp(asn* e){
         delete_trie(e->op.cond_exp.if_symbol_map);
     }
 
+    delete_symbol_list(e->op.cond_exp.if_symbols);
+    delete_symbol_list(e->op.cond_exp.else_symbols);
     free(e);
 }
 
@@ -155,6 +159,7 @@ void delete_while_loop_exp(asn* e){
     delete_exp(e->op.while_loop_exp.cond);
     delete_asn_list(e->op.while_loop_exp.body);
     delete_trie(e->op.while_loop_exp.symbol_map);
+    delete_symbol_list(e->op.while_loop_exp.symbols);
     free(e);
 }
 
@@ -167,6 +172,7 @@ void delete_for_loop_exp(asn* e){
     delete_exp(e->op.for_loop_exp.move);
     delete_asn_list(e->op.for_loop_exp.body);
     delete_trie(e->op.for_loop_exp.symbol_map);
+    delete_symbol_list(e->op.for_loop_exp.symbols);
     free(e);
 }
 
@@ -202,6 +208,7 @@ void delete_struct_exp(asn* e){
 
     delete_asn_list(e->op.struct_exp.body);
     delete_trie(e->op.struct_exp.symbol_map);
+    delete_symbol_list(e->op.struct_exp.symbols);
     free(e);
 }
 

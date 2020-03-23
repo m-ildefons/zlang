@@ -17,11 +17,14 @@ void parse_compound_statement(token** tl,
                             size_t* tnt,
                             asn_list** body,
                             pv_root** symbol_map,
+                            symbol_list** symbols,
                             int top_level){
     printf("[%zu (%s)] parsing compound statement\n", (*tnt), (*tl)->str);
 
     token* tlp = (*tl);
     asn* node = NULL;
+
+    symbol* sym_decl = NULL;
     while((*tnt) > 0 && tlp != NULL && tlp->level > top_level){
 
         node = parse_declaration(tl, tnt, (*symbol_map));
@@ -31,12 +34,19 @@ void parse_compound_statement(token** tl,
                 abort();
             }
             symbol_map_insert(symbol_map, node);
+
+            sym_decl = new_symbol(node->op.var_def_exp.ident,
+                                node->op.var_def_exp.type);
+            sym_decl->scope = node->op.var_def_exp.scope;
+            symbol_list_append(symbols, &sym_decl);
+            delete_symbol(&sym_decl);
+
             append_exp_list(body, node);
             tlp = (*tl);
             continue;
         }
 
-        node = parse_statement(tl, tnt, (*symbol_map));
+        node = parse_statement(tl, tnt, (*symbol_map), (*symbols));
         if(node != NULL){
             append_exp_list(body, node);
             tlp = (*tl);
@@ -56,7 +66,7 @@ void parse_compound_statement(token** tl,
  *               | <iteration-statement>
  *               | <jump-statement>
  */
-asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list* symbols){
     printf("[%zu (%s)] parsing statement\n", (*tnt), (*tl)->str);
 
     if((*tnt) <= 0)
@@ -67,7 +77,7 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 
     switch(tlp->type){
     case token_cond_if:
-        statement = parse_selection_statement(tl, tnt, symbol_map);
+        statement = parse_selection_statement(tl, tnt, symbol_map, &symbols);
         if(statement != NULL){
             printf("\033[92mfound\033[39m selection statement\n");
             return statement;
@@ -75,7 +85,7 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map){
         break;
     case token_loop_for:
     case token_loop_while:
-        statement = parse_iteration_statement(tl, tnt, symbol_map);
+        statement = parse_iteration_statement(tl, tnt, symbol_map, &symbols);
         if(statement != NULL){
             printf("\033[92mfound\033[39m iteration statement\n");
             return statement;
@@ -107,7 +117,7 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 asn* parse_expression_statement(token** tl, size_t* tnt, pv_root* symbol_map){
     printf("[%zu (%s)] parsing expression statement\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
-    asn* exp = parse_exp(tl, tnt, symbol_map);
+    asn* exp = parse_expression(tl, tnt, symbol_map);
 
     tlp = (*tl);
     if(tlp->type == token_semi_colon)
@@ -124,7 +134,7 @@ asn* parse_expression_statement(token** tl, size_t* tnt, pv_root* symbol_map){
  *                           else :
  *                               <compound-statement>
  */
-asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list** symbols){
     printf("[%zu (%s)] parsing selection statement\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
     int scope = tlp->level;
@@ -146,11 +156,20 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 	symbol_map = symbol_map_copy(symbol_map);
 	symbol_map->scope = scope + 1;
 
+    symbol_list* if_symbols = new_symbol_list(scope + 1);
+    if_symbols->bottom->next = (*symbols)->top;
+    if((*symbols)->top != NULL){
+        (*symbols)->top->ref_count++;
+    }
+
     parse_compound_statement(tl,
 							tnt,
 							&(cond_exp->op.cond_exp.if_body),
-							&symbol_map, scope);
+                            &symbol_map,
+                            &if_symbols,
+                            scope);
     cond_exp->op.cond_exp.if_symbol_map = symbol_map;
+    cond_exp->op.cond_exp.if_symbols = if_symbols;
 
 	tlp = (*tl);
 	if(tlp != NULL && tlp->type == token_cond_else && tlp->level == scope){
@@ -162,37 +181,45 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map){
 			return NULL;
 		}
 
+        symbol_list* else_symbols = new_symbol_list((size_t) scope + 1);
+        else_symbols->bottom->next = (*symbols)->top;
+        if((*symbols)->top != NULL){
+            (*symbols)->top->ref_count++;
+        }
+
     	parse_compound_statement(tl,
 								tnt,
 								&(cond_exp->op.cond_exp.else_body),
 								&symbol_map,
+                                &else_symbols,
 								scope);
     	cond_exp->op.cond_exp.else_symbol_map = symbol_map;
+        cond_exp->op.cond_exp.else_symbols = else_symbols;
 	}
     return cond_exp;
 }
 
 /*
- * <iteration-statement> ::= while ( <expression> ) :
+ * <iteration-statement> ::= while <expression> :
  *                               <compound-statement>
- *                         | for ( {<expression>}? ;
- *                                 {<expression>}? ;
- *                                 {<expression>}? ) :
+ *                         | for {<expression>}? ;
+ *                               {<expression>}? ;
+ *                               {<expression>}? :
  *                               <compound-statement>
  */
-asn* parse_iteration_statement(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_iteration_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list** symbols){
     printf("[%zu (%s)] parsing iteration statement\n", (*tnt), (*tl)->str);
 
     if((*tnt) <= 0)
         return NULL;
 
     asn* statement = NULL;
-    statement = parse_for_loop_exp(tl, tnt, symbol_map);
+    statement = parse_for_loop_exp(tl, tnt, symbol_map, symbols);
     if(statement != NULL){
         printf("\033[92mfound\033[39m for loop at\n");
         return statement;
     }
-    statement = parse_while_loop_exp(tl, tnt, symbol_map);
+    statement = parse_while_loop_exp(tl, tnt, symbol_map, symbols);
     if(statement != NULL){
         printf("\033[92mfound\033[39m while loop\n");
         return statement;
