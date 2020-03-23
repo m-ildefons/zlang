@@ -20,12 +20,12 @@ char* asm_gen_for_loop(asn* for_loop){
 	asn_list* body = for_loop->op.for_loop_exp.body;
 
 	ca_list* key_list = symbol_map_ptr->key_list;
-	pv_leaf* symbol;
+	pv_leaf* sym;
 	int num_vars = 0;
 
 	for(; key_list != NULL; key_list = key_list->next){
-		symbol = pv_search(symbol_map_ptr, key_list->key);
-		if(symbol->scope > old_symbol_map_ptr->scope)
+		sym = pv_search(symbol_map_ptr, key_list->key);
+		if(sym->scope > old_symbol_map_ptr->scope)
 			num_vars++;
 	}
 
@@ -93,12 +93,12 @@ char* asm_gen_while_loop(asn* while_loop){
 	asn_list* body = while_loop->op.while_loop_exp.body;
 
 	ca_list* key_list = symbol_map_ptr->key_list;
-	pv_leaf* symbol;
+	pv_leaf* sym;
 	int num_vars = 0;
 
 	for(; key_list != NULL; key_list = key_list->next){
-		symbol = pv_search(symbol_map_ptr, key_list->key);
-		if(symbol->scope > old_symbol_map_ptr->scope)
+		sym = pv_search(symbol_map_ptr, key_list->key);
+		if(sym->scope > old_symbol_map_ptr->scope)
 			num_vars++;
 	}
 

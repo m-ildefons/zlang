@@ -19,15 +19,15 @@ char* asm_gen_log_and(asn* l_and){
     char* lines = strnew();
 
     char* la_1 = gen_label("clause");
-    char* la_1_l = (char*) malloc(80 * sizeof(char));
+    char* la_1_l = salloc(80);
     sprintf(la_1_l, "%s:\n", la_1);
-    char* jump_line = (char*) malloc(80 * sizeof(char));
+    char* jump_line = salloc(80);
     sprintf(jump_line, "    jne    %s\n", la_1);
 
     char* la_end = gen_label("end");
-    char* la_end_l = (char*) malloc(80 * sizeof(char));
+    char* la_end_l = salloc(80);
     sprintf(la_end_l, "%s:\n", la_end);
-    char* jump_line2 = (char*) malloc(80 * sizeof(char));
+    char* jump_line2 = salloc(80);
     sprintf(jump_line2, "    jmp    %s\n", la_end);
 
     strapp(&lines, left_str);

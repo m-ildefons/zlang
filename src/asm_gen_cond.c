@@ -18,12 +18,12 @@ char* asm_gen_cond(asn* cond){
 	asn_list* body = cond->op.cond_exp.if_body;
 	asn_list* else_body = cond->op.cond_exp.else_body;
 	ca_list* key_list = symbol_map_ptr->key_list;
-	pv_leaf* symbol;
+	pv_leaf* sym;
 	int num_vars = 0;
 
 	for(; key_list != NULL; key_list = key_list->next){
-		symbol = pv_search(symbol_map_ptr, key_list->key);
-		if(symbol->scope != 0)
+		sym = pv_search(symbol_map_ptr, key_list->key);
+		if(sym->scope != 0)
 			num_vars++;
 	}
 
@@ -39,14 +39,14 @@ char* asm_gen_cond(asn* cond){
 	}
 
 	char* label_post_body = gen_label("post_body");
-	char* label_post_body_line = (char*) malloc(80 * sizeof(char));
-	char* label_post_body_jmp = (char*) malloc(80 * sizeof(char));
+	char* label_post_body_line = salloc(80);
+	char* label_post_body_jmp = salloc(80);
 	sprintf(label_post_body_line, "%s:\n", label_post_body);
 	sprintf(label_post_body_jmp, "    je     %s\n", label_post_body);
 
 	char* label_end = gen_label("end");
-	char* label_end_line = (char*) malloc(80 * sizeof(char));
-	char* label_end_jmp = (char*) malloc(80 * sizeof(char));
+	char* label_end_line = salloc(80);
+	char* label_end_jmp = salloc(80);
 	sprintf(label_end_line, "%s:\n", label_end);
 	sprintf(label_end_jmp, "    jmp    %s\n", label_end);
 

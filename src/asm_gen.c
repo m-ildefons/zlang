@@ -184,20 +184,16 @@ char* asm_gen_fun_def(asn* fun_def){
     pv_root* symbol_map = fun_def->op.fun_def_exp.symbol_map;
     int map_scope = symbol_map->scope;
     ca_list* key_list = symbol_map->key_list;
-    pv_leaf* symbol;
+    pv_leaf* sym;
     int num_vars = 0;
 
     for(; key_list != NULL; key_list = key_list->next){
-        symbol = pv_search(symbol_map, key_list->key);
-        /*printf("%s %d %d\n", key_list->key, symbol->scope, map_scope);*/
-        if(symbol->scope == map_scope)
+        sym = pv_search(symbol_map, key_list->key);
+        if(sym->scope == map_scope)
             num_vars++;
     }
 
-    /* printf("function containing %d vars\n", num_vars); */
-
-    char* src = (char*) malloc((strlen(id) + 3) * sizeof(char));
-    assert(src != NULL);
+    char* src = salloc(strlen(id) + 3);
     sprintf(src, "%s:\n", id);
     strapp(&src, "    pushq  %rbp\n");
     strapp(&src, "    movq   %rsp, %rbp\n");
@@ -220,7 +216,7 @@ char* asm_gen_fun_def(asn* fun_def){
 			case 3: strapp(&src, "    pushq  %rcx\n"); break;
 			case 4: strapp(&src, "    pushq  %r8\n"); break;
 			case 5: strapp(&src, "    pushq  %r9\n"); break;
-			default: strcat(src, "; should not have happened\n"); break;
+			default: strapp(&src, "# should not have happened\n"); break;
 		}
 	}
 
@@ -446,10 +442,9 @@ char* asm_gen_body(asn_list* body){
 }
 
 char* asm_gen_jump(asn* jump){
-	char* src = (char*) malloc(80 * sizeof(char*));
-    assert(src != NULL);
-
+	char* src = salloc(80);
 	const char* jump_label;
+
 	if(jump->tag == break_tag)
 		jump_label = loop_end_label;
 	else if(jump->tag == continue_tag)
