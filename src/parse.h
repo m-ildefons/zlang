@@ -24,7 +24,7 @@
 
 /* implemented in parse.c */
 asn* parse_translation_unit(token** tl, size_t* tnt, const char* filename);
-asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map);
+asn* parse_var_ref(token** tl, size_t* tnt);
 
 void symbol_map_insert(pv_root** symbol_map, asn* var_exp);
 pv_root* symbol_map_copy(pv_root* symbol_map);

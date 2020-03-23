@@ -33,7 +33,7 @@ asn* parse_translation_unit(token** tl, size_t* tnt, const char* filename){
     return prog;
 }
 
-asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_var_ref(token** tl, size_t* tnt){
     token* tlp = *tl;
 	asn* var = NULL;
 
@@ -42,14 +42,6 @@ asn* parse_var_ref(token** tl, size_t* tnt, pv_root* symbol_map){
     }
 
     printf("[%zu (%s)] parsing var ref expr\n", (*tnt), (*tl)->str);
-
-    pv_leaf* leaf = pv_search(symbol_map, tlp->str);
-    //if(leaf == NULL){
-    //    parse_error("Reference to undeclared symbol", (*tl));
-	//	pv_pretty_print(symbol_map);
-    //    return NULL;
-    //}
-
 	var = make_var_ref_exp(tlp->str);
 
 	pop_token(&tlp, tl, tnt);

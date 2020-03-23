@@ -37,7 +37,7 @@ void parse_compound_statement(token** tl,
 
             sym_decl = new_symbol(node->op.var_def_exp.ident,
                                 node->op.var_def_exp.type);
-            sym_decl->scope = node->op.var_def_exp.scope;
+            sym_decl->scope = (size_t) node->op.var_def_exp.scope;
             symbol_list_append(symbols, &sym_decl);
             delete_symbol(&sym_decl);
 
@@ -156,7 +156,7 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
 	symbol_map = symbol_map_copy(symbol_map);
 	symbol_map->scope = scope + 1;
 
-    symbol_list* if_symbols = new_symbol_list(scope + 1);
+    symbol_list* if_symbols = new_symbol_list((size_t) scope + 1);
     if_symbols->bottom->next = (*symbols)->top;
     if((*symbols)->top != NULL){
         (*symbols)->top->ref_count++;

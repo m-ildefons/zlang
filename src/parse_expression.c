@@ -123,6 +123,7 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
             abort();
 
         postfix_exp = make_call_exp(id, args);
+        delete_exp(primary_exp);
         return postfix_exp;
 	}
 	while(primary_exp != NULL && tlp != NULL && tlp->type == token_dot){
@@ -161,7 +162,7 @@ asn* parse_primary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
             primary = parse_const_exp(tl, tnt);
             break;
         case ident:
-            primary = parse_var_ref(tl, tnt, symbol_map);
+            primary = parse_var_ref(tl, tnt);
             break;
         case open_p:
 		    pop_token(&tlp, tl, tnt);
