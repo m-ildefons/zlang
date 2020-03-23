@@ -28,14 +28,14 @@ void delete_int_stack(int_stack* s){
 }
 
 void push(int_stack** s, int i){
-    int_stack* top = (int_stack*) malloc(sizeof(int_stack));
+    int_stack* top = malloc(sizeof(int_stack));
     top->next = (*s);
     top->val = i;
     (*s) = top;
 }
 
 void push_back(int_stack** s, int i){
-    int_stack* new_bottom = (int_stack*) malloc(sizeof(int_stack));
+    int_stack* new_bottom = malloc(sizeof(int_stack));
     new_bottom->next = NULL;
     new_bottom->val = i;
     int_stack* bottom = (*s);
