@@ -99,7 +99,8 @@ void delete_symbol_list(symbol_list* sl){
 }
 
 void print_symbol_list_entry(const symbol_list_entry* e){
-    printf("[%zu] %s %s\n",
+    printf("[%zu (%zu)] %s %s\n",
+        e->ref_count,
         e->sym->scope,
         atomic_type_cn[e->sym->type],
         e->sym->ident);
@@ -124,15 +125,6 @@ void symbol_list_insert(symbol_list** sl, symbol_list_entry** e){
     if((*sl)->top == NULL){
         (*sl)->top = (*e);
         (*e)->ref_count++;
-    } else if(strcmp((*sl)->top->sym->ident, ".placeholder") == 0){
-        symbol_list_entry* ph = (*sl)->top;
-        (*sl)->top = (*e);
-        (*e)->ref_count++;
-        (*sl)->bottom = (*e);
-        (*e)->ref_count++;
-        delete_symbol_list_entry(&ph);
-        delete_symbol_list_entry(&ph);
-        return;
     }
 
     if((*sl)->bottom != NULL){
