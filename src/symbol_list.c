@@ -124,6 +124,15 @@ void symbol_list_insert(symbol_list** sl, symbol_list_entry** e){
     if((*sl)->top == NULL){
         (*sl)->top = (*e);
         (*e)->ref_count++;
+    } else if(strcmp((*sl)->top->sym->ident, ".placeholder") == 0){
+        symbol_list_entry* ph = (*sl)->top;
+        (*sl)->top = (*e);
+        (*e)->ref_count++;
+        (*sl)->bottom = (*e);
+        (*e)->ref_count++;
+        delete_symbol_list_entry(&ph);
+        delete_symbol_list_entry(&ph);
+        return;
     }
 
     if((*sl)->bottom != NULL){
