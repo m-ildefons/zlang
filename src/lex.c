@@ -121,7 +121,7 @@ static void tokenize_line(char* line,
             t = token_div;
         } else if(strcmp(tok, "%") == 0){
             t = token_mod;
-        } else if(strcmp(tok, "**") == 0 || strcmp(tok, "exp") == 0){
+        } else if(strcmp(tok, "exp") == 0){
             t = token_exp;
         } else if(strcmp(tok, "=") == 0){
             t = token_assign;
@@ -194,7 +194,7 @@ static void tokenize_line(char* line,
         if(t != const_string){
             (*tokens)[num_tokens - 1].str = strdup(tok);
         } else {
-            (*tokens)[num_tokens - 1].str = (char*) malloc((idx / 10 + 2) * sizeof(char));
+            (*tokens)[num_tokens - 1].str = malloc((idx / 10 + 2) * sizeof(char));
             sprintf((*tokens)[num_tokens - 1].str, "%u", (idx-1));
         }
         (*tokens)[num_tokens - 1].type = t;
@@ -228,7 +228,7 @@ static void pre_lex_src(char** src){
             }
             assert(string_index != NULL);
 
-            string_index[string_count] = (char*) malloc((strlen(tok) + 1) * sizeof(char));
+            string_index[string_count] = malloc((strlen(tok) + 1) * sizeof(char));
             assert(string_index[string_count] != NULL);
             strcpy(string_index[string_count], tok);
             string_count++;
@@ -264,7 +264,6 @@ static void pre_lex_line(char** src){
     strrep(src, ">>", " >> ");
     strrep(src, "+  +", " ++ ");
     strrep(src, "-  -", " -- ");
-    strrep(src, "*  *", " ** ");
 	strrep(src, "<  <", " << ");
 	strrep(src, ">  >", " >> ");
     strrep(src, "=  =", " == ");
