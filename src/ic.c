@@ -31,9 +31,9 @@ const char* fac_cn[] = {
 };
 
 quadruple* make_quad(int op,
-                    pv_leaf* arg1,
-                    pv_leaf* arg2,
-                    pv_leaf* res){
+                    symbol* arg1,
+                    symbol* arg2,
+                    symbol* res){
     quadruple* q = malloc(sizeof(quadruple));
     assert(q != NULL);
     q->op = op;
@@ -57,9 +57,9 @@ void delete_quad(quadruple* q){
     if(q == NULL)
         return;
 
-    delete_trie_leaf(q->arg1);
-    delete_trie_leaf(q->arg2);
-    delete_trie_leaf(q->res);
+    delete_symbol(&(q->arg1));
+    delete_symbol(&(q->arg2));
+    delete_symbol(&(q->res));
 
     free(q);
 }

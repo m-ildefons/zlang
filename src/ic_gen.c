@@ -31,6 +31,7 @@ quad_list* ic_gen_translation_unit(asn* ast){
     quad_list* sub_ic = NULL;
 
 	symbol_map_ptr = ast->op.prog_exp.symbol_map;
+    symbol_list_ptr = ast->op.prog_exp.symbols;
 
     for(expr_list = ast->op.prog_exp.prog;
         expr_list != NULL;

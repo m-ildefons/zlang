@@ -16,14 +16,14 @@ quad_list* ic_gen_binary(asn* node){
 
     quad_list* lhs_ic = ic_gen(node->op.binary_exp.lval);
     char* t1_id = get_tmp_name();
-    pv_leaf* t1 = new_pv_leaf(t1_id, at_void, 0, 0, 0);
+    symbol* t1 = new_symbol(t1_id, at_void);
 
     quad_list* rhs_ic = ic_gen(node->op.binary_exp.rval);
     char* t2_id = get_tmp_name();
-    pv_leaf* t2 = new_pv_leaf(t2_id, at_void, 0, 0, 0);
+    symbol* t2 = new_symbol(t2_id, at_void);
 
     char* res_id = gen_tmp_name();
-    pv_leaf* res = new_pv_leaf(res_id, node->op.binary_exp.type, 0, 0, 0);
+    symbol* res = new_symbol(res_id, node->op.binary_exp.type);
 
     int fac;
     switch(node->tag){
@@ -42,11 +42,11 @@ quad_list* ic_gen_binary(asn* node){
     quad_list_app_quad(&IC, q);
 
     free(t1_id);
-    delete_trie_leaf(t1);
+    delete_symbol(&t1);
     free(t2_id);
-    delete_trie_leaf(t2);
+    delete_symbol(&t2);
     free(res_id);
-    delete_trie_leaf(res);
+    delete_symbol(&res);
     return IC;
 }
 

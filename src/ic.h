@@ -17,7 +17,7 @@
 #include <string.h>
 
 #include "strop.h"
-#include "persistent_vector.h"
+#include "symbol_list.h"
 
 typedef struct four_address_code {
     enum {
@@ -39,9 +39,9 @@ typedef struct four_address_code {
         fac_div,
         fac_mod,
     } op;
-    pv_leaf* arg1;
-    pv_leaf* arg2;
-    pv_leaf* res;
+    symbol* arg1;
+    symbol* arg2;
+    symbol* res;
 } quadruple;
 
 typedef struct quadruple_list {
@@ -52,9 +52,9 @@ typedef struct quadruple_list {
 extern const char* fac_cn[];
 
 quadruple* make_quad(int op,
-                    pv_leaf* arg1,
-                    pv_leaf* arg2,
-                    pv_leaf* res);
+                    symbol* arg1,
+                    symbol* arg2,
+                    symbol* res);
 void delete_quad(quadruple* q);
 void print_quad(quadruple* q);
 

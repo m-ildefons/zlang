@@ -19,19 +19,21 @@ quad_list* ic_gen_int_const(asn* node){
     sprintf(arg1_id, "%12d", node->op.int_exp);
     char* res_id = gen_tmp_name();
 
-    pv_leaf* arg1 = new_pv_leaf(arg1_id, at_int, 8, 0, 0);
-    pv_leaf* res = new_pv_leaf(res_id, at_int, 8, 0, 0);
+    symbol* arg1 = new_symbol(arg1_id, at_int);
+    symbol* res = new_symbol(res_id, at_int);
 
-    pv_root* osm = symbol_map_ptr;
-    symbol_map_ptr = pv_insert(symbol_map_ptr, res_id, res);
-    delete_trie(osm);
-    osm = symbol_map_ptr;
-    symbol_map_ptr = pv_insert(symbol_map_ptr, arg1_key, arg1);
-    delete_trie(osm);
+//    pv_root* osm = symbol_map_ptr;
+//    symbol_map_ptr = pv_insert(symbol_map_ptr, res_id, res);
+//    delete_trie(osm);
+//    osm = symbol_map_ptr;
+//    symbol_map_ptr = pv_insert(symbol_map_ptr, arg1_key, arg1);
+//    delete_trie(osm);
 
     quadruple* q = make_quad(fac_load, arg1, NULL, res);
     quad_list_app_quad(&IC, q);
 
+    delete_symbol(&arg1);
+    delete_symbol(&res);
     free(arg1_id);
     free(arg1_key);
     free(res_id);

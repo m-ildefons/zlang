@@ -24,23 +24,24 @@ quad_list* ic_gen_var_def(asn* node){
 
     char* reg_id = get_tmp_name();
 
-//    pv_leaf* var = new_pv_leaf(node->op.var_def_exp.ident,
-//                                node->op.var_def_exp.type,
-//                                0, // TODO: replace
-//                                0, // TODO: replace
-//                                node->op.var_def_exp.scope);
-    pv_leaf* var = pv_search(symbol_map_ptr, node->op.var_def_exp.ident);
-    pv_leaf* reg = new_pv_leaf(reg_id, at_void, 0, 0, 0);
-
-    pv_root* osm = symbol_map_ptr;
-    symbol_map_ptr = pv_insert(symbol_map_ptr, reg_id, reg);
-    delete_trie(osm);
-
-    quadruple* q = make_quad(fac_store, reg, NULL, var);
-
+////    pv_leaf* var = new_pv_leaf(node->op.var_def_exp.ident,
+////                                node->op.var_def_exp.type,
+////                                0, // TODO: replace
+////                                0, // TODO: replace
+////                                node->op.var_def_exp.scope);
+//    pv_leaf* var = pv_search(symbol_map_ptr, node->op.var_def_exp.ident);
+    symbol* reg = new_symbol(reg_id, at_void);
+//
+//    pv_root* osm = symbol_map_ptr;
+//    symbol_map_ptr = pv_insert(symbol_map_ptr, reg_id, reg);
+//    delete_trie(osm);
+//
+//    quadruple* q = make_quad(fac_store, reg, NULL, var);
+//
     quad_list_app_quad_list(&IC, rhs);
-    quad_list_app_quad(&IC, q);
-
+//    quad_list_app_quad(&IC, q);
+//
+  delete_symbol(&reg);
     free(reg_id);
     return IC;
 }
@@ -49,17 +50,18 @@ quad_list* ic_gen_var_ref(asn* node){
     quad_list* IC = NULL;
 
     char* reg_id = gen_tmp_name();
-    pv_leaf* reg = new_pv_leaf(reg_id, at_void, 0, 0, 0);
+    symbol* reg = new_symbol(reg_id, at_void);
 
-    pv_root* osm = symbol_map_ptr;
-    symbol_map_ptr = pv_insert(symbol_map_ptr, reg_id, reg);
-    delete_trie(osm);
+//    pv_root* osm = symbol_map_ptr;
+//    symbol_map_ptr = pv_insert(symbol_map_ptr, reg_id, reg);
+//    delete_trie(osm);
+//
+////    pv_leaf* var = new_pv_leaf(node->op.var_ref_exp.ident, at_void, 0, 0, 0);
+//    pv_leaf* var = pv_search(symbol_map_ptr, node->op.var_ref_exp.ident);
 
-//    pv_leaf* var = new_pv_leaf(node->op.var_ref_exp.ident, at_void, 0, 0, 0);
-    pv_leaf* var = pv_search(symbol_map_ptr, node->op.var_ref_exp.ident);
-
-    quadruple* q = make_quad(fac_load, var, NULL, reg);
-    quad_list_app_quad(&IC, q);
+//    quadruple* q = make_quad(fac_load, var, NULL, reg);
+//    quad_list_app_quad(&IC, q);
+    delete_symbol(&reg);
     free(reg_id);
     return IC;
 }
