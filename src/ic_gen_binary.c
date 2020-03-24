@@ -16,11 +16,11 @@ quad_list* ic_gen_binary(asn* node){
 
     quad_list* lhs_ic = ic_gen(node->op.binary_exp.lval);
     char* t1_id = get_tmp_name();
-    symbol* t1 = new_symbol(t1_id, at_void);
+    symbol* t1 = search_symbol(symbol_list_ptr, t1_id);
 
     quad_list* rhs_ic = ic_gen(node->op.binary_exp.rval);
     char* t2_id = get_tmp_name();
-    symbol* t2 = new_symbol(t2_id, at_void);
+    symbol* t2 = search_symbol(symbol_list_ptr, t2_id);
 
     char* res_id = gen_tmp_name();
     symbol* res = new_symbol(res_id, node->op.binary_exp.type);
@@ -42,9 +42,7 @@ quad_list* ic_gen_binary(asn* node){
     quad_list_app_quad(&IC, q);
 
     free(t1_id);
-    delete_symbol(&t1);
     free(t2_id);
-    delete_symbol(&t2);
     free(res_id);
     delete_symbol(&res);
     return IC;

@@ -11,40 +11,46 @@
 
 #include "ic_gen.h"
 
+
 quad_list* ic_gen_fun_def(asn* node){
     quad_list* IC = NULL;
 
-//    pv_root* old_symbol_map_ptr = symbol_map_ptr;
-//    symbol_map_ptr = copy_trie(node->op.fun_def_exp.symbol_map);
-//
-//	pv_leaf* func = pv_search(symbol_map_ptr, node->op.fun_def_exp.ident);
-//
-//    quadruple* q1 = make_quad(fac_func_start, func, NULL, NULL);
-//    quadruple* q2 = make_quad(fac_label, func, NULL, NULL);
-//    quadruple* q3 = make_quad(fac_func_end, func, NULL, NULL);
-//
-//    quad_list_app_quad(&IC, q1);
-//    quad_list_app_quad(&IC, q2);
-//    quad_list* body = ic_gen_body(node->op.fun_def_exp.body);
-//    quad_list_app_quad_list(&IC, body);
-//    quad_list_app_quad(&IC, q3);
-//
-//    delete_trie(symbol_map_ptr);
-//	symbol_map_ptr = old_symbol_map_ptr;
-//
+    symbol_list* old_symbol_list_ptr = symbol_list_ptr;
+    symbol_list_ptr = new_symbol_list((size_t) node->op.fun_def_exp.scope);
+    symbol_list_attach(&(node->op.fun_def_exp.symbols), &symbol_list_ptr);
+
+    symbol* sym_func = search_symbol(symbol_list_ptr,
+                                    node->op.fun_def_exp.ident);
+    quadruple* q1 = make_quad(fac_label, sym_func, NULL, NULL);
+    quadruple* q2 = make_quad(fac_func_start, sym_func, NULL, NULL);
+    quadruple* q3 = make_quad(fac_func_end, sym_func, NULL, NULL);
+
+    quad_list_app_quad(&IC, q1);
+    quad_list_app_quad(&IC, q2);
+    quad_list* body = ic_gen_body(node->op.fun_def_exp.body);
+    quad_list_app_quad_list(&IC, body);
+    quad_list_app_quad(&IC, q3);
+
+    delete_symbol_list(symbol_list_ptr);
+    symbol_list_ptr = old_symbol_list_ptr;
     return IC;
 }
 
 quad_list* ic_gen_fun_call(asn* node){
     quad_list* IC = NULL;
 
-    // This has to be a new leaf for now to allow functions from libraries to be
-    // called even when they are not declared in this translation unit.
-//    pv_leaf* call = new_pv_leaf(node->op.call_exp.ident, at_func, 0, 0, 0);
-//    quadruple* q1 = make_quad(fac_call, call, NULL, NULL);
-//
-//    quad_list_app_quad(&IC, q1);
-//    delete_trie_leaf(call);
+    symbol* sym_call = search_symbol(symbol_list_ptr,
+                                    node->op.call_exp.ident);
+
+    char* res_id = gen_tmp_name();
+    symbol* res = new_symbol(res_id, at_void);
+    symbol_list_append(&symbol_list_ptr, &res);
+
+    quadruple* q_call = make_quad(fac_call, sym_call, NULL, res);
+    quad_list_app_quad(&IC, q_call);
+
+    free(res_id);
+    delete_symbol(&res);
     return IC;
 }
 

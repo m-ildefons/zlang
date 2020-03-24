@@ -19,6 +19,7 @@
 #include "strop.h"
 #include "symbol_list.h"
 
+
 typedef struct four_address_code {
     enum {
         fac_func_start,
@@ -27,11 +28,17 @@ typedef struct four_address_code {
         fac_ret,
         fac_label,
         fac_jump,
-		fac_je,
-		fac_jne,
+        fac_je,
+        fac_jne,
         fac_load,
         fac_store,
-		fac_compare,
+        fac_compare,
+        fac_setl,
+        fac_setle,
+        fac_setg,
+        fac_setge,
+        fac_sete,
+        fac_setne,
         fac_assign,
         fac_add,
         fac_sub,

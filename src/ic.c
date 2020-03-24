@@ -10,18 +10,25 @@
 
 #include "ic.h"
 
+
 const char* fac_cn[] = {
-    [fac_func_start] = "func_start",
-    [fac_func_end] = "func_end",
+    [fac_func_start] = "func start",
+    [fac_func_end] = "func end",
     [fac_call] = "call",
     [fac_ret] = "return",
     [fac_label] = "label",
     [fac_jump] = "jump",
-	[fac_je] = "jump if equal",
-	[fac_jne] = "jump if not equal",
+	[fac_je] = "jmp if eq",
+	[fac_jne] = "jmp if not eq",
     [fac_load] = "load",
     [fac_store] = "store",
 	[fac_compare] = "compare",
+    [fac_setl] = "set less",
+    [fac_setle] = "set le or eq",
+    [fac_setg] = "set greater",
+    [fac_setge] = "set ge or eq",
+    [fac_sete] = "set eq",
+    [fac_setne] = "set not eq",
     [fac_assign] = "assign",
     [fac_add] = "add",
     [fac_sub] = "sub",
@@ -71,28 +78,37 @@ void print_quad(quadruple* q){
     int padlen;
 
     printf("\u2502");
-    padlen = 18 - strlen(fac_cn[q->op]);
+    padlen = 12 - strlen(fac_cn[q->op]);
     printf("%*.*s%s", padlen, padlen, " ", fac_cn[q->op]);
     printf("\u2551");
     if(q->arg1 !=  NULL){
-        padlen = 18 - strlen(q->arg1->ident);
+        padlen = 7 - strlen(atomic_type_cn[q->arg1->type]);
+        printf("%*.*s%s", padlen, padlen, " ", atomic_type_cn[q->arg1->type]);
+        printf("\u2502");
+        padlen = 12 - strlen(q->arg1->ident);
         printf("%*.*s%s", padlen, padlen, " ", q->arg1->ident);
     } else {
-        printf("                  ");
+        printf("       \u2502            ");
     }
     printf("\u2502");
     if(q->arg2 !=  NULL){
-        padlen = 18 - strlen(q->arg2->ident);
+        padlen = 7 - strlen(atomic_type_cn[q->arg2->type]);
+        printf("%*.*s%s", padlen, padlen, " ", atomic_type_cn[q->arg2->type]);
+        printf("\u2502");
+        padlen = 12 - strlen(q->arg2->ident);
         printf("%*.*s%s", padlen, padlen, " ", q->arg2->ident);
     } else {
-        printf("                  ");
+        printf("       \u2502            ");
     }
     printf("\u2502");
     if(q->res !=  NULL){
-        padlen = 18 - strlen(q->res->ident);
+        padlen = 7 - strlen(atomic_type_cn[q->res->type]);
+        printf("%*.*s%s", padlen, padlen, " ", atomic_type_cn[q->res->type]);
+        printf("\u2502");
+        padlen = 12 - strlen(q->res->ident);
         printf("%*.*s%s", padlen, padlen, " ", q->res->ident);
     } else {
-        printf("                  ");
+        printf("       \u2502            ");
     }
     printf("\u2502\n");
 }
@@ -146,47 +162,51 @@ void print_quad_list(quad_list* list){
     printf("\u2552");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2566");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u2564");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u2564");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u2555\n");
 
     printf("\u2502");
-    printf("%8.8s%s%8.8s", " ", "op", " ");
+    printf("%5.5s%s%5.5s", " ", "op", " ");
     printf("\u2551");
-    printf("%7.7s%s%7.7s", " ", "arg1", " ");
+    printf("%8.8s%s%8.8s", " ", "arg1", " ");
     printf("\u2502");
-    printf("%7.7s%s%7.7s", " ", "arg2", " ");
+    printf("%8.8s%s%8.8s", " ", "arg2", " ");
     printf("\u2502");
-    printf("%8.8s%s%7.7s", " ", "res", " ");
+    printf("%9.9s%s%8.8s", " ", "res", " ");
     printf("\u2502\n");
 
     printf("\u255e");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u256c");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2564\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u256a");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2564\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u256a");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2564\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u2561\n");
 
     quad_list* qlp = NULL;
@@ -194,32 +214,34 @@ void print_quad_list(quad_list* list){
         print_quad(qlp->quad);
         if(qlp->quad->op == fac_func_end && qlp->next != NULL){
             printf("\u2502");
-            printf("                  ");
+            printf("            ");
             printf("\u2551");
-            printf("                  ");
+            printf("       \u2502            ");
             printf("\u2502");
-            printf("                  ");
+            printf("       \u2502            ");
             printf("\u2502");
-            printf("                  ");
+            printf("       \u2502            ");
             printf("\u2502\n");
         }
     }
     printf("\u2558");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
     printf("\u2569");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2567\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u2567");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2567\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u2567");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2567\u2550\u2550\u2550\u2550");
     printf("\u2550\u2550\u2550\u2550\u2550\u2550");
-    printf("\u2550\u2550\u2550\u2550\u2550\u2550");
+    printf("\u2550\u2550");
     printf("\u255b\n");
 }
 

@@ -15,19 +15,14 @@ quad_list* ic_gen_int_const(asn* node){
     quad_list* IC = NULL;
 
     char* arg1_id = salloc(12);
-    char* arg1_key = gen_tmp_name();
     sprintf(arg1_id, "%12d", node->op.int_exp);
     char* res_id = gen_tmp_name();
 
     symbol* arg1 = new_symbol(arg1_id, at_int);
     symbol* res = new_symbol(res_id, at_int);
 
-//    pv_root* osm = symbol_map_ptr;
-//    symbol_map_ptr = pv_insert(symbol_map_ptr, res_id, res);
-//    delete_trie(osm);
-//    osm = symbol_map_ptr;
-//    symbol_map_ptr = pv_insert(symbol_map_ptr, arg1_key, arg1);
-//    delete_trie(osm);
+    symbol_list_append(&symbol_list_ptr, &arg1);
+    symbol_list_append(&symbol_list_ptr, &res);
 
     quadruple* q = make_quad(fac_load, arg1, NULL, res);
     quad_list_app_quad(&IC, q);
@@ -35,7 +30,6 @@ quad_list* ic_gen_int_const(asn* node){
     delete_symbol(&arg1);
     delete_symbol(&res);
     free(arg1_id);
-    free(arg1_key);
     free(res_id);
     return IC;
 }

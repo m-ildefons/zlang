@@ -11,6 +11,7 @@
 
 #include "ic_gen.h"
 
+
 quad_list* ic_gen_var_def(asn* node){
     quad_list* IC = NULL;
     quad_list* rhs = NULL;
@@ -23,25 +24,15 @@ quad_list* ic_gen_var_def(asn* node){
     }
 
     char* reg_id = get_tmp_name();
+    symbol* reg = search_symbol(symbol_list_ptr, reg_id);
 
-////    pv_leaf* var = new_pv_leaf(node->op.var_def_exp.ident,
-////                                node->op.var_def_exp.type,
-////                                0, // TODO: replace
-////                                0, // TODO: replace
-////                                node->op.var_def_exp.scope);
-//    pv_leaf* var = pv_search(symbol_map_ptr, node->op.var_def_exp.ident);
-    symbol* reg = new_symbol(reg_id, at_void);
-//
-//    pv_root* osm = symbol_map_ptr;
-//    symbol_map_ptr = pv_insert(symbol_map_ptr, reg_id, reg);
-//    delete_trie(osm);
-//
-//    quadruple* q = make_quad(fac_store, reg, NULL, var);
-//
+    symbol* var = search_symbol(symbol_list_ptr, node->op.var_def_exp.ident);
+
+    quadruple* q = make_quad(fac_store, reg, NULL, var);
+
     quad_list_app_quad_list(&IC, rhs);
-//    quad_list_app_quad(&IC, q);
-//
-  delete_symbol(&reg);
+    quad_list_app_quad(&IC, q);
+
     free(reg_id);
     return IC;
 }
@@ -49,18 +40,16 @@ quad_list* ic_gen_var_def(asn* node){
 quad_list* ic_gen_var_ref(asn* node){
     quad_list* IC = NULL;
 
+    symbol* var = search_symbol(symbol_list_ptr, node->op.var_ref_exp.ident);
+
     char* reg_id = gen_tmp_name();
-    symbol* reg = new_symbol(reg_id, at_void);
+    symbol* reg = new_symbol(reg_id, var->type);
+    symbol_list_append(&symbol_list_ptr, &reg);
 
-//    pv_root* osm = symbol_map_ptr;
-//    symbol_map_ptr = pv_insert(symbol_map_ptr, reg_id, reg);
-//    delete_trie(osm);
-//
-////    pv_leaf* var = new_pv_leaf(node->op.var_ref_exp.ident, at_void, 0, 0, 0);
-//    pv_leaf* var = pv_search(symbol_map_ptr, node->op.var_ref_exp.ident);
+    quadruple* q = make_quad(fac_load, var, NULL, reg);
 
-//    quadruple* q = make_quad(fac_load, var, NULL, reg);
-//    quad_list_app_quad(&IC, q);
+    quad_list_app_quad(&IC, q);
+
     delete_symbol(&reg);
     free(reg_id);
     return IC;
