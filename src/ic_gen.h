@@ -14,12 +14,15 @@
 #include "ast.h"
 #include "ic.h"
 
+
 pv_root* symbol_map_ptr;
 symbol_list* symbol_list_ptr;
 
 /* implemented in ic_gen.c */
 char* get_tmp_name(void);
 char* gen_tmp_name(void);
+char* gen_label(const char* cust_str);
+
 quad_list* ic_gen_translation_unit(asn* ast);
 quad_list* ic_gen(asn* node);
 quad_list* ic_gen_body(asn_list* body);
@@ -50,12 +53,7 @@ quad_list* ic_gen_dec(asn* node);
 quad_list* ic_gen_binary(asn* node);
 
 /* implemented in ic_gen_comp.c */
-quad_list* ic_gen_less(asn* node);
-quad_list* ic_gen_less_or_equal(asn* node);
-quad_list* ic_gen_greater(asn* node);
-quad_list* ic_gen_greater_or_equal(asn* node);
-quad_list* ic_gen_equal(asn* node);
-quad_list* ic_gen_not_equal(asn* node);
+quad_list* ic_gen_comp(asn* node);
 
 /* implemented in ic_gen_bit_op.c */
 quad_list* ic_gen_bit_op(asn* node);

@@ -21,8 +21,6 @@ const char* loop_end_label;
 
 
 /* implemented in asm_gen.c */
-char* gen_label(const char* cust_str);
-
 char* asm_gen_prog(asn* ast_tree);
 char* asm_gen(asn* e);
 char* asm_gen_fun_def(asn* fun_def);

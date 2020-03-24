@@ -10,7 +10,9 @@
 
 #include "ic_gen.h"
 
+
 static size_t tmp_counter;
+static unsigned int label_counter;
 
 char* get_tmp_name(void){
     char* name = salloc(tmp_counter / 10 + 3);
@@ -22,6 +24,16 @@ char* gen_tmp_name(void){
     tmp_counter++;
     return get_tmp_name();
 }
+
+char* gen_label(const char* cust_str){
+    /* printf("generating label %u\n", label_counter); */
+    size_t len_cs = strlen(cust_str);
+    char* label = salloc((len_cs + 10));
+    sprintf(label, ".%s%.2x", cust_str, label_counter);
+    label_counter++;
+    return label;
+}
+
 
 quad_list* ic_gen_translation_unit(asn* ast){
     asn_list* expr_list;
@@ -71,12 +83,12 @@ quad_list* ic_gen(asn* node){
         case bin_mul_tag: res = ic_gen_binary(node); break;
         case bin_div_tag: res = ic_gen_binary(node); break;
         case bin_mod_tag: res = ic_gen_binary(node); break;
-        case less_tag: res = ic_gen_less(node); break;
-        case less_or_equal_tag: res = ic_gen_less_or_equal(node); break;
-        case greater_tag: res = ic_gen_greater(node); break;
-        case greater_or_equal_tag: res = ic_gen_greater_or_equal(node); break;
-        case equal_tag: res = ic_gen_equal(node); break;
-        case not_equal_tag: res = ic_gen_not_equal(node); break;
+        case less_tag: res = ic_gen_comp(node); break;
+        case less_or_equal_tag: res = ic_gen_comp(node); break;
+        case greater_tag: res = ic_gen_comp(node); break;
+        case greater_or_equal_tag: res = ic_gen_comp(node); break;
+        case equal_tag: res = ic_gen_comp(node); break;
+        case not_equal_tag: res = ic_gen_comp(node); break;
         case bit_shift_left_tag: res = ic_gen_bit_op(node); break;
         case bit_shift_right_tag: res = ic_gen_bit_op(node); break;
         case bit_and_tag: res = ic_gen_bit_op(node); break;
