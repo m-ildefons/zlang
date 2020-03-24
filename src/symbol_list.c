@@ -146,6 +146,12 @@ void symbol_list_append(symbol_list** sl, symbol** s){
     delete_symbol_list_entry(&e);
 }
 
+void symbol_list_attach(symbol_list** outer, symbol_list** inner){
+    (*inner)->bottom->next = (*outer)->top;
+    if((*outer)->top != NULL)
+        (*outer)->top->ref_count++;
+}
+
 symbol* search_symbol(const symbol_list* sl, const char* key){
     symbol_list_entry* ptr = sl->top;
     for(; ptr != NULL; ptr = ptr->next){

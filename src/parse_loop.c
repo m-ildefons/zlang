@@ -24,10 +24,7 @@ asn* parse_for_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map, symbol_lis
 	symbol_map->scope = scope + 1;
 
     symbol_list* for_symbols = new_symbol_list((size_t) scope + 1);
-    for_symbols->bottom->next = (*symbols)->top;
-    if((*symbols)->top != NULL){
-        (*symbols)->top->ref_count++;
-    }
+    symbol_list_attach(symbols, &for_symbols);
 
 	asn* init = parse_exp(tl, tnt, symbol_map);
 	if(init != NULL && init->tag == var_def_tag){
@@ -93,10 +90,7 @@ asn* parse_while_loop_exp(token** tl, size_t* tnt, pv_root* symbol_map, symbol_l
 	symbol_map->scope = scope + 1;
 
     symbol_list* while_symbols = new_symbol_list((size_t) scope + 1);
-    while_symbols->bottom->next = (*symbols)->top;
-    if((*symbols)->top != NULL){
-        (*symbols)->top->ref_count++;
-    }
+    symbol_list_attach(symbols, &while_symbols);
 
 	parse_compound_statement(tl,
                             tnt,

@@ -84,10 +84,7 @@ asn* parse_fun_def_exp(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list
     symbol_map = copy_trie(symbol_map);
 
     symbol_list* symbols_fun = new_symbol_list((size_t) scope + 1);
-    symbols_fun->bottom->next = (*symbols)->top;
-    if((*symbols)->top != NULL){
-        (*symbols)->top->ref_count++;
-    }
+    symbol_list_attach(symbols, &symbols_fun);
 
 	asn_list* args = NULL;
 	asn* arg = NULL;

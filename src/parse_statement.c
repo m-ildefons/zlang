@@ -157,10 +157,7 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
 	symbol_map->scope = scope + 1;
 
     symbol_list* if_symbols = new_symbol_list((size_t) scope + 1);
-    if_symbols->bottom->next = (*symbols)->top;
-    if((*symbols)->top != NULL){
-        (*symbols)->top->ref_count++;
-    }
+    symbol_list_attach(symbols, &if_symbols);
 
     parse_compound_statement(tl,
 							tnt,
@@ -182,10 +179,7 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
 		}
 
         symbol_list* else_symbols = new_symbol_list((size_t) scope + 1);
-        else_symbols->bottom->next = (*symbols)->top;
-        if((*symbols)->top != NULL){
-            (*symbols)->top->ref_count++;
-        }
+        symbol_list_attach(symbols, &else_symbols);
 
     	parse_compound_statement(tl,
 								tnt,

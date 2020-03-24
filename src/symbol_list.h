@@ -84,6 +84,7 @@ void print_symbol_list(const symbol_list* sl);
 
 void symbol_list_insert(symbol_list** sl, symbol_list_entry** e);
 void symbol_list_append(symbol_list** sl, symbol** s);
+void symbol_list_attach(symbol_list** outer, symbol_list** inner);
 symbol* search_symbol(const symbol_list* sl, const char* key);
 
 #endif
