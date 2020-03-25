@@ -41,6 +41,11 @@ quad_list* ic_gen_fun_call(asn* node){
 
     symbol* sym_call = search_symbol(symbol_list_ptr,
                                     node->op.call_exp.ident);
+    int external = 1;
+    if(sym_call != NULL)
+        external = 0;
+    else
+        sym_call = new_symbol(node->op.call_exp.ident, at_func);
 
     char* res_id = gen_tmp_name();
     symbol* res = new_symbol(res_id, at_void);
@@ -51,6 +56,9 @@ quad_list* ic_gen_fun_call(asn* node){
 
     free(res_id);
     delete_symbol(&res);
+    if(external == 1)
+        delete_symbol(&sym_call);
+
     return IC;
 }
 
