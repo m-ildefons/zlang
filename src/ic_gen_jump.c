@@ -29,14 +29,14 @@ quad_list* ic_gen_ret(asn* node){
     return IC;
 }
 
-quad_list* ic_gen_break(asn* node){
+quad_list* ic_gen_break(){
     quad_list* IC = NULL;
     quadruple* q = make_quad(fac_jump, loop_end_symbol, NULL, NULL);
     quad_list_app_quad(&IC, q);
     return IC;
 }
 
-quad_list* ic_gen_continue(asn* node){
+quad_list* ic_gen_continue(){
     quad_list* IC = NULL;
     quadruple* q = make_quad(fac_jump, loop_start_symbol, NULL, NULL);
     quad_list_app_quad(&IC, q);

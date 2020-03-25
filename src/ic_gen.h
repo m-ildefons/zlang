@@ -80,8 +80,8 @@ quad_list* ic_gen_int_to_real(asn* node);
 
 /* implemented in ic_gen_jump.c */
 quad_list* ic_gen_ret(asn* node);
-quad_list* ic_gen_break(asn* node);
-quad_list* ic_gen_continue(asn* node);
+quad_list* ic_gen_break(void);
+quad_list* ic_gen_continue(void);
 
 #endif
 

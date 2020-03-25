@@ -66,8 +66,8 @@ quad_list* ic_gen(asn* node){
         case fun_def_tag: res = ic_gen_fun_def(node); break;
         case call_tag: res = ic_gen_fun_call(node); break;
         case ret_tag: res = ic_gen_ret(node); break;
-        case break_tag: res = ic_gen_break(node); break;
-        case continue_tag: res = ic_gen_continue(node); break;
+        case break_tag: res = ic_gen_break(); break;
+        case continue_tag: res = ic_gen_continue(); break;
         case var_def_tag: res = ic_gen_var_def(node); break;
         case var_ref_tag: res = ic_gen_var_ref(node); break;
         case const_int_tag: res = ic_gen_int_const(node); break;
