@@ -45,6 +45,7 @@ typedef struct four_address_code {
         fac_mul,
         fac_div,
         fac_mod,
+        fac_neg,
     } op;
     symbol* arg1;
     symbol* arg2;

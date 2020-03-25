@@ -35,6 +35,7 @@ const char* fac_cn[] = {
     [fac_mul] = "mul",
     [fac_div] = "div",
     [fac_mod] = "mod",
+    [fac_neg] = "neg",
 };
 
 quadruple* make_quad(int op,

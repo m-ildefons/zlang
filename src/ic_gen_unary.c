@@ -14,7 +14,15 @@
 quad_list* ic_gen_unary_minus(asn* node){
     quad_list* IC = NULL;
     quad_list* inner = ic_gen(node->op.unary_exp.val);
+
+    char* tmp_id = get_tmp_name();
+    symbol* tmp = search_symbol(symbol_list_ptr, tmp_id);
+    quadruple* q = make_quad(fac_neg, tmp, NULL, tmp);
+
     quad_list_app_quad_list(&IC, inner);
+    quad_list_app_quad(&IC, q);
+
+    free(tmp_id);
     return IC;
 }
 
