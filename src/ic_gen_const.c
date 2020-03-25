@@ -21,7 +21,6 @@ quad_list* ic_gen_int_const(asn* node){
     symbol* arg1 = new_symbol(arg1_id, at_int);
     symbol* res = new_symbol(res_id, at_int);
 
-    symbol_list_append(&symbol_list_ptr, &arg1);
     symbol_list_append(&symbol_list_ptr, &res);
 
     quadruple* q = make_quad(fac_load, arg1, NULL, res);
