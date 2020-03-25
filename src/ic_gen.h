@@ -17,6 +17,8 @@
 
 pv_root* symbol_map_ptr;
 symbol_list* symbol_list_ptr;
+symbol* loop_start_symbol;
+symbol* loop_end_symbol;
 
 /* implemented in ic_gen.c */
 char* get_tmp_name(void);

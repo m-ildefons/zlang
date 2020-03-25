@@ -29,7 +29,7 @@ char* gen_label(const char* cust_str){
     /* printf("generating label %u\n", label_counter); */
     size_t len_cs = strlen(cust_str);
     char* label = salloc((len_cs + 10));
-    sprintf(label, ".%s%.2x", cust_str, label_counter);
+    sprintf(label, "_%s%.2x", cust_str, label_counter);
     label_counter++;
     return label;
 }
