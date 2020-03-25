@@ -21,11 +21,9 @@ quad_list* ic_gen_fun_def(asn* node){
 
     symbol* sym_func = search_symbol(symbol_list_ptr,
                                     node->op.fun_def_exp.ident);
-    quadruple* q1 = make_quad(fac_label, sym_func, NULL, NULL);
     quadruple* q2 = make_quad(fac_func_start, sym_func, NULL, NULL);
     quadruple* q3 = make_quad(fac_func_end, sym_func, NULL, NULL);
 
-    quad_list_app_quad(&IC, q1);
     quad_list_app_quad(&IC, q2);
     quad_list* body = ic_gen_body(node->op.fun_def_exp.body);
     quad_list_app_quad_list(&IC, body);
