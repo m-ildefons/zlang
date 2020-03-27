@@ -53,7 +53,6 @@ void init_regex(){
 }
 
 void regrep(char** str, const char* reg, const char* sub, const char* rep){
-    unsigned int i;
     regex_t regex;
     char err[1024];
     int regret = regcomp(&regex, reg, REG_EXTENDED);
@@ -64,36 +63,37 @@ void regrep(char** str, const char* reg, const char* sub, const char* rep){
         exit(1);
     }
 
-    size_t nmatch = 64;
+    size_t nmatch = 1;
     regmatch_t matches[nmatch];
-    char match[64];
-    char* repl = salloc(64);
+    char* match = NULL;
+    char* repl = NULL;
+    size_t len_match = 0;
 
-    if(regexec(&regex, (*str), nmatch, matches, 0) != 0){
-        free(repl);
-        regfree(&regex);
-        return;
-    } else {
+    while(regexec(&regex, (*str), nmatch, matches, 0) == 0){
         printf("%s\n", (*str));
-        for(i = 0; i < nmatch; i++){
-            if(matches[i].rm_so == -1)
-                continue;
+            if(matches[0].rm_so == -1){
+                break;
+            } else {
+                len_match = (size_t) (matches[0].rm_eo - matches[0].rm_so);
+                repl = salloc(len_match);
+                match = salloc(len_match);
+                memset(match, 0, len_match);
+                memset(repl, 0, len_match);
+                strncpy(match,
+                        ((*str)+matches[0].rm_so),
+                        len_match);
 
-            memset(match, 0, 64);
-            memset(repl, 0, 64);
-            strncpy(match,
-                    ((*str)+matches[i].rm_so),
-                    (size_t) (matches[i].rm_eo - matches[i].rm_so));
+                printf("match: \"%s\"\n", match);
+                memcpy(repl, match, len_match);
+                strrep(&repl, sub, rep);
+                printf("repl: \"%s\"\n", repl);
+                strrep(str, match, repl);
 
-            printf("match: \"%s\"\n", match);
-            memcpy(repl, match, 64);
-            strrep(&repl, sub, rep);
-            printf("repl: \"%s\"\n", repl);
-            strrep(str, match, repl);
-        }
+                free(repl);
+                free(match);
+            }
         printf("%s\n", (*str));
     }
-    free(repl);
     regfree(&regex);
 }
 

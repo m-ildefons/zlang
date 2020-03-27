@@ -214,9 +214,9 @@ char* asm_gen_fun_def(asn* fun_def){
 		free(arg_src);
 	arg_src = salloc(80);
 	for(i = 0; i < c_xmm_regs; i++){
-		sprintf(arg_src, "    movsd  %%xmm%u, %%rax\n", i);
+		sprintf(arg_src, "    movsd  %%xmm%u, (%%rsp)\n", i);
+		strapp(&src, "    subq   $8, %rsp\n");
 		strapp(&src, arg_src);
-		strapp(&src, "    pushq  %rax\n");
 	}
     free(arg_src);
 
