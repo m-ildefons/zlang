@@ -356,6 +356,14 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             printf("[ bitwise or node ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
+        case member_access_tag:
+            printf("[ struct member access ]\n");
+            _pretty_print_binary_node(tree, level, ws_stack);
+            break;
+        case array_access_tag:
+            printf("[ array access ]\n");
+            _pretty_print_binary_node(tree, level, ws_stack);
+            break;
         case var_def_tag:
             ty = tree->op.var_def_exp.type;
             printf("[ variable definition (%s %s) ]\n",

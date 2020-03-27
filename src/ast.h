@@ -77,6 +77,8 @@ typedef struct ast_node {
         cast_to_real_tag,
         struct_tag,
         union_tag,
+        member_access_tag,
+        array_access_tag,
     } tag;
     union {
         int int_exp;

@@ -221,6 +221,8 @@ asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type){
         case token_bit_xor: e->tag = bit_xor_tag; break;
         case token_bit_shift_left: e->tag = bit_shift_left_tag; break;
         case token_bit_shift_right: e->tag = bit_shift_right_tag; break;
+        case token_dot: e->tag = member_access_tag; break;
+        case open_square_bracket: e->tag = array_access_tag; break;
         default:
             abort();
     }

@@ -88,6 +88,7 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 			pop_token(&tlp, tl, tnt);
 
 		asn* exp = parse_expression(tl, tnt, symbol_map);
+        tlp = (*tl);
 
 		if(tlp != NULL && tlp->type == close_square_bracket){
 			pop_token(&tlp, tl, tnt);
@@ -95,6 +96,7 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
 			parse_error("Unbalances Square Brackets", (*tl));
 			abort();
 		}
+        postfix_exp = make_binary_exp(at_void, postfix_exp, exp, open_square_bracket);
 	}
 	while(primary_exp != NULL && tlp != NULL && tlp->type == open_p){
         printf("[%zu (%s)] parsing function call\n", (*tnt), (*tl)->str);
@@ -127,7 +129,15 @@ asn* parse_postfix_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         return postfix_exp;
 	}
 	while(primary_exp != NULL && tlp != NULL && tlp->type == token_dot){
-        printf("Parsing Struct Member Access\n");
+        printf("[%zu (%s)] parsing struct member access\n", (*tnt), (*tl)->str);
+        pop_token(&tlp, tl, tnt);
+        if(tlp->type != ident)
+            abort();
+
+        asn* rhs = parse_primary_exp(tl, tnt, symbol_map);
+        tlp = (*tl);
+
+        postfix_exp = make_binary_exp(at_void, postfix_exp, rhs, token_dot);
 	}
 	while(primary_exp != NULL && tlp != NULL && tlp->type == token_inc){
         pop_token(&tlp, tl, tnt);
