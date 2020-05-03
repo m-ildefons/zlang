@@ -1,6 +1,8 @@
 CC=gcc
 CFLAGS= -O0 -g -march=native -mtune=native
+CFLAGS+= -DNDEBUG
 C_DEBUG_FLAGS= -O0 -g -fsanitize=address -fno-omit-frame-pointer
+C_DEBUG_FLAGS+= -D__GIT_REV__=\"$(shell git rev-parse --short HEAD)\"
 C_WARN_FLAGS= -Wall \
 			-Wextra \
 			-Wpedantic \

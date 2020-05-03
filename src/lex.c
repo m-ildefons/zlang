@@ -65,15 +65,23 @@ static void tokenize_line(char* line,
 		if(strcmp(tok, "NULL") == 0){
             t = token_null;
         } else if(strcmp(tok, "void") == 0){
-            t = type_void_kw;
-        } else if(strcmp(tok, "int") == 0){
-            t = type_int_kw;
-        } else if(strcmp(tok, "real") == 0){
-            t = type_real_kw;
-        } else if(strcmp(tok, "complex") == 0){
-            t = type_complex_kw;
+            t = token_void_kw;
+        } else if(strcmp(tok, "bool") == 0){
+            t = token_bool_kw;
         } else if(strcmp(tok, "char") == 0){
-            t = type_char_kw;
+            t = token_char_kw;
+        } else if(strcmp(tok, "int") == 0){
+            t = token_int_kw;
+        } else if(strcmp(tok, "real") == 0){
+            t = token_real_kw;
+        } else if(strcmp(tok, "signed") == 0){
+            t = token_signed_kw;
+        } else if(strcmp(tok, "unsigned") == 0){
+            t = token_unsigned_kw;
+        } else if(strcmp(tok, "complex") == 0){
+            t = token_complex_kw;
+        } else if(strcmp(tok, "string") == 0){
+            t = token_string_kw;
         } else if(strcmp(tok, "(") == 0){
             t = open_p;
         } else if(strcmp(tok, ")") == 0){

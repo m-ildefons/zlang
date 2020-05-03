@@ -23,7 +23,7 @@ quad_list* ic_gen_comp(asn* node){
     symbol* cmp2 = search_symbol(symbol_list_ptr, cmp2_id);
 
     char* res_id = gen_tmp_name();
-    symbol* res = new_symbol(res_id, at_int);
+    symbol* res = new_symbol(res_id);
     symbol_list_append(&symbol_list_ptr, &res);
 
     int fac;

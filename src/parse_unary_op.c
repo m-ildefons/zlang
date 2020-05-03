@@ -10,7 +10,7 @@
 
 #include "parse.h"
 
-asn* parse_unary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_unary_exp(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing unary expr\n", (*tnt), (*tl)->str);
 
     token* tlp = *tl;
@@ -24,12 +24,12 @@ asn* parse_unary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         tok_type == token_asterisk){
 
         pop_token(&tlp, tl, tnt);
-        inner = parse_cast_exp(tl, tnt, symbol_map);
+        inner = parse_cast_exp(tl, tnt);
     } else if(tok_type == token_inc || tok_type == token_dec){
         pop_token(&tlp, tl, tnt);
-        inner = parse_unary_exp(tl, tnt, symbol_map);
+        inner = parse_unary_exp(tl, tnt);
     } else {
-        asn* postfix = parse_postfix_exp(tl, tnt, symbol_map);
+        asn* postfix = parse_postfix_exp(tl, tnt);
         if(postfix != NULL)
             return postfix;
 
@@ -40,9 +40,8 @@ asn* parse_unary_exp(token** tl, size_t* tnt, pv_root* symbol_map){
         return NULL;
     }
 
-    atomic_type inner_ty = get_atomic_type(inner, symbol_map);
     printf("found unary expr %d\n", tok_type);
-    asn* ue = make_unary_exp(inner_ty, inner, tok_type);
+    asn* ue = make_unary_exp(inner, tok_type);
 
     return ue;
 }

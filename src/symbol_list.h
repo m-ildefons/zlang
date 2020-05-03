@@ -34,9 +34,70 @@
 #include <assert.h>
 
 #include "strop.h"
-#include "atomic_type.h"
 #include "int_stack.h"
+#include "storage_location.h"
 
+
+/* Declarator
+ */
+typedef struct {
+    enum {
+        decl_pointer,
+        decl_array,
+        decl_function,
+    } type;
+    /* this holds array size/stack frame size; ununsed when type == pointer */
+    size_t size;
+} declarator;
+
+/* Specifier
+ */
+typedef struct {
+    enum {
+        type_void,
+        type_bool,
+        type_char,
+    	type_int,
+        type_real,
+        type_signed,
+        type_unsigned,
+        type_complex,
+        type_string,
+        type_struct,
+        type_union,
+        type_enum,
+    } type;
+    enum {
+        sclass_auto,
+        sclass_register,
+        sclass_static,
+        sclass_extern,
+        sclass_inline,
+    } storage_class;
+    enum {
+        oclass_auto,
+        oclass_public,
+        oclass_private,
+        oclass_extern,
+        oclass_common,
+    } output_class;
+} specifier;
+
+typedef struct s_type_link {
+    enum {
+        cls_decl,
+        cls_spec,
+    } cls;
+    union {
+        declarator* decl;
+        specifier* spec;
+    } type;
+    struct s_type_link* next;
+} type_link;
+
+extern const char* decl_type_cn[];
+extern const char* sclass_cn[];
+extern const char* type_cn[];
 
 /* Symbol
  *
@@ -46,7 +107,9 @@ typedef struct {
     size_t ref_count;
     char* ident;
     size_t scope;
-    atomic_type type;
+    type_link* stype;
+    type_link* etype;
+    slocation* loc;
 } symbol;
 
 /* Symbol List Entry
@@ -68,20 +131,36 @@ typedef struct s_symbol_list_t {
     struct s_symbol_list_entry_t* top;
     struct s_symbol_list_entry_t* bottom;
     size_t scope;
+    size_t ref_count;
 } symbol_list;
 
 /* imeplemented in symbol_list.c */
-symbol* new_symbol(const char* id, atomic_type type);
+declarator* new_declarator(void);
+declarator* copy_declarator(const declarator* decl);
+specifier* new_specifier(void);
+specifier* copy_specifier(const specifier* spec);
+type_link* new_type_link(void);
+type_link* copy_type_link(const type_link* link);
+symbol* new_symbol(const char* id);
 symbol_list_entry* new_symbol_list_entry(void);
 symbol_list* new_symbol_list(size_t scope);
 
+void delete_declarator(declarator** d);
+void delete_specifier(specifier** s);
+void delete_type_link(type_link** tl);
 void delete_symbol(symbol** s);
 void delete_symbol_list_entry(symbol_list_entry** e);
 void delete_symbol_list(symbol_list* sl);
 
+void print_type_link(const type_link* t);
 void print_symbol_list_entry(const symbol_list_entry* e);
 void print_symbol_list(const symbol_list* sl);
 
+int is_function(type_link* l);
+
+void type_link_attach(symbol** s, type_link* l);
+void copy_type_list(const symbol* src, symbol** dst);
+void copy_return_type(const symbol* func, symbol** dst);
 void symbol_list_insert(symbol_list** sl, symbol_list_entry** e);
 void symbol_list_append(symbol_list** sl, symbol** s);
 void symbol_list_attach(symbol_list** outer, symbol_list** inner);

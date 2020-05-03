@@ -23,7 +23,8 @@ quad_list* ic_gen_binary(asn* node){
     symbol* t2 = search_symbol(symbol_list_ptr, t2_id);
 
     char* res_id = gen_tmp_name();
-    symbol* res = new_symbol(res_id, node->op.binary_exp.type);
+    symbol* res = new_symbol(res_id);
+    symbol_list_append(&symbol_list_ptr, &res);
 
     int fac;
     switch(node->tag){

@@ -15,11 +15,28 @@ quad_list* ic_gen_int_const(asn* node){
     quad_list* IC = NULL;
 
     char* arg1_id = salloc(12);
-    sprintf(arg1_id, "%12d", node->op.int_exp);
+    sprintf(arg1_id, "%d", node->op.int_exp);
     char* res_id = gen_tmp_name();
 
-    symbol* arg1 = new_symbol(arg1_id, at_int);
-    symbol* res = new_symbol(res_id, at_int);
+    symbol* arg1 = new_symbol(arg1_id);
+//    specifier* s = new_specifier();
+//    s->type = type_int;
+//    s->storage_class = sclass_auto;
+//    s->output_class = oclass_auto;
+//    type_link* tl = new_type_link();
+//    tl->cls = cls_spec;
+//    tl->type.spec = s;
+//    type_link_attach(&(arg1), tl);
+
+    symbol* res = new_symbol(res_id);
+    specifier* s_res = new_specifier();
+    s_res->type = type_int;
+    s_res->storage_class = sclass_auto;
+    s_res->output_class = oclass_auto;
+    type_link* tl_res = new_type_link();
+    tl_res->cls = cls_spec;
+    tl_res->type.spec = s_res;
+    type_link_attach(&(res), tl_res);
 
     symbol_list_append(&symbol_list_ptr, &res);
 

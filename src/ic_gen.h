@@ -13,10 +13,9 @@
 
 #include "ast.h"
 #include "ic.h"
+#include "parse.h" // for symbol_list_ptr
 
 
-pv_root* symbol_map_ptr;
-symbol_list* symbol_list_ptr;
 symbol* loop_start_symbol;
 symbol* loop_end_symbol;
 
@@ -32,10 +31,10 @@ quad_list* ic_gen_body(asn_list* body);
 /* implemented in ic_gen_fun.c */
 quad_list* ic_gen_fun_def(asn* node);
 quad_list* ic_gen_fun_call(asn* node);
+quad_list* ic_gen_fun_arg(symbol* s);
 
 /* implemented in ic_gen_var.c */
-quad_list* ic_gen_var_def(asn* node);
-quad_list* ic_gen_var_ref(asn* node);
+quad_list* ic_gen_var(asn* node);
 
 /* implemented in ic_gen_const.c */
 quad_list* ic_gen_int_const(asn* node);

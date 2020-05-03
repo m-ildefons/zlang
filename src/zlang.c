@@ -1,5 +1,5 @@
 /*
- * FILENAME: main.c
+ * FILENAME: zlang.c
  *
  * DESCRIPTION:
  *     Entry point for the ZLang compiler. Also various global declarations and
@@ -15,13 +15,15 @@
 #include <getopt.h>
 #include <unistd.h>
 
+#include "zlang.h"
 #include "lex.h"
 #include "fileop.h"
 #include "strop.h"
 #include "ast.h"
 #include "parse.h"
-#include "asm_gen.h"
 #include "ic_gen.h"
+#include "asm_x86_64.h"
+#include "elf_out.h"
 
 
 static int verbosity;
@@ -30,15 +32,18 @@ static int verbosity_parse;
 static int verbosity_ast;
 static int verbosity_asmgen;
 static int verbosity_asm;
+char* filename = NULL;
+char* asm_out = NULL;
+char* elf_out = NULL;
 
 static struct option long_options[] = {
 	{"verbose", no_argument, &verbosity, 1},
-	{"quiet", no_argument, &verbosity, 0},
-    {"Vlex", no_argument, &verbosity_lex, 0},
-    {"Vparse", no_argument, &verbosity_parse, 0},
-    {"Vast", no_argument, &verbosity_ast, 0},
-    {"Vasmgen", no_argument, &verbosity_asmgen, 0},
-    {"Vasm", no_argument, &verbosity_asm, 0},
+	{"quiet", no_argument, &verbosity, 1},
+    {"Vlex", no_argument, &verbosity_lex, 1},
+    {"Vparse", no_argument, &verbosity_parse, 1},
+    {"Vast", no_argument, &verbosity_ast, 1},
+    {"Vic", no_argument, &verbosity_asmgen, 1},
+    {"Vasm", no_argument, &verbosity_asm, 1},
 	{"output", required_argument, 0, 'o'},
     {NULL, 0, NULL, 0},
 };
@@ -57,7 +62,7 @@ static void print_separator(const char* title){
 int main(int argc, char* argv[]){
 	int c;
 	int opt_idx;
-	while((c = getopt_long(argc, argv, "f:", long_options, &opt_idx))){
+	while((c = getopt_long_only(argc, argv, "foqv:", long_options, &opt_idx))){
         if(c == -1){
             break;
         } else if(c == 0){
@@ -70,7 +75,10 @@ int main(int argc, char* argv[]){
         	printf("\n");
         } else if(c == 'f'){
         	  printf("option -f with value `%s'\n", optarg);
+        } else if(c == 'o'){
+        	  printf("option -o with value `%s'\n", optarg);
 		} else {
+            fprintf(stderr, "Invalid argument: %c\n", c);
             abort();
         }
 	}
@@ -80,14 +88,24 @@ int main(int argc, char* argv[]){
 
     if(optind < argc){
         printf ("non-option ARGV-elements: ");
-        while(optind < argc)
-            printf ("%s ", argv[optind++]);
+        while(optind < argc){
+            if(filename != NULL)
+                free(filename);
+            filename = strdup(argv[optind]);
+            asm_out = basename(filename);
+            elf_out = basename(filename);
+            strrep(&asm_out, ".x", ".s");
+            strrep(&elf_out, ".x", "");
+            printf ("%s", filename);
+            optind++;
+        }
         printf("\n");
     }
 
+    printf("In/Asm/Elf: %s %s %s\n", filename, asm_out, elf_out);
+
     init_regex();
 
-    const char* filename = argv[1];
     if(access(filename, F_OK) == -1){
         printf("\033[91mError\033[39m: File not found: %s\n", filename);
         exit(1);
@@ -119,18 +137,19 @@ int main(int argc, char* argv[]){
     quad_list* IC = ic_gen_translation_unit(expr);
     print_quad_list(IC);
 
-    print_separator("Generating Source");
+    print_separator("Generating Assembly Code");
 
-    char* asm_source = asm_gen_prog(expr);
+    char* asm_code = gen_asm_x86_64(IC);
+    fprintf(stdout, "%s", asm_code);
+    write_file(asm_out, asm_code);
 
-    print_separator("Assembly Source");
+    print_separator("Writing Binary File");
 
-    fprintf(stdout, "%s\n", asm_source);
-    write_file("out.s", asm_source);
+    write_binary();
 
-    delete_prog_exp(expr);
     delete_quad_list(IC);
-    free(asm_source);
+    delete_prog_exp(expr);
+    free(asm_code);
     token* tlp = tlh;
     while(tlhnt > 0){
         free(tlp->str);

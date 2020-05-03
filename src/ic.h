@@ -25,21 +25,28 @@ typedef struct four_address_code {
         fac_func_start,
         fac_func_end,
         fac_call,
-        fac_ret,
+        fac_arg,
+        fac_return,
+
         fac_label,
         fac_jump,
+
         fac_je,
         fac_jne,
         fac_load,
         fac_store,
+
         fac_compare,
+
         fac_setl,
         fac_setle,
         fac_setg,
         fac_setge,
         fac_sete,
         fac_setne,
+
         fac_assign,
+
         fac_add,
         fac_sub,
         fac_mul,
@@ -50,6 +57,8 @@ typedef struct four_address_code {
     symbol* arg1;
     symbol* arg2;
     symbol* res;
+    symbol_list* symbol_list_ptr;
+    symbol_list* temp_list_ptr;
 } quadruple;
 
 typedef struct quadruple_list {

@@ -17,12 +17,19 @@ quad_list* ic_gen_unary_minus(asn* node){
 
     char* tmp_id = get_tmp_name();
     symbol* tmp = search_symbol(symbol_list_ptr, tmp_id);
-    quadruple* q = make_quad(fac_neg, tmp, NULL, tmp);
+
+    char* tmp2_id = gen_tmp_name();
+    symbol* tmp2 = new_symbol(tmp2_id);
+    symbol_list_append(&symbol_list_ptr, &tmp2);
+
+    quadruple* q = make_quad(fac_neg, tmp, NULL, tmp2);
 
     quad_list_app_quad_list(&IC, inner);
     quad_list_app_quad(&IC, q);
 
     free(tmp_id);
+    free(tmp2_id);
+    delete_symbol(&tmp2);
     return IC;
 }
 

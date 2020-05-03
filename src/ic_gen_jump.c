@@ -19,10 +19,10 @@ quad_list* ic_gen_ret(asn* node){
 
         char* val_id = get_tmp_name();
         symbol* val = search_symbol(symbol_list_ptr, val_id);
-        q = make_quad(fac_ret, val, NULL, NULL);
+        q = make_quad(fac_return, val, NULL, NULL);
         free(val_id);
     } else {
-        q = make_quad(fac_ret, NULL, NULL, NULL);
+        q = make_quad(fac_return, NULL, NULL, NULL);
     }
 
     quad_list_app_quad(&IC, q);

@@ -13,7 +13,10 @@
 static void _pretty_print_symbol_list(symbol_list* list, int_stack* ws_stack);
 static void _pretty_print_binary_node(asn* tree, int level, int_stack* ws_stack);
 static void _pretty_print_unary_node(asn* tree, int level, int_stack* ws_stack);
-static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack);
+static void _pretty_print_body(asn_list* body, int level, int_stack* ws_stack);
+static void _pretty_print_cond(asn* tree, int level, int_stack* ws_stack);
+static void _pretty_print_for(asn* tree, int level, int_stack* ws_stack);
+static void _pretty_print_while(asn* tree, int level, int_stack* ws_stack);
 static void _pretty_print(asn* tree, int level, int_stack* ws_stack);
 
 void _print_tabs(int_stack* ws_stack){
@@ -82,8 +85,6 @@ static void _pretty_print_unary_node(asn* tree, int level, int_stack* ws_stack){
     /* we might be dealing with a return statement */
     if(tree->tag == ret_tag)
         next = tree->op.ret_exp.val;
-    else if(tree->tag == var_def_tag) /* or a variable definition */
-        next = tree->op.var_def_exp.val;
     else if(tree->tag == assign_tag){ /* or an assignment */
         push_back(&ws_stack, 1);
         _pretty_print(tree->op.assign_exp.rval, level+1, ws_stack);
@@ -121,85 +122,36 @@ static void _pretty_print_unary_node(asn* tree, int level, int_stack* ws_stack){
     pop_back(&ws_stack);
 }
 
-static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
+static void _pretty_print_body(asn_list* body, int level, int_stack* ws_stack){
+    for(; body != NULL; body = body->next){
+        if(body->next != NULL)
+            push_back(&ws_stack, 1);
+        else
+            push_back(&ws_stack, 2);
+        _pretty_print(body->expr, level+1, ws_stack);
+        pop_back(&ws_stack);
+    }
+}
+
+static void _pretty_print_cond(asn* tree, int level, int_stack* ws_stack){
     asn_list* body = NULL;
-    pv_root* symbol_map = NULL;
     symbol_list* symbols = NULL;
-    ca_list* key_list = NULL;
     int else_body = 0;
 
-    switch(tree->tag){
-        case prog_tag:
-            body = tree->op.prog_exp.prog;
-            symbol_map = tree->op.prog_exp.symbol_map;
-            symbols = tree->op.prog_exp.symbols;
-            break;
-        case fun_def_tag:
-            body = tree->op.fun_def_exp.body;
-            symbol_map = tree->op.fun_def_exp.symbol_map;
-            symbols = tree->op.fun_def_exp.symbols;
-            break;
-        case cond_tag:
-            body = tree->op.cond_exp.if_body;
-            symbol_map = tree->op.cond_exp.if_symbol_map;
-            symbols = tree->op.cond_exp.if_symbols;
-            if(tree->op.cond_exp.else_body != NULL)
-                else_body = 1;
-            break;
-        case for_loop_tag:
-            body = tree->op.for_loop_exp.body;
-            symbol_map = tree->op.for_loop_exp.symbol_map;
-            symbols = tree->op.for_loop_exp.symbols;
-            break;
-        case while_loop_tag:
-            body = tree->op.while_loop_exp.body;
-            symbol_map = tree->op.while_loop_exp.symbol_map;
-            symbols = tree->op.while_loop_exp.symbols;
-            break;
-        case call_tag:
-            body = tree->op.call_exp.args;
-            symbol_map = NULL;
-            break;
-        case struct_tag:
-        case union_tag:
-            body = tree->op.struct_exp.body;
-            symbol_map = tree->op.struct_exp.symbol_map;
-            symbols = tree->op.struct_exp.symbols;
-            break;
-        default: abort();
-    }
+    printf("[ if ]\n");
+    push_back(&ws_stack, -1);
+    push_back(&ws_stack, 2);
+    _pretty_print(tree->op.cond_exp.cond, level, ws_stack);
+    pop_back(&ws_stack);
+    pop_back(&ws_stack);
 
-    if(symbol_map != NULL){
-	    key_list = symbol_map->key_list;
 
-        push_back(&ws_stack, -1);
-        _print_tabs(ws_stack); printf("[ symbol map (%d) ]\n", symbol_map->scope);
-        pop_back(&ws_stack);
+    body = tree->op.cond_exp.if_body;
+    symbols = tree->op.cond_exp.if_symbols;
+    if(tree->op.cond_exp.else_body != NULL)
+        else_body = 1;
 
-        for(; key_list != NULL; key_list = key_list->next){
-            pv_leaf* leaf = pv_search(symbol_map, key_list->key);
-            if(key_list->next != NULL || body != NULL) {
-                push_back(&ws_stack, -1);
-            } else {
-                push_back(&ws_stack, 2);
-            }
-            if(key_list->next != NULL)
-                push_back(&ws_stack, 1);
-            else
-                push_back(&ws_stack, 2);
-            _print_tabs(ws_stack);
-            printf("[ %d %s (%s) ]\n",
-                leaf->scope,
-                leaf->ident,
-                atomic_type_cn[leaf->type]);
-            pop_back(&ws_stack);
-            pop_back(&ws_stack);
-        }
-    }
-
-    if(symbols != NULL){
-        _pretty_print_symbol_list(symbols, ws_stack);
-    }
+    _pretty_print_symbol_list(symbols, ws_stack);
 
     for(; body != NULL; body = body->next){
         if(body->next != NULL || else_body != 0)
@@ -231,129 +183,144 @@ static void _pretty_print_body(asn* tree, int level, int_stack* ws_stack){
     }
 }
 
+static void _pretty_print_for(asn* tree, int level, int_stack* ws_stack){
+    printf("[ for ]\n");
+    push_back(&ws_stack, -1);
+    push_back(&ws_stack, 1);
+    _pretty_print(tree->op.for_loop_exp.init, level, ws_stack);
+    _pretty_print(tree->op.for_loop_exp.cond, level, ws_stack);
+    pop_back(&ws_stack);
+    push_back(&ws_stack, 2);
+    _pretty_print(tree->op.for_loop_exp.move, level, ws_stack);
+    pop_back(&ws_stack);
+    pop_back(&ws_stack);
+
+    _pretty_print_symbol_list(tree->op.for_loop_exp.symbols, ws_stack);
+    _pretty_print_body(tree->op.for_loop_exp.body, level+1, ws_stack);
+}
+
+static void _pretty_print_while(asn* tree, int level, int_stack* ws_stack){
+    printf("[ while ]\n");
+    push_back(&ws_stack, -1);
+    push_back(&ws_stack, 2);
+    _pretty_print(tree->op.while_loop_exp.cond, level, ws_stack);
+    pop_back(&ws_stack);
+    pop_back(&ws_stack);
+
+    _pretty_print_symbol_list(tree->op.while_loop_exp.symbols, ws_stack);
+    _pretty_print_body(tree->op.while_loop_exp.body, level+1, ws_stack);
+}
+
 static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
     int ty;
     _print_tabs(ws_stack);
 
     switch(tree->tag){
         case ret_tag:
-            printf("[ return node ]\n");
+            printf("[ return ]\n");
             /* return statements have one child always - like an unary op. */
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case const_int_tag:
-            printf("[ integer node (%d) ]\n", tree->op.int_exp);
+            printf("[ integer constant (%d) ]\n", tree->op.int_exp);
             break;
         case const_real_tag:
             ty = tree->op.int_exp;
-            printf("[ real node (%d) %f ]\n", ty, real_index[ty]);
+            printf("[ real constant (%d) %f ]\n", ty, real_index[ty]);
             break;
         case const_char_tag:
-            printf("[ char node (%c) ]\n", tree->op.char_exp);
+            printf("[ char constant (%c) ]\n", tree->op.char_exp);
             break;
         case const_string_tag:
             ty = tree->op.int_exp;
-            printf("[ string node (%d) \"%s\" ]\n", ty, string_index[ty]);
+            printf("[ string constant (%d) \"%s\" ]\n", ty, string_index[ty]);
             break;
         case unary_minus_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ unary minus node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ unary minus ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case unary_not_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ unary not node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ unary not ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case unary_compl_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ unary complement node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ unary complement ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case ref_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ reference node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ reference ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case deref_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ dereference node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ dereference ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case bin_add_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ binary add node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ add ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case bin_sub_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ binary sub node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ substract ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case bin_mul_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ binary mult node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ multiply ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case bin_div_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ binary div node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ divide ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case bin_mod_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ binary mod node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ modulo ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case log_and_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ logical and node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ logical and ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case log_xor_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ logical xor node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ logical xor ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case log_or_tag:
-            ty = tree->op.unary_exp.type;
-            printf("[ logical or node (%s) ]\n", atomic_type_cn[ty]);
+            printf("[ logical or ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case equal_tag:
-            printf("[ equal node ]\n");
+            printf("[ equal ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case not_equal_tag:
-            printf("[ not-equal node ]\n");
+            printf("[ not-equal ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case less_tag:
-            printf("[ less node ]\n");
+            printf("[ less ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case less_or_equal_tag:
-            printf("[ less-or-equal node ]\n");
+            printf("[ less-or-equal ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case greater_tag:
-            printf("[ greater node ]\n");
+            printf("[ greater ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case greater_or_equal_tag:
-            printf("[ greater-or-equal node ]\n");
+            printf("[ greater-or-equal ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case bit_and_tag:
-            printf("[ bitwise and node ]\n");
+            printf("[ bitwise and ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case bit_xor_tag:
-            printf("[ bitwise xor node ]\n");
+            printf("[ bitwise xor ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case bit_or_tag:
-            printf("[ bitwise or node ]\n");
+            printf("[ bitwise or ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
         case member_access_tag:
@@ -364,60 +331,63 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             printf("[ array access ]\n");
             _pretty_print_binary_node(tree, level, ws_stack);
             break;
-        case var_def_tag:
-            ty = tree->op.var_def_exp.type;
-            printf("[ variable definition (%s %s) ]\n",
-                    atomic_type_cn[ty],
-                    tree->op.var_def_exp.ident);
-            if(tree->op.var_def_exp.val != NULL)
-                _pretty_print_unary_node(tree, level, ws_stack);
+        case var_tag:
+            printf("[ variable %s ]\n", tree->op.var_exp.sym->ident);
             break;
-        case var_ref_tag:
-            printf("[ variable reference (%s) ]\n",
-                    tree->op.var_ref_exp.ident);
+        case ptr_tag:
+            printf("[ pointer to ]\n");
+            if(tree->op.ptr_exp.to != NULL){
+                push_back(&ws_stack, 2);
+                _pretty_print(tree->op.ptr_exp.to, level, ws_stack);
+                pop_back(&ws_stack);
+            }
+            break;
+        case ident_tag:
+            printf("[ identifier %s ]\n",
+                    tree->op.ident_exp.ident);
             break;
         case assign_tag:
-            printf("[ assign node ]\n");
+            printf("[ assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case add_assign_tag:
-            printf("[ add assign node ]\n");
+            printf("[ add assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case sub_assign_tag:
-            printf("[ sub assign node ]\n");
+            printf("[ sub assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case mul_assign_tag:
-            printf("[ mul assign node ]\n");
+            printf("[ mul assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case div_assign_tag:
-            printf("[ div assign node ]\n");
+            printf("[ div assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case mod_assign_tag:
-            printf("[ mod assign node ]\n");
+            printf("[ mod assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case and_assign_tag:
-            printf("[ and assign node ]\n");
+            printf("[ and assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case xor_assign_tag:
-            printf("[ xor assign node ]\n");
+            printf("[ xor assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case or_assign_tag:
-            printf("[ or assign node ]\n");
+            printf("[ or assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case inc_tag:
-            printf("[ inc node ]\n");
+            printf("[ increment ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case dec_tag:
-            printf("[ dec node ]\n");
+            printf("[ decrement ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case cast_to_real_tag:
@@ -425,45 +395,48 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
         case cond_tag:
-            printf("[ condition node ]\n");
-            _pretty_print_body(tree, level, ws_stack);
+            _pretty_print_cond(tree, level, ws_stack);
             break;
         case for_loop_tag:
-            printf("[ for loop ]\n");
-            _pretty_print_body(tree, level, ws_stack);
+            _pretty_print_for(tree, level, ws_stack);
             break;
         case while_loop_tag:
-            printf("[ while loop ]\n");
-            _pretty_print_body(tree, level, ws_stack);
+            _pretty_print_while(tree, level, ws_stack);
             break;
         case fun_def_tag:
-            printf("[ function def node (%s %s) ]\n",
-                    atomic_type_cn[tree->op.fun_def_exp.type],
-                    tree->op.fun_def_exp.ident);
-            _pretty_print_body(tree, level, ws_stack);
+            printf("[ function %s ]\n",
+                    tree->op.fun_def_exp.sym->ident);
+            push_back(&ws_stack, -1);
+            _pretty_print_body(tree->op.fun_def_exp.args, level, ws_stack);
+            pop_back(&ws_stack);
+            _pretty_print_symbol_list(tree->op.fun_def_exp.symbols, ws_stack);
+            _pretty_print_body(tree->op.fun_def_exp.body, level, ws_stack);
             break;
         case call_tag:
-            printf("[ function call (%s) ]\n", tree->op.call_exp.ident);
-            _pretty_print_body(tree, level, ws_stack);
+            printf("[ call %s ]\n", tree->op.call_exp.ident);
+            _pretty_print_body(tree->op.call_exp.args, level, ws_stack);
             break;
         case prog_tag:
-            printf("[ program node (%s) ]\n", tree->op.prog_exp.name);
-            _pretty_print_body(tree, level, ws_stack);
+            printf("[ program %s ]\n", tree->op.prog_exp.name);
+            _pretty_print_symbol_list(tree->op.prog_exp.symbols, ws_stack);
+            _pretty_print_body(tree->op.prog_exp.prog, level, ws_stack);
             break;
         case struct_tag:
-            printf("[ struct node (%s, %d) ]\n",
+            printf("[ struct (%s, %d) ]\n",
                     tree->op.struct_exp.ident,
                     tree->op.struct_exp.size);
-            _pretty_print_body(tree, level, ws_stack);
+            _pretty_print_symbol_list(tree->op.struct_exp.symbols, ws_stack);
+            _pretty_print_body(tree->op.struct_exp.body, level, ws_stack);
             break;
         case union_tag:
-            printf("[ union node (%s, %d) ]\n",
+            printf("[ union (%s, %d) ]\n",
                     tree->op.struct_exp.ident,
                     tree->op.struct_exp.size);
-            _pretty_print_body(tree, level, ws_stack);
+            _pretty_print_symbol_list(tree->op.struct_exp.symbols, ws_stack);
+            _pretty_print_body(tree->op.struct_exp.body, level, ws_stack);
             break;
         default:
-            printf("< ! unrecognized node ! >\n");
+            printf("< ! unrecognized ! >\n");
             break;
     }
 }

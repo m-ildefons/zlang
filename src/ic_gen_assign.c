@@ -14,13 +14,9 @@
 
 quad_list* ic_gen_assign(asn* node){
     quad_list* IC = NULL;
-    const char* lval_id;
-    if(node->op.assign_exp.lval->tag == var_ref_tag)
-        lval_id = node->op.assign_exp.lval->op.var_ref_exp.ident;
-    else if(node->op.assign_exp.lval->tag == deref_tag)
-        lval_id = node->op.assign_exp.lval->op.unary_exp.val->op.var_ref_exp.ident;
-
-    symbol* lval = search_symbol(symbol_list_ptr, lval_id);
+    symbol* lval;
+    if(node->op.assign_exp.lval->tag == var_tag)
+        lval = node->op.assign_exp.lval->op.var_exp.sym;
 
     quad_list* rhs_code = ic_gen(node->op.assign_exp.rval);
     char* rhs_id = get_tmp_name();
@@ -43,7 +39,7 @@ quad_list* ic_gen_assign(asn* node){
 
     if(node->tag != assign_tag){
         tmp_id = gen_tmp_name();
-        tmp = new_symbol(tmp_id, lval->type);
+        tmp = new_symbol(tmp_id);
         op = make_quad(kind, lval, rhs, tmp);
         quad_list_app_quad(&IC, op);
         delete_symbol(&tmp);

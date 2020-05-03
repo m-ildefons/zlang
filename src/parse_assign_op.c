@@ -27,12 +27,12 @@
  *                         | |=
  */
 
-asn* parse_assign_exp(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_assign_exp(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing assignment\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
     asn* lhs = NULL;
 
-    lhs = parse_bin_exp(tl, tnt, symbol_map);
+    lhs = parse_bin_exp(tl, tnt);
     tlp = (*tl);
 
 	if((*tnt) < 1){
@@ -61,13 +61,7 @@ asn* parse_assign_exp(token** tl, size_t* tnt, pv_root* symbol_map){
     if(*tnt < 1)
 		abort();
 
-	if(lhs->tag == var_ref_tag &&
-		pv_search(symbol_map, lhs->op.var_ref_exp.ident) == NULL){
-		fprintf(stderr, "\033[91mError\033[39m: Reference to undeclared variable.\n");
-        abort();
-	}
-
-    asn* rhs = parse_assign_exp(tl, tnt, symbol_map);
+    asn* rhs = parse_assign_exp(tl, tnt);
     asn* as = make_assign_exp(lhs, rhs, type);
 
     return as;

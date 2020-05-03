@@ -16,37 +16,22 @@
 void parse_compound_statement(token** tl,
                             size_t* tnt,
                             asn_list** body,
-                            pv_root** symbol_map,
-                            symbol_list** symbols,
                             int top_level){
     printf("[%zu (%s)] parsing compound statement\n", (*tnt), (*tl)->str);
 
     token* tlp = (*tl);
     asn* node = NULL;
 
-    symbol* sym_decl = NULL;
     while((*tnt) > 0 && tlp != NULL && tlp->level > top_level){
-
-        node = parse_declaration(tl, tnt, (*symbol_map));
+        type_link* decl_spec = parse_declaration_specifier(tl, tnt);
+        node = parse_declaration(tl, tnt, decl_spec);
         if(node != NULL){
-            if(pv_search((*symbol_map), node->op.var_def_exp.ident) != NULL){
-                parse_error("Multiple Declaration of Symbol", (*tl));
-                abort();
-            }
-            symbol_map_insert(symbol_map, node);
-
-            sym_decl = new_symbol(node->op.var_def_exp.ident,
-                                node->op.var_def_exp.type);
-            sym_decl->scope = (size_t) node->op.var_def_exp.scope;
-            symbol_list_append(symbols, &sym_decl);
-            delete_symbol(&sym_decl);
-
             append_exp_list(body, node);
             tlp = (*tl);
             continue;
         }
 
-        node = parse_statement(tl, tnt, (*symbol_map), (*symbols));
+        node = parse_statement(tl, tnt);
         if(node != NULL){
             append_exp_list(body, node);
             tlp = (*tl);
@@ -66,7 +51,7 @@ void parse_compound_statement(token** tl,
  *               | <iteration-statement>
  *               | <jump-statement>
  */
-asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list* symbols){
+asn* parse_statement(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing statement\n", (*tnt), (*tl)->str);
 
     if((*tnt) <= 0)
@@ -77,7 +62,7 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list* 
 
     switch(tlp->type){
     case token_cond_if:
-        statement = parse_selection_statement(tl, tnt, symbol_map, &symbols);
+        statement = parse_selection_statement(tl, tnt);
         if(statement != NULL){
             printf("\033[92mfound\033[39m selection statement\n");
             return statement;
@@ -85,7 +70,7 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list* 
         break;
     case token_loop_for:
     case token_loop_while:
-        statement = parse_iteration_statement(tl, tnt, symbol_map, &symbols);
+        statement = parse_iteration_statement(tl, tnt);
         if(statement != NULL){
             printf("\033[92mfound\033[39m iteration statement\n");
             return statement;
@@ -94,14 +79,14 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list* 
     case break_kw:
     case continue_kw:
     case return_kw:
-        statement = parse_jump_statement(tl, tnt, symbol_map);
+        statement = parse_jump_statement(tl, tnt);
         if(statement != NULL){
             printf("\033[92mfound\033[39m jump statement\n");
             return statement;
         }
         break;
     default:
-        statement = parse_expression_statement(tl, tnt, symbol_map);
+        statement = parse_expression_statement(tl, tnt);
         if(statement != NULL){
             printf("\033[92mfound\033[39m expresssion statement\n");
             return statement;
@@ -114,10 +99,10 @@ asn* parse_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list* 
 /*
  * <expression-statement> ::= {<expression>}? ;?
  */
-asn* parse_expression_statement(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_expression_statement(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing expression statement\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
-    asn* exp = parse_expression(tl, tnt, symbol_map);
+    asn* exp = parse_expression(tl, tnt);
 
     tlp = (*tl);
     if(tlp->type == token_semi_colon)
@@ -134,7 +119,7 @@ asn* parse_expression_statement(token** tl, size_t* tnt, pv_root* symbol_map){
  *                           else :
  *                               <compound-statement>
  */
-asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list** symbols){
+asn* parse_selection_statement(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing selection statement\n", (*tnt), (*tl)->str);
     token* tlp = (*tl);
     int scope = tlp->level;
@@ -144,7 +129,7 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
 	}
 	pop_token(&tlp, tl, tnt);
 
-    asn* condition = parse_bin_exp(tl, tnt, symbol_map);
+    asn* condition = parse_bin_exp(tl, tnt);
     asn* cond_exp = make_cond_exp(condition, NULL, NULL, scope);
 
     tlp = (*tl);
@@ -153,19 +138,13 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
 	}
 	pop_token(&tlp, tl, tnt);
 
-	symbol_map = symbol_map_copy(symbol_map);
-	symbol_map->scope = scope + 1;
-
     symbol_list* if_symbols = new_symbol_list((size_t) scope + 1);
-    symbol_list_attach(symbols, &if_symbols);
+    symbol_list_attach(&symbol_list_ptr, &if_symbols);
 
     parse_compound_statement(tl,
 							tnt,
 							&(cond_exp->op.cond_exp.if_body),
-                            &symbol_map,
-                            &if_symbols,
                             scope);
-    cond_exp->op.cond_exp.if_symbol_map = symbol_map;
     cond_exp->op.cond_exp.if_symbols = if_symbols;
 
 	tlp = (*tl);
@@ -179,15 +158,12 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
 		}
 
         symbol_list* else_symbols = new_symbol_list((size_t) scope + 1);
-        symbol_list_attach(symbols, &else_symbols);
+        symbol_list_attach(&symbol_list_ptr, &else_symbols);
 
     	parse_compound_statement(tl,
 								tnt,
 								&(cond_exp->op.cond_exp.else_body),
-								&symbol_map,
-                                &else_symbols,
 								scope);
-    	cond_exp->op.cond_exp.else_symbol_map = symbol_map;
         cond_exp->op.cond_exp.else_symbols = else_symbols;
 	}
     return cond_exp;
@@ -196,24 +172,24 @@ asn* parse_selection_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
 /*
  * <iteration-statement> ::= while <expression> :
  *                               <compound-statement>
- *                         | for {<expression>}? ;
+ *                         | for {<declaration> | <expression>}? ;
  *                               {<expression>}? ;
  *                               {<expression>}? :
  *                               <compound-statement>
  */
-asn* parse_iteration_statement(token** tl, size_t* tnt, pv_root* symbol_map, symbol_list** symbols){
+asn* parse_iteration_statement(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing iteration statement\n", (*tnt), (*tl)->str);
 
     if((*tnt) <= 0)
         return NULL;
 
     asn* statement = NULL;
-    statement = parse_for_loop_exp(tl, tnt, symbol_map, symbols);
+    statement = parse_for_loop_exp(tl, tnt);
     if(statement != NULL){
         printf("\033[92mfound\033[39m for loop at\n");
         return statement;
     }
-    statement = parse_while_loop_exp(tl, tnt, symbol_map, symbols);
+    statement = parse_while_loop_exp(tl, tnt);
     if(statement != NULL){
         printf("\033[92mfound\033[39m while loop\n");
         return statement;
@@ -228,7 +204,7 @@ asn* parse_iteration_statement(token** tl, size_t* tnt, pv_root* symbol_map, sym
  *                    | break ;
  *                    | return {<expression>}? ;
  */
-asn* parse_jump_statement(token** tl, size_t* tnt, pv_root* symbol_map){
+asn* parse_jump_statement(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing jump statement\n", (*tnt), (*tl)->str);
 	token* tlp = (*tl);
 	asn* jump = NULL;
@@ -242,7 +218,7 @@ asn* parse_jump_statement(token** tl, size_t* tnt, pv_root* symbol_map){
         pop_token(&tlp, tl, tnt);
         asn* inner = NULL;
         if(tlp != NULL && tlp->type != token_semi_colon){
-            inner = parse_bin_exp(tl, tnt, symbol_map);
+            inner = parse_bin_exp(tl, tnt);
 			tlp = (*tl);
         }
         if(tlp != NULL && tlp->type == token_semi_colon){

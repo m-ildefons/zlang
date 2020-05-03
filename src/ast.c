@@ -30,41 +30,42 @@ void append_exp_list(asn_list** list, asn* e){
     lp->next = el;
 }
 
-asn* make_int_exp(int val){
+asn* make_exp(){
     asn* e = malloc(sizeof(asn));
     assert(e != NULL);
+    return e;
+}
+
+asn* make_int_exp(int val){
+    asn* e = make_exp();
     e->tag = const_int_tag;
     e->op.int_exp = val;
     return e;
 }
 
 asn* make_real_exp(int idx){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = const_real_tag;
     e->op.int_exp = idx;
     return e;
 }
 
 asn* make_char_exp(char val){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = const_char_tag;
     e->op.char_exp = val;
     return e;
 }
 
 asn* make_string_exp(int idx){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = const_string_tag;
     e->op.int_exp = idx;
     return e;
 }
 
 asn* make_call_exp(char* id, asn_list* args){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = call_tag;
     e->op.call_exp.ident = id;
     e->op.call_exp.args = args;
@@ -72,23 +73,19 @@ asn* make_call_exp(char* id, asn_list* args){
 }
 
 asn* make_ret_exp(asn* v){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = ret_tag;
     e->op.ret_exp.val = v;
     return e;
 }
 
-asn* make_fun_def_exp(atomic_type type,
-					char* id,
+asn* make_fun_def_exp(symbol* sym,
 					asn_list* args,
 					asn_list* body,
 					int scope){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = fun_def_tag;
-    e->op.fun_def_exp.type = type;
-    e->op.fun_def_exp.ident = id;
+    e->op.fun_def_exp.sym = sym;
     e->op.fun_def_exp.args = args;
     e->op.fun_def_exp.body = body;
     e->op.fun_def_exp.scope = scope;
@@ -99,15 +96,12 @@ asn* make_cond_exp(asn* cond,
 				asn_list* if_body,
 				asn_list* else_body,
 				int scope){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = cond_tag;
     e->op.cond_exp.cond = cond;
     e->op.cond_exp.if_body = if_body;
-    e->op.cond_exp.if_symbol_map = NULL;
     e->op.cond_exp.if_symbols = NULL;
 	e->op.cond_exp.else_body = else_body;
-    e->op.cond_exp.else_symbol_map = NULL;
     e->op.cond_exp.else_symbols = NULL;
     e->op.cond_exp.scope = scope;
     return e;
@@ -118,70 +112,60 @@ asn* make_for_exp(asn* init,
                 asn* move,
                 asn_list* body,
                 int scope){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
     e->tag = for_loop_tag;
     e->op.for_loop_exp.init = init;
     e->op.for_loop_exp.cond = cond;
     e->op.for_loop_exp.move = move;
     e->op.for_loop_exp.body = body;
-    e->op.for_loop_exp.symbol_map = NULL;
     e->op.for_loop_exp.symbols = NULL;
     e->op.for_loop_exp.scope = scope;
     return e;
 }
 
 asn* make_while_exp(asn* cond, asn_list* body, int scope){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
-
+    asn* e = make_exp();
     e->tag = while_loop_tag;
     e->op.while_loop_exp.cond = cond;
     e->op.while_loop_exp.body = body;
-    e->op.while_loop_exp.symbol_map = NULL;
     e->op.while_loop_exp.symbols = NULL;
     e->op.while_loop_exp.scope = scope;
     return e;
 }
 
-asn* make_var_def_exp(atomic_type type,
-                    char* id,
-                    int scope){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
-
-    e->tag = var_def_tag;
-    e->op.var_def_exp.type = type;
-    e->op.var_def_exp.ident = id;
-    e->op.var_def_exp.val = NULL;
-    e->op.var_def_exp.scope = scope;
+asn* make_var_exp(symbol* sym){
+    asn* e = make_exp();
+    e->tag = var_tag;
+    e->op.var_exp.sym = sym;
+    e->op.var_exp.sym->ref_count++;
     return e;
 }
 
-asn* make_var_ref_exp(char* id){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
-
-    e->tag = var_ref_tag;
-    e->op.var_ref_exp.ident = id;
+asn* make_ptr_exp(asn* to){
+    asn* e = make_exp();
+    e->tag = ptr_tag;
+    e->op.ptr_exp.to = to;
     return e;
 }
 
-asn* make_prog_exp(const char* name, asn_list* prog){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+asn* make_ident_exp(char* id){
+    asn* e = make_exp();
+    e->tag = ident_tag;
+    e->op.ident_exp.ident = id;
+    return e;
+}
 
+asn* make_prog_exp(const char* name){
+    asn* e = make_exp();
     e->tag = prog_tag;
-    e->op.prog_exp.name = name;
-    e->op.prog_exp.prog = prog;
-    e->op.prog_exp.symbol_map = new_trie();
+    e->op.prog_exp.name = strdup(name);
+    e->op.prog_exp.prog = NULL;
     e->op.prog_exp.symbols = new_symbol_list(0);
     return e;
 }
 
-asn* make_unary_exp(atomic_type at_type, asn* expr, int type){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+asn* make_unary_exp(asn* expr, int type){
+    asn* e = make_exp();
 
     switch(type){
         case token_minus: e->tag = unary_minus_tag; break;
@@ -193,14 +177,13 @@ asn* make_unary_exp(atomic_type at_type, asn* expr, int type){
         case token_asterisk: e->tag = deref_tag; break;
         default: abort();
     }
-    e->op.unary_exp.type = at_type;
     e->op.unary_exp.val = expr;
     return e;
 }
 
-asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+asn* make_binary_exp(asn* expr_l, asn* expr_r, int type){
+    asn* e = make_exp();
+
     switch(type){
         case token_minus: e->tag = bin_sub_tag; break;
         case token_plus: e->tag = bin_add_tag; break;
@@ -226,15 +209,13 @@ asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type){
         default:
             abort();
     }
-    e->op.binary_exp.type = at_type;
     e->op.binary_exp.lval = expr_l;
     e->op.binary_exp.rval = expr_r;
     return e;
 }
 
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type){
-    asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+    asn* e = make_exp();
 
     switch(assign_type){
         case token_assign: e->tag = assign_tag; break;
@@ -259,8 +240,7 @@ asn* make_assign_exp(asn* lhs, asn* val, int assign_type){
 }
 
 asn* make_jump_exp(int type){
-	asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+	asn* e = make_exp();
 
 	switch(type){
 		case break_kw: e->tag = break_tag; break;
@@ -271,17 +251,14 @@ asn* make_jump_exp(int type){
 }
 
 asn* make_cast_to_real(asn* val){
-	asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+	asn* e = make_exp();
     e->tag = cast_to_real_tag;
-    e->op.unary_exp.type = at_real;
     e->op.unary_exp.val = val;
 	return e;
 }
 
 asn* make_struct_exp(int tag, char* id, int scope){
-	asn* e = malloc(sizeof(asn));
-    assert(e != NULL);
+	asn* e = make_exp();
     if(tag != struct_tag && tag != union_tag)
         abort();
 
@@ -289,43 +266,8 @@ asn* make_struct_exp(int tag, char* id, int scope){
     e->op.struct_exp.ident = id;
     e->op.struct_exp.body = NULL;
     e->op.struct_exp.size = 0;
-    e->op.struct_exp.symbol_map = new_trie();
     e->op.struct_exp.symbols = new_symbol_list(0);
     e->op.struct_exp.scope = scope;
 	return e;
-}
-
-atomic_type get_atomic_type(asn* expr, pv_root* symbol_map){
-    pv_leaf* leaf;
-    if(expr == NULL)
-        return at_void;
-    switch(expr->tag){
-        case const_int_tag: return at_int;
-        case const_real_tag: return at_real;
-        case const_char_tag: return at_char;
-        case const_string_tag: return at_char_ptr;
-        case unary_minus_tag: return expr->op.unary_exp.type;
-        case unary_not_tag: return expr->op.unary_exp.type;
-        case unary_compl_tag: return expr->op.unary_exp.type;
-        case inc_tag: return expr->op.unary_exp.type;
-        case dec_tag: return expr->op.unary_exp.type;
-
-        case bin_add_tag: return expr->op.binary_exp.type;
-        case bin_sub_tag: return expr->op.binary_exp.type;
-        case bin_mul_tag: return expr->op.binary_exp.type;
-        case bin_div_tag: return expr->op.binary_exp.type;
-        case bin_mod_tag: return expr->op.binary_exp.type;
-        case log_and_tag: return expr->op.binary_exp.type;
-        case log_xor_tag: return expr->op.binary_exp.type;
-        case log_or_tag: return expr->op.binary_exp.type;
-
-        case var_def_tag: return expr->op.var_def_exp.type;
-        case var_ref_tag:
-            leaf = pv_search(symbol_map, expr->op.var_ref_exp.ident);
-            if(leaf == NULL)
-                return at_void;
-            return leaf->type;
-        default: return at_void;
-    }
 }
 

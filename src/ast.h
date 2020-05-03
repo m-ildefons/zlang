@@ -16,9 +16,7 @@
 #include "lex.h"
 #include "strop.h"
 #include "int_stack.h"
-#include "persistent_vector.h"
 #include "symbol_list.h"
-#include "atomic_type.h"
 
 typedef struct ast_node {
     enum {
@@ -26,8 +24,10 @@ typedef struct ast_node {
         const_real_tag,
         const_char_tag,
         const_string_tag,
-        var_def_tag,
-        var_ref_tag,
+        type_tag,
+        var_tag,
+        ptr_tag,
+        ident_tag,
         call_tag,
         ret_tag,
 		break_tag,
@@ -86,15 +86,16 @@ typedef struct ast_node {
         char char_exp;
 
         struct {
-            atomic_type type;
-            char* ident;
-            struct ast_node* val;
-            int scope;
-        } var_def_exp;
+            struct ast_node* to; // pointer to
+        } ptr_exp;
+
+        struct {
+            symbol* sym;
+        } var_exp;
 
         struct {
             char* ident;
-        } var_ref_exp;
+        } ident_exp;
 
         struct {
             char* ident;
@@ -106,11 +107,9 @@ typedef struct ast_node {
         } ret_exp;
 
         struct {
-            atomic_type type;
-            char* ident;
+            symbol* sym;
             struct ast_node_list* args;
             struct ast_node_list* body;
-            struct trie_root_node* symbol_map;
             struct s_symbol_list_t* symbols;
             int scope;
         } fun_def_exp;
@@ -119,9 +118,7 @@ typedef struct ast_node {
             struct ast_node* cond;
             struct ast_node_list* if_body;
 			struct ast_node_list* else_body;
-            struct trie_root_node* if_symbol_map;
             struct s_symbol_list_t* if_symbols;
-            struct trie_root_node* else_symbol_map;
             struct s_symbol_list_t* else_symbols;
             int scope;
         } cond_exp;
@@ -131,7 +128,6 @@ typedef struct ast_node {
             struct ast_node* cond;
             struct ast_node* move;
             struct ast_node_list* body;
-            struct trie_root_node* symbol_map;
             struct s_symbol_list_t* symbols;
             int scope;
         } for_loop_exp;
@@ -139,25 +135,21 @@ typedef struct ast_node {
         struct {
             struct ast_node* cond;
             struct ast_node_list* body;
-            struct trie_root_node* symbol_map;
             struct s_symbol_list_t* symbols;
             int scope;
         } while_loop_exp;
 
         struct {
-            const char* name;
+            char* name;
             struct ast_node_list* prog;
-            struct trie_root_node* symbol_map;
             struct s_symbol_list_t* symbols;
         } prog_exp;
 
         struct {
-            atomic_type type;
             struct ast_node* val;
         } unary_exp;
 
         struct {
-            atomic_type type;
             struct ast_node* lval;
             struct ast_node* rval;
         } binary_exp;
@@ -171,7 +163,6 @@ typedef struct ast_node {
             char* ident;
             int size;
             struct ast_node_list* body;
-            struct trie_root_node* symbol_map;
             struct s_symbol_list_t* symbols;
             int scope;
         } struct_exp;
@@ -189,14 +180,14 @@ void pretty_print(asn* tree);
 
 /* implemented in ast.c */
 void append_exp_list(asn_list** list, asn* e);
+asn* make_exp(void);
 asn* make_int_exp(int val);
 asn* make_real_exp(int idx);
 asn* make_char_exp(char val);
 asn* make_string_exp(int idx);
 asn* make_call_exp(char* id, asn_list* args);
 asn* make_ret_exp(asn* v);
-asn* make_fun_def_exp(atomic_type type,
-                    char* ident,
+asn* make_fun_def_exp(symbol* sym,
                     asn_list* args,
                     asn_list* body,
                     int scope);
@@ -210,11 +201,12 @@ asn* make_for_exp(asn* init,
                 asn_list* body,
                 int scope);
 asn* make_while_exp(asn* cond, asn_list* body, int scope);
-asn* make_var_def_exp(atomic_type type, char* ident, int scope);
-asn* make_var_ref_exp(char* ident);
-asn* make_prog_exp(const char* name, asn_list* prog);
-asn* make_unary_exp(atomic_type at_type, asn* expr, int type);
-asn* make_binary_exp(atomic_type at_type, asn* expr_l, asn* expr_r, int type);
+asn* make_var_exp(symbol* sym);
+asn* make_ptr_exp(asn* to);
+asn* make_ident_exp(char* ident);
+asn* make_prog_exp(const char* name);
+asn* make_unary_exp(asn* expr, int type);
+asn* make_binary_exp(asn* expr_l, asn* expr_r, int type);
 asn* make_assign_exp(asn* lhs, asn* val, int assign_type);
 asn* make_jump_exp(int type);
 asn* make_cast_to_real(asn* val);
@@ -223,7 +215,8 @@ asn* make_struct_exp(int tag, char* id, int scope);
 /* implemented in ast_del.c */
 void delete_exp(asn* e);
 void delete_asn_list(asn_list* l);
-void delete_var_def_exp(asn* e);
+void delete_var_exp(asn* e);
+void delete_ptr_exp(asn* e);
 void delete_fun_def_exp(asn* e);
 void delete_call_exp(asn* e);
 void delete_return_exp(asn* e);
@@ -235,8 +228,6 @@ void delete_binary_exp(asn* e);
 void delete_assign_exp(asn* e);
 void delete_prog_exp(asn* e);
 void delete_struct_exp(asn* e);
-
-atomic_type get_atomic_type(asn* expr, pv_root* symbol_map);
 
 #endif
 

@@ -11,7 +11,11 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
+#include <string.h>
+
+
 int max(int l, int r);
+char* basename(const char* path);
 
 #endif
 

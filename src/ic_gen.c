@@ -42,14 +42,14 @@ quad_list* ic_gen_translation_unit(asn* ast){
     quad_list* IC = NULL;
     quad_list* sub_ic = NULL;
 
-	symbol_map_ptr = ast->op.prog_exp.symbol_map;
     symbol_list_ptr = ast->op.prog_exp.symbols;
 
     for(expr_list = ast->op.prog_exp.prog;
         expr_list != NULL;
         expr_list = expr_list->next){
         node = expr_list->expr;
-        if(node->tag == var_def_tag){
+
+        if(node->tag == var_tag){
         } else if(node->tag == fun_def_tag){
             sub_ic = ic_gen_fun_def(node);
         } else {
@@ -68,8 +68,7 @@ quad_list* ic_gen(asn* node){
         case ret_tag: res = ic_gen_ret(node); break;
         case break_tag: res = ic_gen_break(); break;
         case continue_tag: res = ic_gen_continue(); break;
-        case var_def_tag: res = ic_gen_var_def(node); break;
-        case var_ref_tag: res = ic_gen_var_ref(node); break;
+        case var_tag: res = ic_gen_var(node); break;
         case const_int_tag: res = ic_gen_int_const(node); break;
         case const_real_tag: res = ic_gen_real_const(node); break;
         case const_string_tag: res = ic_gen_string_const(node); break;
