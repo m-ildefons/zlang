@@ -4,6 +4,7 @@ SUBDIR=$(DIR:%/=%_subdir)
 SRC=$(notdir $(wildcard ./*.x))
 RES=$(SRC:%.x=%.res)
 OUT=$(SRC:%.x=%.out)
+ASM=$(SRC:%.x=%.s)
 BIN=$(SRC:%.x=%.bin)
 TEST=$(SRC:%.x=%_test)
 
@@ -24,12 +25,14 @@ all: $(TEST) $(SUBDIR) clean
 	fi
 
 %.out: %.bin
-	@./$< > $@;
+	@./$< > /dev/null; \
+	echo $$? > $@
 
-%.bin: %.x
+%.bin: %.s
+	gcc $< -o $@;
+
+%.s: %.x
 	@$(CC) $< > /dev/null; \
-	gcc out.s -o $@;
 
-clean: $(OUT) $(BIN)
-	@rm out.s
+clean: $(OUT) $(BIN) $(ASM)
 	@rm $?
