@@ -143,9 +143,9 @@ int main(int argc, char* argv[]){
     fprintf(stdout, "%s", asm_code);
     write_file(asm_out, asm_code);
 
-    print_separator("Writing Binary File");
+//    print_separator("Writing Binary File");
 
-    write_binary();
+//    write_binary();
 
     delete_quad_list(IC);
     delete_prog_exp(expr);
