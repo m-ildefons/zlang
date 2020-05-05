@@ -6,8 +6,7 @@ The Syntax of Zlang in Backus-Naur Form
     <external-declaration> ::= <function-definition>
                              | <declaration>
 
-    <function-definition> ::= {<declaration-specifier>}* <declarator> {<declaration>}* :
-                                  <compound-statement>
+    <function-definition> ::= {<declaration-specifier>}* <declarator> : <compound-statement>
 
     <declaration-specifier> ::= <storage-class-specifier>
                               | <type-specifier>
@@ -31,10 +30,8 @@ The Syntax of Zlang in Backus-Naur Form
                        | <enum-specifier>
                        | <typedef-name>
 
-    <struct-or-union-specifier> ::= <struct-or-union> <identifier> :
-                                        {<struct-declaration>}+
-                                  | <struct-or-union> :
-                                        {<struct-declaration>}+
+    <struct-or-union-specifier> ::= <struct-or-union> <identifier> : {<struct-declaration>}+
+                                  | <struct-or-union> : {<struct-declaration>}+
                                   | <struct-or-union> <identifier>
 
     <struct-or-union> ::= struct
@@ -68,13 +65,13 @@ The Syntax of Zlang in Backus-Naur Form
 
     <constant-expression> ::= <logical-or-expression>
 
-    <logical-or-expression> ::= <logical-and-expression>
-                              | <logical-or-expression> || <logical-and-expression>
-                              | <logical-or-expression> or <logical-and-expression>
+    <logical-or-expression> ::= <logical-xor-expression>
+                              | <logical-or-expression> || <logical-xor-expression>
+                              | <logical-or-expression> or <logical-xor-expression>
 
     <logical-xor-expression> ::= <logical-and-expression>
-                               | <logical-or-expression> >< <logical-and-expression>
-                               | <logical-or-expression> xor <logical-and-expression>
+                               | <logical-xor-expression> >< <logical-and-expression>
+                               | <logical-xor-expression> xor <logical-and-expression>
 
     <logical-and-expression> ::= <inclusive-or-expression>
                                | <logical-and-expression> && <inclusive-or-expression>
@@ -115,7 +112,6 @@ The Syntax of Zlang in Backus-Naur Form
                                   | <multiplicative-expression> % <exponential-expression>
 
     <exponential-expression> ::= <cast-expression>
-                               | <exponential-expression> ** <cast-expression>
                                | <exponential-expression> exp <cast-expression>
 
     <cast-expression> ::= <unary-expression>
@@ -224,24 +220,22 @@ The Syntax of Zlang in Backus-Naur Form
                   | <selection-statement>
                   | <iteration-statement>
                   | <jump-statement>
+                  | <label-statement>
+
+    <label-statement> ::= <identifier> :
 
     <expression-statement> ::= {<expression>}? ;?
 
-    <selection-statement> ::= if ( <expression> ) :
-                                  <statement>
-                            | if ( <expression> ) :
-                                  <statement>
-                              else:
-                                  <statement>
-                            | if ( <expression> ) :
-                                  <statement>
+    <selection-statement> ::= if ( <expression> ) : <statement>
+                            | if ( <expression> ) : <statement>
+                              else : <statement>
+                            | if ( <expression> ) : <statement>
                               else <selection-statement>
 
-    <iteration-statement> ::= while ( <expression> ) :
-							      <statement>
-                            | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) :
-                                  <statement>
+    <iteration-statement> ::= while ( <expression> ) : <statement>
+                            | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) : <statement>
 
-    <jump-statement> ::= continue ;?
+    <jump-statement> ::= goto identifier ;?
+                       | continue ;?
                        | break ;?
                        | return {<expression>}? ;?
