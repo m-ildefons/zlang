@@ -52,14 +52,24 @@ char* strpad(const char* str, size_t len, const char* pad){
     return new;
 }
 
-void strapp(char** str, const char* app){
-    size_t str_len = strlen((*str));
-    size_t app_len = strlen(app);
+void strapp(char** str, const char* fmt, ...){
+    char buffer[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
 
-    (*str) = realloc((*str), (str_len + app_len + 1) * sizeof(char));
+    __strapp(str, buffer);
+}
+
+void __strapp(char** str, const char* fmt){
+    size_t str_len = strlen((*str));
+    size_t fmt_len = strlen(fmt);
+
+    (*str) = realloc((*str), (str_len + fmt_len + 1) * sizeof(char));
     assert((*str) != NULL);
 
-    strcat((*str), app);
+    strcat((*str), fmt);
 }
 
 void strprp(char** str, const char* prp){

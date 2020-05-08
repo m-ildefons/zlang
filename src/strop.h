@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <assert.h>
 
@@ -40,7 +41,8 @@ char* strpad(const char* str, size_t len, const char* pad);
  *
  * Appends string 'app' to string 'str'. Changes 'str'.
  */
-void strapp(char** str, const char* app);
+void strapp(char** str, const char* app, ...);
+void __strapp(char** str, const char* app);
 
 /*
  * strprp - String Prepend

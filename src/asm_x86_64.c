@@ -27,10 +27,8 @@ char* gen_asm_x86_64(const quad_list* IC){
     const quad_list* ql = IC;
     char* snippet = NULL;
 
-    char* bname= basename(filename);
-    strapp(&code, "    .file     \"");
-    strapp(&code, bname);
-    strapp(&code, "\"\n");
+    char* bname = basename(filename);
+    strapp(&code, "    .file     \"%s\"\n", bname);
 
     for(; ql != NULL; ql = ql->next){
         switch(ql->quad->op){
@@ -67,14 +65,11 @@ char* gen_asm_x86_64(const quad_list* IC){
         free(snippet);
     }
 
-    snippet = salloc(80);
-    sprintf(snippet,
-        "    .ident    \"ZLang %d.%d.%s\"\n",
+    strapp(&code,
+        "    .ident    \"Zlang %d.%d.%s\"\n",
         __ZLANG_MAJ__,
         __ZLANG_MIN__,
         __ZLANG_SUB__);
-    strapp(&code, snippet);
-    free(snippet);
 
     free(bname);
     return code;
@@ -91,8 +86,8 @@ char* asm_x86_64_func_start(const quadruple* q){
     strapp(&code, ", @function\n");
     strapp(&code, q->arg1->ident);
     strapp(&code, ":\n");
-    strapp(&code, "    pushq     %rbp\n");
-    strapp(&code, "    movq      %rsp, %rbp\n");
+    strapp(&code, "    pushq     %%rbp\n");
+    strapp(&code, "    movq      %%rsp, %%rbp\n");
 
     size_t frame_size = 0;
     symbol_list_entry* e = q->symbol_list_ptr->top;
@@ -116,10 +111,7 @@ char* asm_x86_64_func_start(const quadruple* q){
     }
     printf("%s: %zu\n", q->arg1->ident, frame_size);
 
-    char* frameline = salloc(80);
-    sprintf(frameline, "    subq      $%zu, %%rsp\n", frame_size);
-    strapp(&code, frameline);
-    free(frameline);
+    strapp(&code, "    subq      $%zu, %%rsp\n", frame_size);
     return code;
 }
 
@@ -129,11 +121,7 @@ char* asm_x86_64_func_end(const quadruple* q){
     strapp(&code, "    movq      %rbp, %rsp\n");
     strapp(&code, "    popq      %rbp\n");
     strapp(&code, "    ret\n");
-    strapp(&code, "    .size     ");
-    strapp(&code, q->arg1->ident);
-    strapp(&code, ", .-");
-    strapp(&code, q->arg1->ident);
-    strapp(&code, "\n");
+    strapp(&code, "    .size     %s, .-%s\n", q->arg1->ident, q->arg1->ident);
     return code;
 }
 
@@ -150,8 +138,7 @@ char* asm_x86_64_return(const quadruple* q){
 
 char* asm_x86_64_label(const quadruple* q){
     char* code = strnew();
-    strapp(&code, q->arg1->ident);
-    strapp(&code, ":\n");
+    strapp(&code, "%s:\n", q->arg1->ident);
     return code;
 }
 
@@ -165,12 +152,7 @@ char* asm_x86_64_load(const quadruple* q){
         usage[RAX]->loc->type = mem_stack;
         usage[RAX]->loc->pos = rel_stack_pos;
     }
-    strapp(&code, "    movq      ");
-    if(q->arg1->loc == NULL){
-        strapp(&code, "$");
-        strapp(&code, q->arg1->ident);
-    }
-    strapp(&code, ", %rax\n");
+    strapp(&code, "    movq      $%s, %%rax\n", q->arg1->ident);
 
     set_register(RAX, q->res);
     return code;
@@ -184,19 +166,13 @@ char* asm_x86_64_jump(const quadruple* q){
         case fac_jne: strapp(&code, "    jne       "); break;
         default: break;
     }
-    strapp(&code, q->arg1->ident);
-    strapp(&code, "\n");
+    strapp(&code, "%s\n", q->arg1->ident);
     return code;
 }
 
 char* asm_x86_64_compare(const quadruple* q){
     char* code = strnew();
-    strapp(&code, "    cmpq      ");
-    strapp(&code, "$");
-    strapp(&code, q->arg1->ident);
-    strapp(&code, ", ");
-    strapp(&code, "%rax");
-    strapp(&code, "\n");
+    strapp(&code, "    cmpq      $%s, %%rax\n", q->arg1->ident);
     return code;
 }
 
@@ -219,12 +195,7 @@ char* asm_x86_64_set(const quadruple* q){
 char* asm_x86_64_add(const quadruple* q){
     char* code = strnew();
     if(q->arg1->loc != NULL && q->arg1->loc->type != mem_register){
-        char* line = salloc(80);
-        sprintf(line,
-                "    movq      -%zu(%%rbp), %%rdx\n",
-                q->arg1->loc->pos);
-        strapp(&code, line);
-        free(line);
+        strapp(&code, "    movq      -%zu(%%rbp), %%rdx\n", q->arg1->loc->pos);
     }
     if(q->arg2->loc != NULL && q->arg2->loc->type != mem_register){
     }
@@ -236,12 +207,7 @@ char* asm_x86_64_add(const quadruple* q){
 char* asm_x86_64_sub(const quadruple* q){
     char* code = strnew();
     if(q->arg1->loc != NULL && q->arg1->loc->type != mem_register){
-        char* line = salloc(80);
-        sprintf(line,
-                "    movq      -%zu(%%rbp), %%rdx\n",
-                q->arg1->loc->pos);
-        strapp(&code, line);
-        free(line);
+        strapp(&code, "    movq      -%zu(%%rbp), %%rdx\n", q->arg1->loc->pos);
     }
     if(q->arg2->loc != NULL && q->arg2->loc->type != mem_register){
     }
@@ -253,12 +219,7 @@ char* asm_x86_64_sub(const quadruple* q){
 char* asm_x86_64_mul(const quadruple* q){
     char* code = strnew();
     if(q->arg1->loc->type != mem_register){
-        char* line = salloc(80);
-        sprintf(line,
-                "    movq      -%zu(%%rbp), %%rdx\n",
-                q->arg1->loc->pos);
-        strapp(&code, line);
-        free(line);
+        strapp(&code, "    movq      -%zu(%%rbp), %%rdx\n", q->arg1->loc->pos);
     }
     if(q->arg2->loc->type != mem_register){
     }
