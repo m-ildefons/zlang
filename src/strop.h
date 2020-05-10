@@ -39,10 +39,10 @@ char* strpad(const char* str, size_t len, const char* pad);
 /*
  * strapp - String Append
  *
- * Appends string 'app' to string 'str'. Changes 'str'.
+ * Appends string 'fmt' to string 'str'. Changes 'str'.
  */
-void strapp(char** str, const char* app, ...);
-void __strapp(char** str, const char* app);
+void strapp(char** str, const char* fmt, ...);
+void __strapp(char** str, const char* fmt);
 
 /*
  * strprp - String Prepend

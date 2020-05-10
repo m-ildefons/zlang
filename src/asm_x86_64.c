@@ -61,7 +61,7 @@ char* gen_asm_x86_64(const quad_list* IC){
                 printf(" during x86_64 asm generation.\n");
                 continue;
         }
-        strapp(&code, snippet);
+        strapp(&code, "%s", snippet);
         free(snippet);
     }
 
@@ -78,14 +78,9 @@ char* gen_asm_x86_64(const quad_list* IC){
 char* asm_x86_64_func_start(const quadruple* q){
     char* code = strnew();
     strapp(&code, "    .text\n");
-    strapp(&code, "    .global   ");
-    strapp(&code, q->arg1->ident);
-    strapp(&code, "\n");
-    strapp(&code, "    .type     ");
-    strapp(&code, q->arg1->ident);
-    strapp(&code, ", @function\n");
-    strapp(&code, q->arg1->ident);
-    strapp(&code, ":\n");
+    strapp(&code, "    .global   %s\n", q->arg1->ident);
+    strapp(&code, "    .type     %s, @function\n", q->arg1->ident);
+    strapp(&code, "%s:\n", q->arg1->ident);
     strapp(&code, "    pushq     %%rbp\n");
     strapp(&code, "    movq      %%rsp, %%rbp\n");
 
@@ -117,9 +112,9 @@ char* asm_x86_64_func_start(const quadruple* q){
 
 char* asm_x86_64_func_end(const quadruple* q){
     char* code = strnew();
-    strapp(&code, "    movq      $0, %rax\n");
-    strapp(&code, "    movq      %rbp, %rsp\n");
-    strapp(&code, "    popq      %rbp\n");
+    strapp(&code, "    movq      $0, %%rax\n");
+    strapp(&code, "    movq      %%rbp, %%rsp\n");
+    strapp(&code, "    popq      %%rbp\n");
     strapp(&code, "    ret\n");
     strapp(&code, "    .size     %s, .-%s\n", q->arg1->ident, q->arg1->ident);
     return code;
@@ -128,10 +123,10 @@ char* asm_x86_64_func_end(const quadruple* q){
 char* asm_x86_64_return(const quadruple* q){
     char* code = strnew();
     if(q->arg1 == NULL)
-        strapp(&code, "    movq      $0, %rax\n");
+        strapp(&code, "    movq      $0, %%rax\n");
 
-    strapp(&code, "    movq      %rbp, %rsp\n");
-    strapp(&code, "    popq      %rbp\n");
+    strapp(&code, "    movq      %%rbp, %%rsp\n");
+    strapp(&code, "    popq      %%rbp\n");
     strapp(&code, "    ret\n");
     return code;
 }
@@ -145,8 +140,8 @@ char* asm_x86_64_label(const quadruple* q){
 char* asm_x86_64_load(const quadruple* q){
     char* code = strnew();
     if(usage[RAX] != NULL){
-        strapp(&code, "    subq      $8, %rsp\n");
-        strapp(&code, "    movq      %rax, (%rsp)\n");
+        strapp(&code, "    subq      $8, %%rsp\n");
+        strapp(&code, "    movq      %%rax, (%%rsp)\n");
 
         rel_stack_pos += 8;
         usage[RAX]->loc->type = mem_stack;
@@ -178,7 +173,7 @@ char* asm_x86_64_compare(const quadruple* q){
 
 char* asm_x86_64_set(const quadruple* q){
     char* code = strnew();
-    strapp(&code, "    movq      $0, %rax\n");
+    strapp(&code, "    movq      $0, %%rax\n");
     switch(q->op){
         case fac_setl: strapp(&code, "    setl      "); break;
         case fac_setle: strapp(&code, "    setle     "); break;
@@ -199,7 +194,7 @@ char* asm_x86_64_add(const quadruple* q){
     }
     if(q->arg2->loc != NULL && q->arg2->loc->type != mem_register){
     }
-    strapp(&code, "    addq      %rdx, %rax\n");
+    strapp(&code, "    addq      %%rdx, %%rax\n");
     set_register(RAX, q->res);
     return code;
 }
@@ -211,7 +206,7 @@ char* asm_x86_64_sub(const quadruple* q){
     }
     if(q->arg2->loc != NULL && q->arg2->loc->type != mem_register){
     }
-    strapp(&code, "    subq      %rdx, %rax\n");
+    strapp(&code, "    subq      %%rdx, %%rax\n");
     set_register(RAX, q->res);
     return code;
 }
@@ -223,7 +218,7 @@ char* asm_x86_64_mul(const quadruple* q){
     }
     if(q->arg2->loc->type != mem_register){
     }
-    strapp(&code, "    imulq     %rdx, %rax\n");
+    strapp(&code, "    imulq     %%rdx, %%rax\n");
     set_register(RAX, q->res);
     return code;
 }
