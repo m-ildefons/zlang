@@ -200,9 +200,9 @@ asn* parse_iteration_statement(token** tl, size_t* tnt){
 }
 
 /*
- * <jump-statement> ::= continue ;
- *                    | break ;
- *                    | return {<expression>}? ;
+ * <jump-statement> ::= continue ;?
+ *                    | break ;?
+ *                    | return {<expression>}? ;?
  */
 asn* parse_jump_statement(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing jump statement\n", (*tnt), (*tl)->str);
