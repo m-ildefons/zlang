@@ -109,7 +109,8 @@ typedef struct {
     size_t scope;
     type_link* stype;
     type_link* etype;
-    slocation* loc;
+    int mem_loc;
+    int reg_loc;
 } symbol;
 
 /* Symbol List Entry

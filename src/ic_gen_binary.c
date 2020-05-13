@@ -24,6 +24,7 @@ quad_list* ic_gen_binary(asn* node){
 
     char* res_id = gen_tmp_name();
     symbol* res = new_symbol(res_id);
+    copy_type_list(t1, &res);
     symbol_list_append(&symbol_list_ptr, &res);
 
     int fac;

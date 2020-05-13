@@ -140,7 +140,7 @@ int main(int argc, char* argv[]){
     print_separator("Generating Assembly Code");
 
     char* asm_code = gen_asm_x86_64(IC);
-    fprintf(stdout, "%s", asm_code);
+//    fprintf(stdout, "%s", asm_code);
     write_file(asm_out, asm_code);
 
 //    print_separator("Writing Binary File");

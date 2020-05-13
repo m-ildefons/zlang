@@ -36,6 +36,7 @@ char* asm_x86_64_func_end(const quadruple* q);
 char* asm_x86_64_return(const quadruple* q);
 char* asm_x86_64_label(const quadruple* q);
 char* asm_x86_64_load(const quadruple* q);
+char* asm_x86_64_store(const quadruple* q);
 
 char* asm_x86_64_jump(const quadruple* q);
 
@@ -47,6 +48,7 @@ char* asm_x86_64_add(const quadruple* q);
 char* asm_x86_64_sub(const quadruple* q);
 char* asm_x86_64_mul(const quadruple* q);
 
+int get_register(void);
 void set_register(int reg, symbol* s);
 void print_registers(void);
 

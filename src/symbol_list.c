@@ -80,7 +80,7 @@ type_link* copy_type_link(const type_link* link)
     } else if (link->cls == cls_spec) {
         l->type.spec = copy_specifier(link->type.spec);
     }
-    l->next = NULL; //link->next;
+    l->next = NULL;
     return l;
 }
 
@@ -92,7 +92,10 @@ symbol* new_symbol(const char* id){
     s->scope = 0;
     s->stype = NULL;
     s->etype = NULL;
-    s->loc = NULL;
+
+    // negative location ==> no valid location
+    s->mem_loc = -1;
+    s->reg_loc = -1;
     return s;
 }
 
@@ -163,9 +166,6 @@ void delete_symbol(symbol** s){
         link = link->next;
         delete_type_link(&prev);
     }
-
-    if((*s)->loc != NULL)
-        delete_slocation((*s)->loc);
 
     free((*s)->ident);
     free((*s));
@@ -249,10 +249,7 @@ void print_symbol_list_entry(const symbol_list_entry* e){
         printf("]");
     }
 
-    if(e->sym->loc != NULL){
-        printf(" %u: %zu", e->sym->loc->type, e->sym->loc->pos);
-    }
-
+    printf(" m/%d(%%rbp) r/%d", e->sym->mem_loc, e->sym->reg_loc);
     printf("\n");
 }
 

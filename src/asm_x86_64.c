@@ -12,6 +12,7 @@
 
 
 static symbol* usage[NUM_REGISTERS];
+static const char* registers[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi"};
 static size_t rel_stack_pos;
 static size_t size_of[type_enum + 1] = {
     [type_void] = 8,
@@ -41,7 +42,7 @@ char* gen_asm_x86_64(const quad_list* IC){
             case fac_je:
             case fac_jne: snippet = asm_x86_64_jump(ql->quad); break;
             case fac_load: snippet = asm_x86_64_load(ql->quad); break;
-            //case fac_store: break;
+            case fac_store: snippet = asm_x86_64_store(ql->quad); break;
             case fac_compare: snippet = asm_x86_64_compare(ql->quad); break;
             case fac_setl:
             case fac_setle:
@@ -62,6 +63,7 @@ char* gen_asm_x86_64(const quad_list* IC){
                 continue;
         }
         strapp(&code, "%s", snippet);
+        printf("\n%s", snippet);
         free(snippet);
     }
 
@@ -89,20 +91,16 @@ char* asm_x86_64_func_start(const quadruple* q){
     for(; e != q->symbol_list_ptr->bottom->next; e = e->next){
         if(e->sym->etype != NULL){
             frame_size += size_of[e->sym->etype->type.spec->type];
-            delete_slocation(e->sym->loc);
-            e->sym->loc = new_slocation(mem_stack, frame_size);
+            e->sym->mem_loc = frame_size;
         }
-
         print_symbol_list_entry(e);
     }
     for(e = q->temp_list_ptr->top; e != q->temp_list_ptr->bottom->next; e = e->next){
         if(e->sym->etype != NULL){
-            frame_size += size_of[e->sym->etype->type.spec->type];
-            delete_slocation(e->sym->loc);
-            e->sym->loc = new_slocation(mem_stack, frame_size);
+//            frame_size += size_of[e->sym->etype->type.spec->type];
+//            e->sym->mem_loc = frame_size;
         }
         print_symbol_list_entry(e);
-
     }
     printf("%s: %zu\n", q->arg1->ident, frame_size);
 
@@ -125,6 +123,11 @@ char* asm_x86_64_return(const quadruple* q){
     if(q->arg1 == NULL)
         strapp(&code, "    movq      $0, %%rax\n");
 
+    else if(q->arg1->reg_loc > 0)
+        strapp(&code,
+            "    movq      %%%s, %%rax\n",
+            registers[q->arg1->reg_loc]);
+
     strapp(&code, "    movq      %%rbp, %%rsp\n");
     strapp(&code, "    popq      %%rbp\n");
     strapp(&code, "    ret\n");
@@ -139,17 +142,37 @@ char* asm_x86_64_label(const quadruple* q){
 
 char* asm_x86_64_load(const quadruple* q){
     char* code = strnew();
-    if(usage[RAX] != NULL){
+
+    int reg = get_register();
+    printf("%s --> %s\n", q->arg1->ident, registers[reg]);
+
+    if(usage[reg] != NULL){
         strapp(&code, "    subq      $8, %%rsp\n");
-        strapp(&code, "    movq      %%rax, (%%rsp)\n");
+        strapp(&code, "    movq      %%%s, (%%rsp)\n", registers[reg]);
 
         rel_stack_pos += 8;
-        usage[RAX]->loc->type = mem_stack;
-        usage[RAX]->loc->pos = rel_stack_pos;
+        usage[RAX]->mem_loc = rel_stack_pos;
     }
-    strapp(&code, "    movq      $%s, %%rax\n", q->arg1->ident);
+    if(q->arg1->mem_loc < 0){
+        strapp(&code,
+            "    movq      $%s, %%%s\n",
+            q->arg1->ident,
+            registers[reg]);
+    } else {
+        strapp(&code,
+            "    movq      -%d(%%rbp), %%%s\n",
+            q->arg1->mem_loc,
+            registers[reg]);
+    }
 
-    set_register(RAX, q->res);
+    set_register(reg, q->res);
+    return code;
+}
+
+char* asm_x86_64_store(const quadruple* q){
+    char* code = strnew();
+    strapp(&code, "    movq      %%rax, -%d(%%rbp)\n", q->res->mem_loc);
+    set_register(q->arg1->reg_loc, NULL);
     return code;
 }
 
@@ -189,49 +212,55 @@ char* asm_x86_64_set(const quadruple* q){
 
 char* asm_x86_64_add(const quadruple* q){
     char* code = strnew();
-    if(q->arg1->loc != NULL && q->arg1->loc->type != mem_register){
-        strapp(&code, "    movq      -%zu(%%rbp), %%rdx\n", q->arg1->loc->pos);
-    }
-    if(q->arg2->loc != NULL && q->arg2->loc->type != mem_register){
-    }
-    strapp(&code, "    addq      %%rdx, %%rax\n");
-    set_register(RAX, q->res);
+    strapp(&code,
+        "    addq      %%%s, %%%s\n",
+        registers[q->arg2->reg_loc],
+        registers[q->arg1->reg_loc]);
+    set_register(q->arg1->reg_loc, q->res);
     return code;
 }
 
 char* asm_x86_64_sub(const quadruple* q){
     char* code = strnew();
-    if(q->arg1->loc != NULL && q->arg1->loc->type != mem_register){
-        strapp(&code, "    movq      -%zu(%%rbp), %%rdx\n", q->arg1->loc->pos);
-    }
-    if(q->arg2->loc != NULL && q->arg2->loc->type != mem_register){
-    }
-    strapp(&code, "    subq      %%rdx, %%rax\n");
-    set_register(RAX, q->res);
+    strapp(&code,
+        "    subq      %%%s, %%%s\n",
+        registers[q->arg2->reg_loc],
+        registers[q->arg1->reg_loc]);
+    set_register(q->arg1->reg_loc, q->res);
     return code;
 }
 
 char* asm_x86_64_mul(const quadruple* q){
     char* code = strnew();
-    if(q->arg1->loc->type != mem_register){
-        strapp(&code, "    movq      -%zu(%%rbp), %%rdx\n", q->arg1->loc->pos);
-    }
-    if(q->arg2->loc->type != mem_register){
-    }
-    strapp(&code, "    imulq     %%rdx, %%rax\n");
-    set_register(RAX, q->res);
+    strapp(&code,
+        "    imulq     %%%s, %%%s\n",
+        registers[q->arg2->reg_loc],
+        registers[q->arg1->reg_loc]);
+    set_register(q->arg1->reg_loc, q->res);
     return code;
 }
 
-void set_register(int reg, symbol* s){
-    usage[reg] = s;
-    if(s->loc != NULL){
-        s->loc->type = mem_register;
-        s->loc->pos = RAX;
-    } else {
-        s->loc = new_slocation(mem_register, RAX);
+int get_register(){
+    int i;
+    for(i = 0; i < NUM_REGISTERS; i++){
+        if(i == RSP || i == RBP)
+            continue;
+
+        if(usage[i] == NULL)
+            return i;
     }
-    print_registers();
+    return -1; // No register found --> Error
+}
+
+void set_register(int reg, symbol* s){
+    if(usage[reg] != NULL)
+        usage[reg]->reg_loc = -1;
+
+    usage[reg] = s;
+    if(s != NULL)
+        s->reg_loc = reg;
+
+    //print_registers();
 }
 
 void print_registers(){
