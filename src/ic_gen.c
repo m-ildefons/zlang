@@ -14,6 +14,7 @@
 static size_t tmp_counter;
 static unsigned int label_counter;
 
+
 char* get_tmp_name(void){
     char* name = salloc(tmp_counter / 10 + 3);
     sprintf(name, ".t%zu", tmp_counter);
@@ -49,9 +50,9 @@ quad_list* ic_gen_translation_unit(asn* ast){
         expr_list = expr_list->next){
         node = expr_list->expr;
 
-        if(node->tag == var_tag){
-        } else if(node->tag == fun_def_tag){
+        if(node->tag == fun_def_tag){
             sub_ic = ic_gen_fun_def(node);
+        } else if(node->tag == assign_tag){
         } else {
         }
 

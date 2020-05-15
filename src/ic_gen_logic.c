@@ -11,6 +11,7 @@
 
 #include "ic_gen.h"
 
+
 quad_list* ic_gen_log_and(asn* node){
     quad_list* IC = NULL;
 

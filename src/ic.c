@@ -30,7 +30,6 @@ const char* fac_cn[] = {
     [fac_setge] = "set ge or eq",
     [fac_sete] = "set eq",
     [fac_setne] = "set neq",
-    [fac_assign] = "assign",
     [fac_add] = "add",
     [fac_sub] = "sub",
     [fac_mul] = "mul",

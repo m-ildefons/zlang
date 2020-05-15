@@ -30,6 +30,11 @@ char* gen_asm_x86_64(const quad_list* IC){
 
     char* bname = basename(filename);
     strapp(&code, "    .file     \"%s\"\n", bname);
+    strapp(&code,
+        "    .ident    \"Zlang %d.%d.%s\"\n",
+        __ZLANG_MAJ__,
+        __ZLANG_MIN__,
+        __ZLANG_SUB__);
 
     for(; ql != NULL; ql = ql->next){
         switch(ql->quad->op){
@@ -50,7 +55,6 @@ char* gen_asm_x86_64(const quad_list* IC){
             case fac_setge:
             case fac_sete:
             case fac_setne: snippet = asm_x86_64_set(ql->quad); break;
-            //case fac_assign: break;
             case fac_add: snippet = asm_x86_64_add(ql->quad); break;
             case fac_sub: snippet = asm_x86_64_sub(ql->quad); break;
             case fac_mul: snippet = asm_x86_64_mul(ql->quad); break;
@@ -68,15 +72,9 @@ char* gen_asm_x86_64(const quad_list* IC){
                 continue;
         }
         strapp(&code, "%s", snippet);
-        printf("%s", snippet);
         free(snippet);
     }
 
-    strapp(&code,
-        "    .ident    \"Zlang %d.%d.%s\"\n",
-        __ZLANG_MAJ__,
-        __ZLANG_MIN__,
-        __ZLANG_SUB__);
 
     free(bname);
     return code;
@@ -195,23 +193,35 @@ char* asm_x86_64_jump(const quadruple* q){
 
 char* asm_x86_64_compare(const quadruple* q){
     char* code = strnew();
-    strapp(&code, "    cmpq      $%s, %%rax\n", q->arg1->ident);
+//    strapp(&code, "    cmpq      $%s, %%rax\n", q->arg1->ident);
+    if(q->arg1->reg_loc < 0){
+        strapp(&code,
+            "    cmpq      $%s, %%%s\n",
+            q->arg1->ident,
+            registers[q->arg2->reg_loc]);
+    } else {
+        strapp(&code,
+            "    cmpq      %%%s, %%%s\n",
+            registers[q->arg2->reg_loc],
+            registers[q->arg1->reg_loc]);
+    }
     return code;
 }
 
 char* asm_x86_64_set(const quadruple* q){
     char* code = strnew();
+    const char* instr = NULL;
     strapp(&code, "    movq      $0, %%rax\n");
     switch(q->op){
-        case fac_setl: strapp(&code, "    setl      "); break;
-        case fac_setle: strapp(&code, "    setle     "); break;
-        case fac_setg: strapp(&code, "    setg      "); break;
-        case fac_setge: strapp(&code, "    setge     "); break;
-        case fac_sete: strapp(&code, "    sete      "); break;
-        case fac_setne: strapp(&code, "    setne     "); break;
+        case fac_setl: instr = "setl "; break;
+        case fac_setle: instr = "setle"; break;
+        case fac_setg: instr = "setg "; break;
+        case fac_setge: instr = "setge"; break;
+        case fac_sete: instr = "sete "; break;
+        case fac_setne: instr = "setne"; break;
         default: break;
     }
-    strapp(&code, "%al\n");
+    strapp(&code, "    %s     %%al\n", instr);
     return code;
 }
 

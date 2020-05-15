@@ -48,8 +48,6 @@ typedef struct four_address_code {
         fac_sete,
         fac_setne,
 
-        fac_assign,
-
         // arithmetic ops
         fac_add,
         fac_sub,
