@@ -31,14 +31,15 @@ void strrep(char** str, const char* exp, const char* rep){
     unsigned int i;
     for(tok = strstr(res, exp); tok != NULL; tok = strstr(res, exp)){
         strncpy(tmp, res, (size_t) (tok - res));
-        strapp(&dest, tmp);
-        strapp(&dest, rep);
+        __strapp(&dest, tmp);
+        __strapp(&dest, rep);
         for(i = 0; i < src_len; i++)
             tmp[i] = '\0';
         res = tok + exp_len;
     }
 
-    strapp(&dest, res);
+    // Must not use fmt string since it might contain a % sign unescaped.
+    __strapp(&dest, res);
 
     free((*str));
     (*str) = dest;
