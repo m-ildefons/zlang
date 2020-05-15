@@ -1,7 +1,7 @@
 .PHONY: valid invalid
 
 valid:
-	$(MAKE) -i -C valid
+	$(MAKE) -C valid
 
 invalid:
 	$(MAKE) -C invalid

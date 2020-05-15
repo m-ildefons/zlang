@@ -29,10 +29,10 @@ all: $(TEST) $(SUBDIR) clean
 	echo $$? > $@
 
 %.bin: %.s
-	gcc $< -o $@;
+	@gcc $< -o $@;
 
 %.s: %.x
 	@$(CC) $< > /dev/null; \
 
-clean: $(OUT) $(BIN) $(ASM)
-	@rm $?
+clean:
+	@rm -f $(OUT) $(BIN) $(ASM)
