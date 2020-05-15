@@ -54,16 +54,21 @@ char* gen_asm_x86_64(const quad_list* IC){
             case fac_add: snippet = asm_x86_64_add(ql->quad); break;
             case fac_sub: snippet = asm_x86_64_sub(ql->quad); break;
             case fac_mul: snippet = asm_x86_64_mul(ql->quad); break;
-            //case fac_div: break;
-            //case fac_mod: break;
-            //case fac_neg: break;
+            case fac_div: snippet = asm_x86_64_div(ql->quad); break;
+            case fac_mod: snippet = asm_x86_64_mod(ql->quad); break;
+            case fac_neg: snippet = asm_x86_64_neg(ql->quad); break;
+            case fac_shl: snippet = asm_x86_64_bit(ql->quad); break;
+            case fac_shr: snippet = asm_x86_64_bit(ql->quad); break;
+            case fac_and: snippet = asm_x86_64_bit(ql->quad); break;
+            case fac_xor: snippet = asm_x86_64_bit(ql->quad); break;
+            case fac_or: snippet = asm_x86_64_bit(ql->quad); break;
             default:
                 printf("Warning: Encountered unimplemented intermediary code");
                 printf(" during x86_64 asm generation.\n");
                 continue;
         }
         strapp(&code, "%s", snippet);
-        printf("\n%s", snippet);
+        printf("%s", snippet);
         free(snippet);
     }
 
@@ -144,7 +149,7 @@ char* asm_x86_64_load(const quadruple* q){
     char* code = strnew();
 
     int reg = get_register();
-    printf("%s --> %s\n", q->arg1->ident, registers[reg]);
+//    printf("%s --> %s\n", q->arg1->ident, registers[reg]);
 
     if(usage[reg] != NULL){
         strapp(&code, "    subq      $8, %%rsp\n");
@@ -240,6 +245,57 @@ char* asm_x86_64_mul(const quadruple* q){
     return code;
 }
 
+char* asm_x86_64_div(const quadruple* q){
+    char* code = strnew();
+    strapp(&code, "    cqo\n");
+    strapp(&code,
+        "    idivq     %%%s\n",
+        registers[q->arg2->reg_loc]);
+    set_register(RAX, q->res);
+    return code;
+}
+
+char* asm_x86_64_mod(const quadruple* q){
+    char* code = strnew();
+    strapp(&code, "    cqo\n");
+    strapp(&code,
+        "    idivq     %%%s\n",
+        registers[q->arg2->reg_loc]);
+    set_register(RDX, q->res);
+    return code;
+}
+
+char* asm_x86_64_neg(const quadruple* q){
+    char* code = strnew();
+    strapp(&code,
+        "    negq      %%%s\n",
+        registers[q->arg1->reg_loc]);
+    set_register(q->arg1->reg_loc, q->res);
+    return code;
+}
+
+char* asm_x86_64_bit(const quadruple* q){
+    char* code = strnew();
+    const char* instr = NULL;
+    const char* reg = NULL;
+    switch(q->op){
+        case fac_shl: instr = "shlq"; reg = "cl"; break;
+        case fac_shr: instr = "shrq"; reg = "cl"; break;
+        case fac_and: instr = "andq"; reg = registers[q->arg2->reg_loc]; break;
+        case fac_xor: instr = "xorq"; reg = registers[q->arg2->reg_loc]; break;
+        case fac_or: instr = "orq "; reg = registers[q->arg2->reg_loc]; break;
+        default: instr = "#";
+    }
+
+    strapp(&code,
+        "    %s      %%%s, %%%s\n",
+        instr,
+        reg,
+        registers[q->arg1->reg_loc]);
+    set_register(q->arg1->reg_loc, q->res);
+    return code;
+}
+
 int get_register(){
     int i;
     for(i = 0; i < NUM_REGISTERS; i++){
@@ -257,6 +313,7 @@ void set_register(int reg, symbol* s){
         usage[reg]->reg_loc = -1;
 
     usage[reg] = s;
+
     if(s != NULL)
         s->reg_loc = reg;
 

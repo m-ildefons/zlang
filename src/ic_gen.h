@@ -47,8 +47,7 @@ quad_list* ic_gen_unary_not(asn* node);
 quad_list* ic_gen_unary_compl(asn* node);
 quad_list* ic_gen_reference(asn* node);
 quad_list* ic_gen_dereference(asn* node);
-quad_list* ic_gen_inc(asn* node);
-quad_list* ic_gen_dec(asn* node);
+quad_list* ic_gen_incdec(asn* node);
 
 /* implemented in ic_gen_binary */
 quad_list* ic_gen_binary(asn* node);

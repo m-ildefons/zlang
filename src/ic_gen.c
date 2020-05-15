@@ -107,8 +107,8 @@ quad_list* ic_gen(asn* node){
         case or_assign_tag: res = ic_gen_assign(node); break;
         case bsl_assign_tag: res = ic_gen_assign(node); break;
         case bsr_assign_tag: res = ic_gen_assign(node); break;
-        case inc_tag: res = ic_gen_inc(node); break;
-        case dec_tag: res = ic_gen_dec(node); break;
+        case inc_tag: res = ic_gen_incdec(node); break;
+        case dec_tag: res = ic_gen_incdec(node); break;
         case cond_tag: res = ic_gen_cond(node); break;
         case while_loop_tag: res = ic_gen_while_loop(node); break;
         case for_loop_tag: res = ic_gen_for_loop(node); break;

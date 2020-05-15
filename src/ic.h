@@ -22,20 +22,23 @@
 
 typedef struct four_address_code {
     enum {
+        // flow control
         fac_func_start,
         fac_func_end,
         fac_call,
         fac_arg,
         fac_return,
-
         fac_label,
         fac_jump,
 
         fac_je,
         fac_jne,
+
+        // memory ops
         fac_load,
         fac_store,
 
+        // comparison ops
         fac_compare,
 
         fac_setl,
@@ -47,12 +50,20 @@ typedef struct four_address_code {
 
         fac_assign,
 
+        // arithmetic ops
         fac_add,
         fac_sub,
         fac_mul,
         fac_div,
         fac_mod,
         fac_neg,
+
+        // bitwise ops
+        fac_shl,
+        fac_shr,
+        fac_and,
+        fac_xor,
+        fac_or,
     } op;
     symbol* arg1;
     symbol* arg2;

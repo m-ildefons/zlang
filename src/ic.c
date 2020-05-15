@@ -37,6 +37,11 @@ const char* fac_cn[] = {
     [fac_div] = "div",
     [fac_mod] = "mod",
     [fac_neg] = "neg",
+    [fac_shl] = "shl",
+    [fac_shr] = "shr",
+    [fac_and] = "and",
+    [fac_xor] = "xor",
+    [fac_or] = "or",
 };
 
 quadruple* make_quad(int op,

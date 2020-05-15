@@ -47,6 +47,11 @@ char* asm_x86_64_set(const quadruple* q);
 char* asm_x86_64_add(const quadruple* q);
 char* asm_x86_64_sub(const quadruple* q);
 char* asm_x86_64_mul(const quadruple* q);
+char* asm_x86_64_div(const quadruple* q);
+char* asm_x86_64_mod(const quadruple* q);
+char* asm_x86_64_neg(const quadruple* q);
+
+char* asm_x86_64_bit(const quadruple* q);
 
 int get_register(void);
 void set_register(int reg, symbol* s);
