@@ -320,11 +320,17 @@ asn_list* parse_parameter_type_list(token** tl, size_t* tnt){
  */
 asn_list* parse_parameter_list(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing parameter list\n", (*tnt), (*tl)->str);
+	token* tlp = (*tl);
     asn_list* param_list = NULL;
 
     asn* param = parse_parameter_declaration(tl, tnt);
     while(param != NULL){
         append_exp_list(&param_list, param);
+
+		tlp = (*tl);
+		if(tlp->type == token_comma)
+			pop_token(&tlp, tl, tnt);
+
         param = parse_parameter_declaration(tl, tnt);
     }
     return param_list;
@@ -336,7 +342,7 @@ asn_list* parse_parameter_list(token** tl, size_t* tnt){
  *                           | {<declaration-specifier>}+
  */
 asn* parse_parameter_declaration(token** tl, size_t* tnt){
-    printf("[%zu (%s)] parsing declaration\n", (*tnt), (*tl)->str);
+    printf("[%zu (%s)] parsing parameter declaration\n", (*tnt), (*tl)->str);
     type_link* decl_spec = parse_declaration_specifier(tl, tnt);
     if(decl_spec == NULL)
         return NULL;
