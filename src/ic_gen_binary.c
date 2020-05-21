@@ -3,7 +3,7 @@
  *
  * DESCRIPTION
  *     Implementation of functions for intermediate code generation for
- *     binary operations.
+ *     binary operations. These are arithmetic and bitwise operations.
  *
  * AUTHOR: Moritz Röhrich <moritzr@pool.math.tu-berlin.de>
  *
@@ -15,17 +15,13 @@ quad_list* ic_gen_binary(asn* node){
     quad_list* IC = NULL;
 
     quad_list* lhs_ic = ic_gen(node->op.binary_exp.lval);
-    char* t1_id = get_tmp_name();
-    symbol* t1 = search_symbol(symbol_list_ptr, t1_id);
+	symbol* lhs = get_tmp();
 
     quad_list* rhs_ic = ic_gen(node->op.binary_exp.rval);
-    char* t2_id = get_tmp_name();
-    symbol* t2 = search_symbol(symbol_list_ptr, t2_id);
+	symbol* rhs = get_tmp();
 
-    char* res_id = gen_tmp_name();
-    symbol* res = new_symbol(res_id);
-    copy_type_list(t1, &res);
-    symbol_list_append(&symbol_list_ptr, &res);
+	symbol* res = gen_tmp();
+    copy_type_list(lhs, &res);
 
     int fac;
     switch(node->tag){
@@ -34,18 +30,21 @@ quad_list* ic_gen_binary(asn* node){
         case bin_mul_tag: fac = fac_mul; break;
         case bin_div_tag: fac = fac_div; break;
         case bin_mod_tag: fac = fac_mod; break;
-        default: fac = 0;
+
+		case bit_shift_left_tag: fac = fac_shl; break;
+		case bit_shift_right_tag: fac = fac_shr; break;
+		case bit_and_tag: fac = fac_and; break;
+		case bit_xor_tag: fac = fac_xor; break;
+		case bit_or_tag: fac = fac_or; break;
+        default: ic_error("Compiler error in %s\n", __func__);
     }
 
-    quadruple* q = make_quad(fac, t1, t2, res);
+    quadruple* q = make_quad(fac, lhs, rhs, res);
 
     quad_list_app_quad_list(&IC, lhs_ic);
     quad_list_app_quad_list(&IC, rhs_ic);
     quad_list_app_quad(&IC, q);
 
-    free(t1_id);
-    free(t2_id);
-    free(res_id);
     delete_symbol(&res);
     return IC;
 }

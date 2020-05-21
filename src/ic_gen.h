@@ -62,9 +62,6 @@ quad_list* ic_gen_binary(asn* node);
 /* implemented in ic_gen_comp.c */
 quad_list* ic_gen_comp(asn* node);
 
-/* implemented in ic_gen_bit_op.c */
-quad_list* ic_gen_bit_op(asn* node);
-
 /* implemented in ic_gen_logic.c */
 quad_list* ic_gen_log_and(asn* node);
 quad_list* ic_gen_log_xor(asn* node);

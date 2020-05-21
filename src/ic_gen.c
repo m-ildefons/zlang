@@ -135,11 +135,11 @@ quad_list* ic_gen(asn* node){
         case greater_or_equal_tag: res = ic_gen_comp(node); break;
         case equal_tag: res = ic_gen_comp(node); break;
         case not_equal_tag: res = ic_gen_comp(node); break;
-        case bit_shift_left_tag: res = ic_gen_bit_op(node); break;
-        case bit_shift_right_tag: res = ic_gen_bit_op(node); break;
-        case bit_and_tag: res = ic_gen_bit_op(node); break;
-        case bit_xor_tag: res = ic_gen_bit_op(node); break;
-        case bit_or_tag: res = ic_gen_bit_op(node); break;
+        case bit_shift_left_tag: res = ic_gen_binary(node); break;
+        case bit_shift_right_tag: res = ic_gen_binary(node); break;
+        case bit_and_tag: res = ic_gen_binary(node); break;
+        case bit_xor_tag: res = ic_gen_binary(node); break;
+        case bit_or_tag: res = ic_gen_binary(node); break;
         case log_and_tag: res = ic_gen_log_and(node); break;
         case log_xor_tag: res = ic_gen_log_xor(node); break;
         case log_or_tag: res = ic_gen_log_or(node); break;
