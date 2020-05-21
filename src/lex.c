@@ -159,6 +159,8 @@ static void tokenize_line(char* line,
             t = token_inc;
         } else if(strcmp(tok, "--") == 0){
             t = token_dec;
+		} else if(strcmp(tok, "//") == 0){
+			t = token_ignore; break;
         } else if(strcmp(tok, "<<") == 0){
             t = token_bit_shift_left;
         } else if(strcmp(tok, ">>") == 0){
@@ -272,6 +274,7 @@ static void pre_lex_line(char** src){
     strrep(src, ">>", " >> ");
     strrep(src, "+  +", " ++ ");
     strrep(src, "-  -", " -- ");
+	strrep(src, "/  /", " // "); // Comments
 	strrep(src, "<  <", " << ");
 	strrep(src, ">  >", " >> ");
     strrep(src, "=  =", " == ");

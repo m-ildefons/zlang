@@ -24,6 +24,7 @@
 
 typedef struct token_struct {
     enum token_type {
+		token_ignore,
         token_null,
         token_void_kw,
         token_bool_kw,
