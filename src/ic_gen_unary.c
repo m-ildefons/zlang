@@ -37,7 +37,19 @@ quad_list* ic_gen_unary_minus(asn* node){
 quad_list* ic_gen_unary_not(asn* node){
     quad_list* IC = NULL;
     quad_list* inner = ic_gen(node->op.unary_exp.val);
+	symbol* ires = get_tmp();
+	symbol* zero = new_symbol("0");
+	symbol* res = gen_tmp();
+
+	quadruple* qcmp = make_quad(fac_compare, zero, ires, NULL);
+	quadruple* set_eq = make_quad(fac_sete, NULL, NULL, res);
+
     quad_list_app_quad_list(&IC, inner);
+	quad_list_app_quad(&IC, qcmp);
+	quad_list_app_quad(&IC, set_eq);
+
+	delete_symbol(&zero);
+	delete_symbol(&res);
     return IC;
 }
 

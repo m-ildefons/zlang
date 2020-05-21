@@ -26,13 +26,59 @@ char* gen_tmp_name(void){
     return get_tmp_name();
 }
 
-char* gen_label(const char* cust_str){
+char* gen_label_name(const char* cust_str){
     /* printf("generating label %u\n", label_counter); */
     size_t len_cs = strlen(cust_str);
     char* label = salloc((len_cs + 10));
     sprintf(label, "_%s%.2x", cust_str, label_counter);
     label_counter++;
     return label;
+}
+
+symbol* gen_symbol(const char* name){
+	symbol* s = new_symbol(name);
+	symbol_list_append(&symbol_list_ptr, &s);
+	return s;
+}
+
+symbol* get_tmp(void){
+	char* id = get_tmp_name();
+	symbol* tmp = search_symbol(symbol_list_ptr, id);
+	free(id);
+	return tmp;
+}
+
+symbol* gen_tmp(void){
+	char* id = gen_tmp_name();
+	symbol* tmp = gen_symbol(id);
+	free(id);
+	return tmp;
+}
+
+symbol* gen_label(const char* name){
+	char* id = gen_label_name(name);
+	symbol* label = gen_symbol(id);
+	free(id);
+	return label;
+}
+
+void ic_error(const char* fmt, ...){
+	char buffer[1024];
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf(buffer, sizeof(buffer), fmt, args);
+	printf("\033[91mError\033[39m: %s\n", buffer);
+	va_end(args);
+	abort();
+}
+
+void ic_warning(const char* fmt, ...){
+	char buffer[1024];
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf(buffer, sizeof(buffer), fmt, args);
+	printf("\033[93mWarning\033[39m: %s\n", buffer);
+	va_end(args);
 }
 
 

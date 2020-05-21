@@ -19,25 +19,19 @@ quad_list* ic_gen_cond(asn* node){
 
     quad_list* cond = ic_gen(node->op.cond_exp.cond);
 
-    char* res_id = get_tmp_name();
-    symbol* res = search_symbol(symbol_list_ptr, res_id);
+    symbol* res = get_tmp();
 
-    char* zero_str = salloc(12);
-    sprintf(zero_str, "0");
-    symbol* zero = new_symbol(zero_str);
-
+	symbol* zero = new_symbol("0");
     quadruple* qcmp = make_quad(fac_compare, zero, res, NULL);
 
     quad_list_app_quad_list(&IC, cond);
     quad_list_app_quad(&IC, qcmp);
 
-    char* label_str = gen_label("label");
-    symbol* label = new_symbol(label_str);
+    symbol* label = gen_label("lpos");
     quadruple* qlabel = make_quad(fac_label, label, NULL, NULL);
     quadruple* jlabel = make_quad(fac_je, label, NULL, NULL);
 
-    char* end_str = gen_label("end");
-    symbol* end = new_symbol(end_str);
+	symbol* end = gen_label("end");
     quadruple* qend = make_quad(fac_label, end, NULL, NULL);
     quadruple* jend = make_quad(fac_jump, end, NULL, NULL);
 
@@ -66,10 +60,6 @@ quad_list* ic_gen_cond(asn* node){
 
     quad_list_app_quad(&IC, qend);
 
-    free(label_str);
-    free(end_str);
-    free(res_id);
-    free(zero_str);
     delete_symbol(&zero);
     delete_symbol(&label);
     delete_symbol(&end);

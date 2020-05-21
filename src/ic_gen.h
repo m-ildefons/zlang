@@ -22,7 +22,14 @@ symbol* loop_end_symbol;
 /* implemented in ic_gen.c */
 char* get_tmp_name(void);
 char* gen_tmp_name(void);
-char* gen_label(const char* cust_str);
+char* gen_label_name(const char* cust_str);
+symbol* gen_symbol(const char* name);
+symbol* get_tmp(void);
+symbol* gen_tmp(void);
+symbol* gen_label(const char* name);
+
+void ic_error(const char* fmt, ...);
+void ic_warning(const char* fmt, ...);
 
 quad_list* ic_gen_translation_unit(asn* ast);
 quad_list* ic_gen(asn* node);

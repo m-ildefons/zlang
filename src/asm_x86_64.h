@@ -33,11 +33,13 @@ char* gen_asm_x86_64(const quad_list* IC);
 
 char* asm_x86_64_func_start(const quadruple* q);
 char* asm_x86_64_func_end(const quadruple* q);
+char* asm_x86_64_func_call(const quadruple* q);
 char* asm_x86_64_return(const quadruple* q);
-char* asm_x86_64_label(const quadruple* q);
+
 char* asm_x86_64_load(const quadruple* q);
 char* asm_x86_64_store(const quadruple* q);
 
+char* asm_x86_64_label(const quadruple* q);
 char* asm_x86_64_jump(const quadruple* q);
 
 char* asm_x86_64_compare(const quadruple* q);
@@ -52,6 +54,9 @@ char* asm_x86_64_mod(const quadruple* q);
 char* asm_x86_64_neg(const quadruple* q);
 
 char* asm_x86_64_bit(const quadruple* q);
+
+char* push_stack(symbol* sym);
+char* pop_stack(symbol* sym);
 
 int get_register(void);
 void set_register(int reg, symbol* s);

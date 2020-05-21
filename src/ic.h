@@ -68,6 +68,7 @@ typedef struct four_address_code {
     symbol* res;
     symbol_list* symbol_list_ptr;
     symbol_list* temp_list_ptr;
+	symbol_list* args;
 } quadruple;
 
 typedef struct quadruple_list {

@@ -12,36 +12,37 @@
 
 
 const char* fac_cn[] = {
-    [fac_func_start] = "func start",
-    [fac_func_end] = "func end",
-    [fac_call] = "call",
-    [fac_arg] = "func arg",
-    [fac_return] = "return",
-    [fac_label] = "label",
-    [fac_jump] = "jump",
+	[fac_func_start] = "func start",
+	[fac_func_end] = "func end",
+	[fac_call] = "call",
+	[fac_arg] = "func arg",
+	[fac_return] = "return",
+	[fac_label] = "label",
+	[fac_jump] = "jump",
 	[fac_je] = "jmp if eq",
 	[fac_jne] = "jmp if neq",
-    [fac_load] = "load",
-    [fac_store] = "store",
+	[fac_load] = "load",
+	[fac_store] = "store",
 	[fac_compare] = "compare",
-    [fac_setl] = "set less",
-    [fac_setle] = "set le or eq",
-    [fac_setg] = "set greater",
-    [fac_setge] = "set ge or eq",
-    [fac_sete] = "set eq",
-    [fac_setne] = "set neq",
-    [fac_add] = "add",
-    [fac_sub] = "sub",
-    [fac_mul] = "mul",
-    [fac_div] = "div",
-    [fac_mod] = "mod",
-    [fac_neg] = "neg",
-    [fac_shl] = "shl",
-    [fac_shr] = "shr",
-    [fac_and] = "and",
-    [fac_xor] = "xor",
-    [fac_or] = "or",
+	[fac_setl] = "set less",
+	[fac_setle] = "set le or eq",
+	[fac_setg] = "set greater",
+	[fac_setge] = "set ge or eq",
+	[fac_sete] = "set eq",
+	[fac_setne] = "set neq",
+	[fac_add] = "add",
+	[fac_sub] = "sub",
+	[fac_mul] = "mul",
+	[fac_div] = "div",
+	[fac_mod] = "mod",
+	[fac_neg] = "neg",
+	[fac_shl] = "shl",
+	[fac_shr] = "shr",
+	[fac_and] = "and",
+	[fac_xor] = "xor",
+	[fac_or] = "or",
 };
+
 
 quadruple* make_quad(int op,
                     symbol* arg1,
@@ -65,6 +66,7 @@ quadruple* make_quad(int op,
 
     q->symbol_list_ptr = NULL;
     q->temp_list_ptr = NULL;
+	q->args = NULL;
     return q;
 }
 
@@ -78,6 +80,7 @@ void delete_quad(quadruple* q){
 
     delete_symbol_list(q->symbol_list_ptr);
     delete_symbol_list(q->temp_list_ptr);
+	delete_symbol_list(q->args);
     free(q);
 }
 
