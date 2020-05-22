@@ -55,12 +55,12 @@ char* gen_asm_x86_64(const quad_list* IC){
             case fac_setge:
             case fac_sete:
             case fac_setne: snippet = asm_x86_64_set(ql->quad); break;
-            case fac_add: snippet = asm_x86_64_add(ql->quad); break;
-            case fac_sub: snippet = asm_x86_64_sub(ql->quad); break;
-            case fac_mul: snippet = asm_x86_64_mul(ql->quad); break;
-            case fac_div: snippet = asm_x86_64_div(ql->quad); break;
-            case fac_mod: snippet = asm_x86_64_mod(ql->quad); break;
-            case fac_neg: snippet = asm_x86_64_neg(ql->quad); break;
+            case fac_add:
+            case fac_sub:
+            case fac_mul:
+            case fac_div:
+            case fac_mod:
+            case fac_neg: snippet = asm_x86_64_arith(ql->quad); break;
             case fac_shl: snippet = asm_x86_64_bit(ql->quad); break;
             case fac_shr: snippet = asm_x86_64_bit(ql->quad); break;
             case fac_and: snippet = asm_x86_64_bit(ql->quad); break;
@@ -96,15 +96,15 @@ char* asm_x86_64_func_start(const quadruple* q){
             frame_size += size_of[e->sym->etype->type.spec->type];
             e->sym->mem_loc = frame_size;
         }
-        print_symbol_list_entry(e);
+//        print_symbol_list_entry(e);
     }
-    for(e = q->temp_list_ptr->top; e != q->temp_list_ptr->bottom->next; e = e->next){
+//    for(e = q->temp_list_ptr->top; e != q->temp_list_ptr->bottom->next; e = e->next){
 //        if(e->sym->etype != NULL){
 //            frame_size += size_of[e->sym->etype->type.spec->type];
 //            e->sym->mem_loc = frame_size;
 //        }
-        print_symbol_list_entry(e);
-    }
+//        print_symbol_list_entry(e);
+//    }
     printf("%s: %zu\n", q->arg1->ident, frame_size);
 
 	if(frame_size > 0)
@@ -248,6 +248,7 @@ char* asm_x86_64_store(const quadruple* q){
 		strapp(&code, "    movq      %%%s, (%%rsp)\n", registers[q->arg1->reg_loc]);
 	} else if(q->arg1->reg_loc < 0){
     	strapp(&code, "    movq      %%rax, -%d(%%rbp)\n", q->res->mem_loc);
+	} else if(q->res->mem_loc < 0){
 	} else {
 		strapp(&code,
 			"    movq      %%%s, -%d(%%rbp)\n",
@@ -306,76 +307,59 @@ char* asm_x86_64_set(const quadruple* q){
     return code;
 }
 
-char* asm_x86_64_add(const quadruple* q){
-    char* code = strnew();
-	if(q->arg1->reg_loc < 0){
+char* asm_x86_64_arith(const quadruple* q){
+	char* code = strnew();
+	const char* op;
+	switch(q->op){
+		case fac_add: op = "addq "; break;
+		case fac_sub: op = "subq "; break;
+		case fac_mul: op = "imulq"; break;
+		case fac_div: op = "idivq"; break;
+		case fac_mod: op = "idivq"; break;
+		case fac_neg: op = "negq "; break;
+		default: abort();
+	}
+
+	if(q->arg1 != NULL && q->arg1->reg_loc < 0){
 		char* ps = pop_stack(q->arg1);
 		strapp(&code, "%s", ps);
 		free(ps);
 	}
-	if(q->arg2->reg_loc < 0){
+
+	if(q->arg2 != NULL && q->arg2->reg_loc < 0){
 		char* ps = pop_stack(q->arg2);
 		strapp(&code, "%s", ps);
 		free(ps);
 	}
-    strapp(&code,
-        "    addq      %%%s, %%%s\n",
-        registers[q->arg2->reg_loc],
-        registers[q->arg1->reg_loc]);
-    set_register(q->arg1->reg_loc, q->res);
-	set_register(q->arg2->reg_loc, NULL);
-    return code;
-}
 
-char* asm_x86_64_sub(const quadruple* q){
-    char* code = strnew();
-    strapp(&code,
-        "    subq      %%%s, %%%s\n",
-        registers[q->arg2->reg_loc],
-        registers[q->arg1->reg_loc]);
-    set_register(q->arg1->reg_loc, q->res);
-	set_register(q->arg2->reg_loc, NULL);
-    return code;
-}
+	if(q->op== fac_div || q->op == fac_mod)
+		strapp(&code, "    cqo\n");
 
-char* asm_x86_64_mul(const quadruple* q){
-    char* code = strnew();
-    strapp(&code,
-        "    imulq     %%%s, %%%s\n",
-        registers[q->arg2->reg_loc],
-        registers[q->arg1->reg_loc]);
-    set_register(q->arg1->reg_loc, q->res);
-	set_register(q->arg2->reg_loc, NULL);
-    return code;
-}
+	if(q->op == fac_neg){
+		strapp(&code,
+			"    %s     %%%s\n",
+			op,
+			registers[q->arg1->reg_loc]);
+	} else {
+		strapp(&code,
+			"    %s     %%%s, %%%s\n",
+			op,
+			registers[q->arg2->reg_loc],
+			registers[q->arg1->reg_loc]);
+	}
 
-char* asm_x86_64_div(const quadruple* q){
-    char* code = strnew();
-    strapp(&code, "    cqo\n");
-    strapp(&code,
-        "    idivq     %%%s\n",
-        registers[q->arg2->reg_loc]);
-    set_register(RAX, q->res);
-    return code;
-}
+	if(q->op == fac_div){
+		set_register(RAX, q->res);
+	} else if(q->op == fac_mod){
+		set_register(RDX, q->res);
+	} else if(q->op == fac_neg){
+		set_register(q->arg1->reg_loc, q->res);
+	} else {
+		set_register(q->arg1->reg_loc, q->res);
+		set_register(q->arg2->reg_loc, NULL);
+	}
 
-char* asm_x86_64_mod(const quadruple* q){
-    char* code = strnew();
-    strapp(&code, "    cqo\n");
-    strapp(&code,
-        "    idivq     %%%s\n",
-        registers[q->arg2->reg_loc]);
-    set_register(RDX, q->res);
-    return code;
-}
-
-char* asm_x86_64_neg(const quadruple* q){
-    char* code = strnew();
-    strapp(&code,
-        "    negq      %%%s\n",
-        registers[q->arg1->reg_loc]);
-    set_register(q->arg1->reg_loc, q->res);
-    return code;
+	return code;
 }
 
 char* asm_x86_64_bit(const quadruple* q){
@@ -444,20 +428,11 @@ void set_register(int reg, symbol* s){
 
 void print_registers(){
     int i;
-    printf("|   RAX   |   RCX   |   RDX   |   RBX   |");
-    printf("   RBP   |   RSP   |   RSI   |   RDI   |\n");
-    for(i = 0; i < NUM_REGISTERS; i++){
-        if(usage[i] != NULL){
-            int padlen = 8 - strlen(usage[i]->ident);
-            printf("|%*.*s%s ",
-                padlen,
-                padlen,
-                " ",
-                usage[i]->ident);
-        }
-        else
-            printf("|%*.*s ", 8, 8, " ");
-    }
-    printf("|\n");
+	for(i = 0; i < NUM_REGISTERS; i++){
+		if(usage[i] == NULL)
+			continue;
+
+		printf("> %s: %s\n", registers[i], usage[i]->ident);
+	}
 }
 

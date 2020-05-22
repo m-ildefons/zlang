@@ -17,15 +17,24 @@
 #include "strop.h"
 #include "storage_location.h"
 
-#define RAX 0
-#define RCX 1
-#define RDX 2
-#define RBX 3
-#define RSP 4
-#define RBP 5
-#define RSI 6
-#define RDI 7
+#define RAX 0x0
+#define RCX 0x1
+#define RDX 0x2
+#define RBX 0x3
+#define RSP 0x4
+#define RBP 0x5
+#define RSI 0x6
+#define RDI 0x7
 #define NUM_REGISTERS 8
+
+#define R8 0x8
+#define R9 0x9
+#define R10 0xA
+#define R11 0xB
+#define R12 0xC
+#define R13 0xD
+#define R14 0xE
+#define R15 0xF
 
 
 /* implemented in asm_x86_64.c */
@@ -46,12 +55,7 @@ char* asm_x86_64_compare(const quadruple* q);
 
 char* asm_x86_64_set(const quadruple* q);
 
-char* asm_x86_64_add(const quadruple* q);
-char* asm_x86_64_sub(const quadruple* q);
-char* asm_x86_64_mul(const quadruple* q);
-char* asm_x86_64_div(const quadruple* q);
-char* asm_x86_64_mod(const quadruple* q);
-char* asm_x86_64_neg(const quadruple* q);
+char* asm_x86_64_arith(const quadruple* q);
 
 char* asm_x86_64_bit(const quadruple* q);
 
