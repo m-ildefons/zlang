@@ -141,14 +141,6 @@ asn* parse_postfix_exp(token** tl, size_t* tnt){
 
         postfix_exp = make_binary_exp(postfix_exp, rhs, token_dot);
 	}
-	while(primary_exp != NULL && tlp != NULL && tlp->type == token_inc){
-        pop_token(&tlp, tl, tnt);
-        postfix_exp = make_unary_exp(primary_exp, token_inc);
-	}
-	while(primary_exp != NULL && tlp != NULL && tlp->type == token_dec){
-        pop_token(&tlp, tl, tnt);
-        postfix_exp = make_unary_exp(primary_exp, token_dec);
-	}
 
     if(postfix_exp->tag == ident_tag){
         symbol* sym = search_symbol(symbol_list_ptr, postfix_exp->op.ident_exp.ident);
@@ -160,6 +152,16 @@ asn* parse_postfix_exp(token** tl, size_t* tnt){
             postfix_exp = make_var_exp(sym);
         }
     }
+
+	while(primary_exp != NULL && tlp != NULL && tlp->type == token_inc){
+        pop_token(&tlp, tl, tnt);
+        postfix_exp = make_unary_exp(postfix_exp, token_inc);
+	}
+	while(primary_exp != NULL && tlp != NULL && tlp->type == token_dec){
+        printf("[%zu (%s)] parsing postfix decrement\n", (*tnt), (*tl)->str);
+        pop_token(&tlp, tl, tnt);
+        postfix_exp = make_unary_exp(postfix_exp, token_dec);
+	}
 
     printf("found postfix expr.\n");
     return postfix_exp;
