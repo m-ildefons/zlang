@@ -55,22 +55,22 @@ quad_list* ic_gen_unary_not(asn* node){
 
 quad_list* ic_gen_unary_compl(asn* node){
     quad_list* IC = NULL;
-    quad_list* inner = ic_gen(node->op.unary_exp.val);
-    quad_list_app_quad_list(&IC, inner);
+//    quad_list* inner = ic_gen(node->op.unary_exp.val);
+//    quad_list_app_quad_list(&IC, inner);
     return IC;
 }
 
 quad_list* ic_gen_reference(asn* node){
     quad_list* IC = NULL;
-    quad_list* inner = ic_gen(node->op.unary_exp.val);
-    quad_list_app_quad_list(&IC, inner);
+//    quad_list* inner = ic_gen(node->op.unary_exp.val);
+//    quad_list_app_quad_list(&IC, inner);
     return IC;
 }
 
 quad_list* ic_gen_dereference(asn* node){
     quad_list* IC = NULL;
-    quad_list* inner = ic_gen(node->op.unary_exp.val);
-    quad_list_app_quad_list(&IC, inner);
+//    quad_list* inner = ic_gen(node->op.unary_exp.val);
+//    quad_list_app_quad_list(&IC, inner);
     return IC;
 }
 
@@ -81,23 +81,16 @@ quad_list* ic_gen_incdec(asn* node){
         val = node->op.unary_exp.val->op.var_exp.sym;
 
     quad_list* inner = ic_gen(node->op.unary_exp.val);
-    char* inner_id = get_tmp_name();
-    symbol* inner_sym = search_symbol(symbol_list_ptr, inner_id);
+	symbol* inner_sym = get_tmp();
 
-    char* one_id = "1";
-    symbol* one_sym = new_symbol(one_id);
+	symbol* one_sym = gen_symbol("1");
     copy_type_list(inner_sym, &one_sym);
-    symbol_list_append(&symbol_list_ptr, &one_sym);
 
-    char* tmp_id = gen_tmp_name();
-    symbol* tmp_sym = new_symbol(tmp_id);
+	symbol* tmp_sym = gen_tmp();
     copy_type_list(one_sym, &tmp_sym);
-    symbol_list_append(&symbol_list_ptr, &tmp_sym);
 
-    char* res_id = gen_tmp_name();
-    symbol* res_sym = new_symbol(res_id);
+	symbol* res_sym = gen_tmp();
     copy_type_list(inner_sym, &res_sym);
-    symbol_list_append(&symbol_list_ptr, &res_sym);
 
     int fac_type;
     switch(node->tag){
@@ -119,9 +112,6 @@ quad_list* ic_gen_incdec(asn* node){
     quad_list_app_quad(&IC, q2);
     quad_list_app_quad(&IC, q3);
 
-    free(inner_id);
-    free(tmp_id);
-    free(res_id);
     delete_symbol(&one_sym);
     delete_symbol(&tmp_sym);
     delete_symbol(&res_sym);
