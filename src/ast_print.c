@@ -63,7 +63,7 @@ static void _pretty_print_symbol_list(symbol_list* list, int_stack* ws_stack){
             else
                 printf("\033[90m      ");
             print_symbol_list_entry(e);
-            printf("\033[39m");
+            printf("\033[39m\n");
             pop_back(&ws_stack);
         }
     }

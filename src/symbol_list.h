@@ -109,8 +109,9 @@ typedef struct {
     size_t scope;
     type_link* stype;
     type_link* etype;
-    int mem_loc;
-    int reg_loc;
+	int data_loc; // memory in (ro)data/heap
+    int mem_loc; // memory on stack
+    int reg_loc; // register
 } symbol;
 
 /* Symbol List Entry

@@ -12,7 +12,11 @@
 
 
 static symbol* usage[NUM_REGISTERS];
-static const char* registers[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi"};
+static const char* registers[] = {
+	"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi",
+	"r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
+	"xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",
+	"xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15"};
 static size_t rel_stack_pos;
 static size_t size_of[type_enum + 1] = {
     [type_void] = 8,
@@ -20,6 +24,7 @@ static size_t size_of[type_enum + 1] = {
     [type_char] = 1,
     [type_int] = 8,
     [type_real] = 8,
+	[type_string] = 8,
 };
 
 char* gen_asm_x86_64(const quad_list* IC){
@@ -27,6 +32,7 @@ char* gen_asm_x86_64(const quad_list* IC){
     char* code = strnew();
     const quad_list* ql = IC;
     char* snippet = NULL;
+	unsigned int idx;
 
     char* bname = basename(filename);
     strapp(&code, "    .file     \"%s\"\n", bname);
@@ -76,13 +82,29 @@ char* gen_asm_x86_64(const quad_list* IC){
         free(snippet);
     }
 
+	strapp(&code, "    .section  .rodata\n");
+	for(idx = 0; idx < string_count; idx++){
+		strapp(&code, ".SC%u:\n", idx);
+		strapp(&code, "    .string   \"%s\"\n", string_index[idx]);
+	}
+
+	for(idx = 0; idx < real_count; idx++){
+		unsigned long bits = *((unsigned long*) &(real_index[idx]));
+		unsigned int upper = ((unsigned int*) &bits)[0];
+		unsigned int lower = ((unsigned int*) &bits)[1];
+		strapp(&code, ".RC%u:\n", idx);
+		strapp(&code, "    .align    8\n");
+		strapp(&code, "    .long     %u\n", upper);
+		strapp(&code, "    .long     %u\n", lower);
+	}
+
     free(bname);
     return code;
 }
 
 char* asm_x86_64_func_start(const quadruple* q){
     char* code = strnew();
-    strapp(&code, "    .text\n");
+    strapp(&code, "    .section  .text\n");
     strapp(&code, "    .global   %s\n", q->arg1->ident);
     strapp(&code, "    .type     %s, @function\n", q->arg1->ident);
     strapp(&code, "%s:\n", q->arg1->ident);
@@ -96,15 +118,17 @@ char* asm_x86_64_func_start(const quadruple* q){
             frame_size += size_of[e->sym->etype->type.spec->type];
             e->sym->mem_loc = frame_size;
         }
-//        print_symbol_list_entry(e);
+		print_symbol_list_entry(e);
+		printf("\n");
     }
-//    for(e = q->temp_list_ptr->top; e != q->temp_list_ptr->bottom->next; e = e->next){
+    for(e = q->temp_list_ptr->top; e != q->temp_list_ptr->bottom->next; e = e->next){
 //        if(e->sym->etype != NULL){
 //            frame_size += size_of[e->sym->etype->type.spec->type];
 //            e->sym->mem_loc = frame_size;
 //        }
-//        print_symbol_list_entry(e);
-//    }
+        print_symbol_list_entry(e);
+		printf("\n");
+    }
     printf("%s: %zu\n", q->arg1->ident, frame_size);
 
 	if(frame_size > 0)
@@ -181,6 +205,7 @@ char* asm_x86_64_func_call(const quadruple* q){
 		}
 	}
 
+	strapp(&code, "    movq      $0, %%rax\n");
 	strapp(&code, "    call      %s\n", q->arg1->ident);
 	set_register(RAX, q->res);
 	return code;
@@ -225,12 +250,17 @@ char* asm_x86_64_load(const quadruple* q){
 	if(q->arg1 == NULL){
 		strapp(&code, "    movq      (%%rsp), %%%s\n", registers[reg]);
 		strapp(&code, "    addq      $8, %%rsp\n");
-	} else if(q->arg1->mem_loc < 0){
+	} else if(q->arg1->mem_loc < 0 && q->arg1->data_loc < 0){
         strapp(&code,
             "    movq      $%s, %%%s\n",
             q->arg1->ident,
             registers[reg]);
-    } else {
+    } else if(q->arg1->mem_loc < 0 && q->arg1->data_loc >= 0){
+		strapp(&code,
+			"    leaq      %s(%%rip), %%%s\n",
+			q->arg1->ident,
+			registers[reg]);
+	} else {
         strapp(&code,
             "    movq      -%d(%%rbp), %%%s\n",
             q->arg1->mem_loc,
@@ -423,7 +453,7 @@ void set_register(int reg, symbol* s){
     if(s != NULL)
         s->reg_loc = reg;
 
-    print_registers();
+//    print_registers();
 }
 
 void print_registers(){

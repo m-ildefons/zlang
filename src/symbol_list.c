@@ -94,6 +94,7 @@ symbol* new_symbol(const char* id){
     s->etype = NULL;
 
     // negative location ==> no valid location
+	s->data_loc = -1;
     s->mem_loc = -1;
     s->reg_loc = -1;
     return s;
@@ -249,8 +250,10 @@ void print_symbol_list_entry(const symbol_list_entry* e){
         printf("]");
     }
 
-    printf(" m/%d(%%rbp) r/%d", e->sym->mem_loc, e->sym->reg_loc);
-    printf("\n");
+    printf(" d/%d(%%rip) m/%d(%%rbp) r/%d",
+		e->sym->data_loc,
+		e->sym->mem_loc,
+		e->sym->reg_loc);
 }
 
 void print_symbol_list(const symbol_list* sl){

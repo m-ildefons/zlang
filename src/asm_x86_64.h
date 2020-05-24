@@ -14,6 +14,7 @@
 #include "util.h"
 #include "zlang.h"
 #include "ic.h"
+#include "ast.h"
 #include "strop.h"
 #include "storage_location.h"
 
@@ -36,6 +37,22 @@
 #define R14 0xE
 #define R15 0xF
 
+#define XMM0 0x10
+#define XMM1 0x11
+#define XMM2 0x12
+#define XMM3 0x13
+#define XMM4 0x14
+#define XMM5 0x15
+#define XMM6 0x16
+#define XMM7 0x17
+#define XMM8 0x18
+#define XMM9 0x19
+#define XMM10 0x1A
+#define XMM11 0x1B
+#define XMM12 0x1C
+#define XMM13 0x1D
+#define XMM14 0x1E
+#define XMM15 0x1F
 
 /* implemented in asm_x86_64.c */
 char* gen_asm_x86_64(const quad_list* IC);

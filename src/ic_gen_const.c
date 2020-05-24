@@ -52,6 +52,31 @@ quad_list* ic_gen_int_const(asn* node){
 
 quad_list* ic_gen_real_const(asn* node){
     quad_list* IC = NULL;
+
+	char* rc_id = strnew();
+	strapp(&rc_id, ".RC%d", node->op.int_exp);
+	symbol* rc = gen_symbol(rc_id);
+	rc->data_loc = node->op.int_exp;
+
+	specifier* s_rc = new_specifier();
+	s_rc->type = type_real;
+	s_rc->storage_class = sclass_auto;
+	s_rc->output_class = oclass_auto;
+	type_link* tl_rc = new_type_link();
+	tl_rc->cls = cls_spec;
+	tl_rc->type.spec = s_rc;
+	type_link_attach(&rc, tl_rc);
+
+	symbol* res = gen_tmp();
+	copy_type_list(rc, &res);
+	symbol_list_append(&symbol_list_ptr, &res);
+
+	quadruple* load = make_quad(fac_load, rc, NULL, res);
+	quad_list_app_quad(&IC, load);
+
+	delete_symbol(&rc);
+	delete_symbol(&res);
+	free(rc_id);
     return IC;
 }
 
@@ -60,16 +85,19 @@ quad_list* ic_gen_string_const(asn* node){
 	char* sc_id = salloc(12);
 	sprintf(sc_id, ".SC%d", node->op.int_exp);
 	symbol* sc = gen_symbol(sc_id);
+	sc->data_loc = node->op.int_exp;
+
+	specifier* s_sc = new_specifier();
+	s_sc->type = type_string;
+	s_sc->storage_class = sclass_auto;
+	s_sc->output_class = oclass_auto;
+	type_link* tl_sc = new_type_link();
+	tl_sc->cls = cls_spec;
+	tl_sc->type.spec = s_sc;
+	type_link_attach(&sc, tl_sc);
 
 	symbol* res = gen_tmp();
-	specifier* s_res = new_specifier();
-	s_res->type = type_string;
-	s_res->storage_class = sclass_auto;
-	s_res->output_class = oclass_auto;
-	type_link* tl_res = new_type_link();
-	tl_res->cls = cls_spec;
-	tl_res->type.spec = s_res;
-	type_link_attach(&(res), tl_res);
+	copy_type_list(sc, &res);
 	symbol_list_append(&symbol_list_ptr, &res);
 
 	quadruple* load = make_quad(fac_load, sc, NULL, res);
