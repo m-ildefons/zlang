@@ -14,45 +14,47 @@
 #include "util.h"
 #include "zlang.h"
 #include "ic.h"
+#include "parse.h"
 #include "ast.h"
 #include "strop.h"
 #include "storage_location.h"
 
-#define RAX 0x0
-#define RCX 0x1
-#define RDX 0x2
-#define RBX 0x3
-#define RSP 0x4
-#define RBP 0x5
-#define RSI 0x6
-#define RDI 0x7
-#define NUM_REGISTERS 8
+#define NUM_REGISTERS 0x10
 
-#define R8 0x8
-#define R9 0x9
-#define R10 0xA
-#define R11 0xB
-#define R12 0xC
-#define R13 0xD
-#define R14 0xE
-#define R15 0xF
+#define RAX 0x00
+#define RCX 0x01
+#define RDX 0x02
+#define RBX 0x03
+#define RSP 0x04
+#define RBP 0x05
+#define RSI 0x06
+#define RDI 0x07
+#define R8  0x08
+#define R9  0x09
+#define R10 0x0A
+#define R11 0x0B
+#define R12 0x0C
+#define R13 0x0D
+#define R14 0x0E
+#define R15 0x0F
 
-#define XMM0 0x10
-#define XMM1 0x11
-#define XMM2 0x12
-#define XMM3 0x13
-#define XMM4 0x14
-#define XMM5 0x15
-#define XMM6 0x16
-#define XMM7 0x17
-#define XMM8 0x18
-#define XMM9 0x19
+#define XMM0  0x10
+#define XMM1  0x11
+#define XMM2  0x12
+#define XMM3  0x13
+#define XMM4  0x14
+#define XMM5  0x15
+#define XMM6  0x16
+#define XMM7  0x17
+#define XMM8  0x18
+#define XMM9  0x19
 #define XMM10 0x1A
 #define XMM11 0x1B
 #define XMM12 0x1C
 #define XMM13 0x1D
 #define XMM14 0x1E
 #define XMM15 0x1F
+
 
 /* implemented in asm_x86_64.c */
 char* gen_asm_x86_64(const quad_list* IC);
@@ -75,6 +77,7 @@ char* asm_x86_64_set(const quadruple* q);
 char* asm_x86_64_arith(const quadruple* q);
 
 char* asm_x86_64_bit(const quadruple* q);
+char* asm_x86_64_compl(const quadruple* q);
 
 char* push_stack(symbol* sym);
 char* pop_stack(symbol* sym);

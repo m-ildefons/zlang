@@ -175,6 +175,17 @@ type_link* parse_declaration_specifier(token** tl, size_t* tnt){
  */
 type_link* parse_storage_class_specifier(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing storage-class specifier\n", (*tnt), (*tl)->str);
+	token* tlp = (*tl);
+
+	switch(tlp->type){
+		case token_auto: break;
+		case token_register: break;
+		case token_static: break;
+		case token_extern: break;
+		case token_inline: break;
+		default: return NULL;
+	}
+
     return NULL;
 }
 
@@ -232,6 +243,15 @@ type_link* parse_type_specifier(token** tl, size_t* tnt){
  */
 type_link* parse_type_qualifier(token** tl, size_t* tnt){
     printf("[%zu (%s)] parsing type qualifier\n", (*tnt), (*tl)->str);
+	token* tlp = (*tl);
+
+//	int type;
+	switch(tlp->type){
+		case token_const: break;
+		case token_volatile: break;
+		case token_restrict: break;
+		default: return NULL;
+	}
     return NULL;
 }
 

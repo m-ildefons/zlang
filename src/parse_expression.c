@@ -142,7 +142,7 @@ asn* parse_postfix_exp(token** tl, size_t* tnt){
         postfix_exp = make_binary_exp(postfix_exp, rhs, token_dot);
 	}
 
-    if(postfix_exp->tag == ident_tag){
+    if(postfix_exp != NULL && postfix_exp->tag == ident_tag){
         symbol* sym = search_symbol(symbol_list_ptr, postfix_exp->op.ident_exp.ident);
         if(sym == NULL){
             parse_error("Reference to undefined symbol", (*tl));

@@ -41,6 +41,7 @@ const char* fac_cn[] = {
 	[fac_and] = "and",
 	[fac_xor] = "xor",
 	[fac_or] = "or",
+	[fac_compl] = "compl",
 };
 
 

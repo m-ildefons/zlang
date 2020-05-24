@@ -55,8 +55,16 @@ quad_list* ic_gen_unary_not(asn* node){
 
 quad_list* ic_gen_unary_compl(asn* node){
     quad_list* IC = NULL;
-//    quad_list* inner = ic_gen(node->op.unary_exp.val);
-//    quad_list_app_quad_list(&IC, inner);
+    quad_list* inner = ic_gen(node->op.unary_exp.val);
+	symbol* ires = get_tmp();
+	symbol* res = gen_tmp();
+
+	quadruple* compl = make_quad(fac_compl, ires, NULL, res);
+
+    quad_list_app_quad_list(&IC, inner);
+	quad_list_app_quad(&IC, compl);
+
+	delete_symbol(&res);
     return IC;
 }
 

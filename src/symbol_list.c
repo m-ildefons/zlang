@@ -267,6 +267,7 @@ void print_symbol_list(const symbol_list* sl){
         else
             printf("    ");
         print_symbol_list_entry(e);
+		printf("\n");
     }
     printf("--\n");
 }

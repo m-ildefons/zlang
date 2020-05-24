@@ -12,6 +12,8 @@
 
 
 static symbol* usage[NUM_REGISTERS];
+static symbol* xmm_usage[NUM_REGISTERS];
+
 static const char* registers[] = {
 	"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi",
 	"r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
@@ -33,6 +35,8 @@ char* gen_asm_x86_64(const quad_list* IC){
     const quad_list* ql = IC;
     char* snippet = NULL;
 	unsigned int idx;
+
+	print_symbol_list(symbol_list_ptr);
 
     char* bname = basename(filename);
     strapp(&code, "    .file     \"%s\"\n", bname);
@@ -72,6 +76,7 @@ char* gen_asm_x86_64(const quad_list* IC){
             case fac_and: snippet = asm_x86_64_bit(ql->quad); break;
             case fac_xor: snippet = asm_x86_64_bit(ql->quad); break;
             case fac_or: snippet = asm_x86_64_bit(ql->quad); break;
+			case fac_compl: snippet = asm_x86_64_compl(ql->quad); break;
             default:
                 printf("Warning: Encountered unimplemented intermediary code");
                 printf(" during x86_64 asm generation.\n");
@@ -82,7 +87,11 @@ char* gen_asm_x86_64(const quad_list* IC){
         free(snippet);
     }
 
-	strapp(&code, "    .section  .rodata\n");
+	strapp(&code, "    .section  .data\n");
+
+	if(string_count > 0 || real_count > 0)
+		strapp(&code, "    .section  .rodata\n");
+
 	for(idx = 0; idx < string_count; idx++){
 		strapp(&code, ".SC%u:\n", idx);
 		strapp(&code, "    .string   \"%s\"\n", string_index[idx]);
@@ -412,6 +421,13 @@ char* asm_x86_64_bit(const quadruple* q){
         registers[q->arg1->reg_loc]);
     set_register(q->arg1->reg_loc, q->res);
     return code;
+}
+
+char* asm_x86_64_compl(const quadruple* q){
+	char* code = strnew();
+	strapp(&code, "    not       %%%s\n", registers[q->arg1->reg_loc]);
+	set_register(q->arg1->reg_loc, q->res);
+	return code;
 }
 
 char* push_stack(symbol* sym){

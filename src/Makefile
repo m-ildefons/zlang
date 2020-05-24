@@ -54,7 +54,7 @@ OBJ_DEBUG=$(SRC:%.c=%_debug.o)
 
 all: $(OUT) clean_after_build
 
-debug: $(OUT_DEBUG) clean_after_build
+debug: $(OUT_DEBUG) clean_debug_after_build
 
 $(OUT): $(OBJ)
 	$(CC) -g $(OBJ) $(LDFLAGS) -o $(OUT)
@@ -78,7 +78,10 @@ clean_obj:
 
 clean: clean_bin clean_obj
 
-clean_after_build:
+clean_after_build: $(OUT)
+	$(MAKE) clean_obj
+
+clean_debug_after_build: $(OUT_DEBUG)
 	$(MAKE) clean_obj
 
 lint:

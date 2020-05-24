@@ -8,12 +8,22 @@ if exists("b:current_syntax")
 endif
 
 syn keyword basicLanguageKeywords void
+syn keyword basicLanguageKeywords bool
+syn keyword basicLanguageKeywords char
 syn keyword basicLanguageKeywords int
 syn keyword basicLanguageKeywords real
+syn keyword basicLanguageKeywords signed
+syn keyword basicLanguageKeywords unsigned
 syn keyword basicLanguageKeywords complex
 syn keyword basicLanguageKeywords imaginary
-syn keyword basicLanguageKeywords char
 syn keyword basicLanguageKeywords string
+
+syn keyword basicLanguageKeywords const
+syn keyword basicLanguageKeywords volatile
+syn keyword basicLanguageKeywords restrict
+
+syn keyword basicLanguageKeywords auto
+syn keyword basicLanguageKeywords register
 
 syn keyword basicLanguageKeywords for
 syn keyword basicLanguageKeywords while

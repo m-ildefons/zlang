@@ -197,6 +197,22 @@ static void tokenize_line(char* line,
             t = token_struct;
         } else if(strcmp(tok, "union") == 0){
             t = token_union;
+		} else if(strcmp(tok, "auto") == 0){
+			t = token_auto;
+		} else if(strcmp(tok, "register") == 0){
+			t = token_register;
+		} else if(strcmp(tok, "static") == 0){
+			t = token_static;
+		} else if(strcmp(tok, "extern") == 0){
+			t = token_extern;
+		} else if(strcmp(tok, "inline") == 0){
+			t = token_inline;
+		} else if(strcmp(tok, "const") == 0){
+			t = token_const;
+		} else if(strcmp(tok, "volatile") == 0){
+			t = token_volatile;
+		} else if(strcmp(tok, "restrict") == 0){
+			t = token_restrict;
         } else {
             t = ident;
         }

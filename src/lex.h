@@ -93,6 +93,14 @@ typedef struct {
         token_loop_while,
         token_struct,
         token_union,
+		token_auto,
+		token_register,
+		token_static,
+		token_extern,
+		token_inline,
+		token_const,
+		token_volatile,
+		token_restrict,
     } type;
 	char* str;
     int level;

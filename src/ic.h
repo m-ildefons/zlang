@@ -62,6 +62,7 @@ typedef struct four_address_code {
         fac_and,
         fac_xor,
         fac_or,
+		fac_compl,
     } op;
     symbol* arg1;
     symbol* arg2;
