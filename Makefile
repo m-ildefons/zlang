@@ -20,10 +20,10 @@ test: directories src
 clean: clean_src
 
 src: clean_src
-	$(MAKE) -C src
+	$(MAKE) -j -C src
 
 src_debug: clean_src
-	$(MAKE) debug -C src
+	$(MAKE) debug -j -C src
 
 clean_src:
 	$(MAKE) clean -C src
