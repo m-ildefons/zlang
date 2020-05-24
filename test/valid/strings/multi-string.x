@@ -1,6 +1,6 @@
 int main():
-    char* a = "Hello";
-    char* b = "World";
-    char* c = "!";
+    string a = "Hello";
+    string b = "World";
+    string c = "!";
     printf("%s, %s%s\n", a, b, c);
     return 0;

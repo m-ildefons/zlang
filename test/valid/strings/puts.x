@@ -1,4 +1,4 @@
 int main():
-    char* s = "Hello, World!\n";
+    string s = "Hello, World!\n";
     puts(s);
     return 0;

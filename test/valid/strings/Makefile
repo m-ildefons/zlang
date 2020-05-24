@@ -25,8 +25,7 @@ all: $(TEST) $(SUBDIR) clean
 	fi
 
 %.out: %.bin
-	@./$< > /dev/null; \
-	echo $$? > $@
+	@./$< > $@;
 
 %.bin: %.s
 	@gcc $< -o $@;
