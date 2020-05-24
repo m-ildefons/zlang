@@ -22,7 +22,7 @@
 #include "int_stack.h"
 #include "regexp.h"
 
-typedef struct token_struct {
+typedef struct {
     enum token_type {
 		token_ignore,
         token_null,
