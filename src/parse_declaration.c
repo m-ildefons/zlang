@@ -37,14 +37,16 @@ asn* parse_external_declaration(token** tl, size_t* tnt){
 
     exp = parse_declaration(tl, tnt, decl_spec);
     tlp = (*tl);
-    if(tlp->type == token_colon)
+    if(exp->tag == fun_def_tag && tlp->type == token_colon)
         exp = parse_function_definition(tl, tnt, exp);
+	else if(tlp->type == token_colon)
+		exp = parse_struct_specifier(tl, tnt, exp);
 
     if(exp != NULL){
         return exp;
     }
 
-    parse_error("invalid token", (*tl));
+    parse_error("invalid token in external declaration", (*tl));
     return NULL;
 }
 
@@ -112,7 +114,9 @@ asn* parse_declarator(token** tl, size_t* tnt){
         type_link_attach(&(dir_decl->op.var_exp.sym), ptr);
     } else if(dir_decl->tag == fun_def_tag){
         type_link_attach(&(dir_decl->op.fun_def_exp.sym), ptr);
-    }
+    } else {
+		parse_warning("declarator neither variable nor function", (*tl));
+	}
 
     return dir_decl;
 }

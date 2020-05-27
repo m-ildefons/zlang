@@ -10,11 +10,15 @@
 
 #include "parse.h"
 
+
 /*
  * <struct-specifier> ::= struct <identifier> : {<declaration>}+
  */
-asn* parse_struct_specifier(token** tl, size_t* tnt){
-    printf("[%zu (%s)] parsing struct\n", (*tnt), (*tl)->str);
+asn* parse_struct_specifier(token** tl, size_t* tnt, asn* exp){
+    printf("[%zu (%s)] parsing struct \'%s\'\n",
+		(*tnt),
+		(*tl)->str,
+		exp->op.var_exp.sym->ident);
     token* tlp = (*tl);
     int level = tlp->level;
 
