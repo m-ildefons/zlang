@@ -28,6 +28,7 @@ asn* parse_translation_unit(token** tl, size_t* tnt, const char* filename);
 asn* parse_ident(token** tl, size_t* tnt);
 
 void pop_token(token** tlp, token** tl, size_t* tnt);
+void parse_warning(const char* warn, token* tok);
 void parse_error(const char* err, token* tok);
 
 /* implemented in parse_expression.c */
@@ -96,7 +97,7 @@ asn* parse_for_loop_exp(token** tl, size_t* tnt);
 asn* parse_while_loop_exp(token** tl, size_t* tnt);
 
 /* implemented in parse_struct.c */
-asn* parse_struct_specifier(token** tl, size_t* tnt);
+asn* parse_struct_specifier(token** tl, size_t* tnt, asn* exp);
 
 #endif
 

@@ -58,11 +58,20 @@ void pop_token(token** tlp, token** tl, size_t* tnt){
 	(*tl) = (*tlp);
 }
 
+void parse_warning(const char* warn, token* tok){
+	fprintf(stderr,
+			"Line %d: \033[93mWarning\033[039m: %s: %s\n",
+			tok->line,
+			warn,
+			tok->str);
+}
+
 void parse_error(const char* err, token* tok){
     fprintf(stderr,
             "Line %d: \033[91mError\033[39m: %s: %s\n",
             tok->line,
             err,
             tok->str);
+	abort();
 }
 
