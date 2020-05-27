@@ -20,10 +20,12 @@ quad_list* ic_gen_while_loop(asn* node){
 
 	symbol* start_label = gen_label("wstart");
     quadruple* qstart = make_quad(fac_label, start_label, NULL, NULL);
+	quadruple* jstart = make_quad(fac_jump, start_label, NULL, NULL);
     loop_start_symbol = start_label;
 
     symbol* end_label = gen_label("wend");
     quadruple* qend = make_quad(fac_label, end_label, NULL, NULL);
+	quadruple* jend = make_quad(fac_je, end_label, NULL, NULL);
     loop_end_symbol = end_label;
 
     quad_list* cond = ic_gen(node->op.while_loop_exp.cond);
@@ -31,8 +33,9 @@ quad_list* ic_gen_while_loop(asn* node){
 
     quad_list_app_quad(&IC, qstart);
     quad_list_app_quad_list(&IC, cond);
-    // need to act here
+    quad_list_app_quad(&IC, jend);
     quad_list_app_quad_list(&IC, body);
+	quad_list_app_quad(&IC, jstart);
     quad_list_app_quad(&IC, qend);
 
     loop_start_symbol = NULL;
@@ -53,10 +56,12 @@ quad_list* ic_gen_for_loop(asn* node){
 
     symbol* start_label = gen_label("fstart");
     quadruple* qstart = make_quad(fac_label, start_label, NULL, NULL);
+	quadruple* jstart = make_quad(fac_jump, start_label, NULL, NULL);
     loop_start_symbol = start_label;
 
     symbol* end_label = gen_label("fend");
     quadruple* qend = make_quad(fac_label, end_label, NULL, NULL);
+	quadruple* jend = make_quad(fac_je, end_label, NULL, NULL);
     loop_end_symbol = end_label;
 
     quad_list* init = ic_gen(node->op.for_loop_exp.init);
@@ -67,9 +72,10 @@ quad_list* ic_gen_for_loop(asn* node){
     quad_list_app_quad_list(&IC, init);
     quad_list_app_quad(&IC, qstart);
     quad_list_app_quad_list(&IC, cond);
-    // need to act here
+	quad_list_app_quad(&IC, jend);
     quad_list_app_quad_list(&IC, body);
     quad_list_app_quad_list(&IC, move);
+	quad_list_app_quad(&IC, jstart);
     quad_list_app_quad(&IC, qend);
 
     loop_start_symbol = NULL;
