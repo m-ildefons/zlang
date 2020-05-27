@@ -20,6 +20,7 @@ static const char* registers[] = {
 	"xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",
 	"xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15"};
 static size_t rel_stack_pos;
+static size_t frame_size;
 static size_t size_of[type_enum + 1] = {
     [type_void] = 8,
     [type_bool] = 1,
@@ -120,7 +121,7 @@ char* asm_x86_64_func_start(const quadruple* q){
     strapp(&code, "    pushq     %%rbp\n");
     strapp(&code, "    movq      %%rsp, %%rbp\n");
 
-    size_t frame_size = 0;
+    frame_size = 0;
     symbol_list_entry* e = q->symbol_list_ptr->top;
     for(; e != q->symbol_list_ptr->bottom->next; e = e->next){
         if(e->sym->etype != NULL){
@@ -288,6 +289,11 @@ char* asm_x86_64_store(const quadruple* q){
 	} else if(q->arg1->reg_loc < 0){
     	strapp(&code, "    movq      %%rax, -%d(%%rbp)\n", q->res->mem_loc);
 	} else if(q->res->mem_loc < 0){
+		frame_size += 8;
+		strapp(&code, "    subq      $8, %%rsp\n");
+		strapp(&code, "    movq      %%%s, (%%rsp)\n",
+			registers[q->arg1->reg_loc]);
+		q->res->mem_loc = frame_size;
 	} else {
 		strapp(&code,
 			"    movq      %%%s, -%d(%%rbp)\n",
@@ -475,10 +481,10 @@ void set_register(int reg, symbol* s){
 void print_registers(){
     int i;
 	for(i = 0; i < NUM_REGISTERS; i++){
-		if(usage[i] == NULL)
-			continue;
-
-		printf("> %s: %s\n", registers[i], usage[i]->ident);
+		if(usage[i] != NULL)
+			printf("> %s: %s\n", registers[i], usage[i]->ident);
+		if(xmm_usage[i] != NULL)
+			printf("> %s: %s\n", registers[i+0x10], xmm_usage[i]->ident);
 	}
 }
 
