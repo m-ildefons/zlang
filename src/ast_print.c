@@ -382,6 +382,14 @@ static void _pretty_print(asn* tree, int level, int_stack* ws_stack){
             printf("[ or assign ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);
             break;
+		case bsl_assign_tag:
+			printf("[ bsl assign ]\n");
+            _pretty_print_unary_node(tree, level, ws_stack);
+			break;
+		case bsr_assign_tag:
+			printf("[ bsr assign ]\n");
+            _pretty_print_unary_node(tree, level, ws_stack);
+			break;
         case inc_tag:
             printf("[ increment ]\n");
             _pretty_print_unary_node(tree, level, ws_stack);

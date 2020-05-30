@@ -43,6 +43,8 @@ quad_list* ic_gen_assign(asn* node){
         case and_assign_tag: kind = fac_and; break;
         case xor_assign_tag: kind = fac_xor; break;
         case or_assign_tag: kind = fac_or; break;
+		case bsl_assign_tag: kind = fac_shl; break;
+		case bsr_assign_tag: kind = fac_shr; break;
         default: kind = 0;
     }
 
