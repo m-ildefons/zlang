@@ -99,6 +99,12 @@ quad_list* ic_gen_translation_unit(asn* ast){
         if(node->tag == fun_def_tag){
             sub_ic = ic_gen_fun_def(node);
         } else if(node->tag == assign_tag){
+			if(node->op.assign_exp.lval->tag != var_tag)
+				ic_error("Error: assign to something that is not an lval.\n");
+
+			symbol* s = node->op.assign_exp.lval->op.var_exp.sym;
+			s->data_loc = 0;
+			s->reg_loc = node->op.assign_exp.rval->op.int_exp;
         } else {
         }
 

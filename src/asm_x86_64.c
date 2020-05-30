@@ -88,7 +88,21 @@ char* gen_asm_x86_64(const quad_list* IC){
         free(snippet);
     }
 
-	strapp(&code, "    .section  .data\n");
+	symbol_list_entry* e;
+	char* data = strnew();
+	strapp(&data, "    .section  .data\n");
+	for(e = symbol_list_ptr->top; e != NULL; e = e->next){
+		if(!is_function(e->sym->stype)){
+			strapp(&code, "    .global    %s\n", e->sym->ident);
+
+			strapp(&data, "%s:\n", e->sym->ident);
+			strapp(&data, "    .long      %d\n", e->sym->reg_loc);
+			strapp(&data, "    .align     8\n");
+			strapp(&data, "    .type      %s, @object\n", e->sym->ident);
+		}
+	}
+	strapp(&code, data);
+	free(data);
 
 	if(string_count > 0 || real_count > 0)
 		strapp(&code, "    .section  .rodata\n");
@@ -266,10 +280,24 @@ char* asm_x86_64_load(const quadruple* q){
             q->arg1->ident,
             registers[reg]);
     } else if(q->arg1->mem_loc < 0 && q->arg1->data_loc >= 0){
-		strapp(&code,
-			"    leaq      %s(%%rip), %%%s\n",
-			q->arg1->ident,
-			registers[reg]);
+		if(q->arg1->stype->cls == cls_decl &&
+				q->arg1->stype->type.decl->type == decl_pointer){
+			strapp(&code,
+				"    leaq      %s(%%rip), %%%s\n",
+				q->arg1->ident,
+				registers[reg]);
+		} else if(q->arg1->stype->cls == cls_spec &&
+				q->arg1->stype->type.spec->type == type_string){
+			strapp(&code,
+				"    leaq      %s(%%rip), %%%s\n",
+				q->arg1->ident,
+				registers[reg]);
+		} else {
+			strapp(&code,
+				"    movq      %s(%%rip), %%%s\n",
+				q->arg1->ident,
+				registers[reg]);
+		}
 	} else {
         strapp(&code,
             "    movq      -%d(%%rbp), %%%s\n",
