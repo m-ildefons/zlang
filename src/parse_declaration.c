@@ -223,6 +223,7 @@ type_link* parse_type_specifier(token** tl, size_t* tnt){
         case token_complex_kw: type = type_complex; break;
         case token_string_kw: type = type_string; break;
         case token_struct: type = type_struct; break;
+		case token_union: type = type_union; break;
         default:
             return NULL;
     }

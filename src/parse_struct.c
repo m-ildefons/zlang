@@ -22,57 +22,32 @@ asn* parse_struct_specifier(token** tl, size_t* tnt, asn* exp){
     token* tlp = (*tl);
     int level = tlp->level;
 
-    int tag = -1;
-    if(tlp->type == token_struct)
-        tag = struct_tag;
-    else if(tlp->type == token_union)
-        tag = union_tag;
-    else
-        return NULL;
+	char* id = exp->op.var_exp.sym->ident;
 
+	delete_exp(exp);
+	if(tlp->type == token_colon)
+		pop_token(&tlp, tl, tnt);
 
-    if((tlp+1)->type != ident)
-        return NULL;
-
-    char* id = (tlp+1)->str;
-
-    if((tlp+2)->type != token_colon)
-        return NULL;
-
-    pop_token(&tlp, tl, tnt);
-    pop_token(&tlp, tl, tnt);
-    pop_token(&tlp, tl, tnt);
-
-    asn* str = make_struct_exp(tag, id, level);
-    symbol_list* symbols = str->op.struct_exp.symbols;
-    str->op.struct_exp.symbols = symbols;
+    asn* str = make_struct_exp(struct_tag, id, level);
+    symbol_list* old_symbol_list_ptr = symbol_list_ptr;
+    symbol_list_ptr = str->op.struct_exp.symbols;
 
     asn* decl;
     while(tlp->level == (level + 1)){
-        printf("[%zu (%s)] parsing struct member\n", (*tnt), (*tl)->str);
+        printf("[%zu (%s)] parsing struct member of %s\n", (*tnt), (*tl)->str, id);
         type_link* decl_spec = parse_declaration_specifier(tl, tnt);
         decl = parse_declaration(tl, tnt, decl_spec);
         tlp = (*tl);
 
-        if(decl->tag == var_tag){
+		if(tlp->type == token_colon){
+			decl = parse_struct_specifier(tl, tnt, decl);
+        	tlp = (*tl);
+		}
 
-
-            append_exp_list(&(str->op.struct_exp.body), decl);
-        } else if(decl->tag == struct_tag || decl->tag == union_tag){
-
-
-            append_exp_list(&(str->op.struct_exp.body), decl);
-            if(tag == union_tag)
-                str->op.struct_exp.size = max(str->op.struct_exp.size,
-                                            decl->op.struct_exp.size);
-            else if(tag == struct_tag)
-                str->op.struct_exp.size += decl->op.struct_exp.size;
-        } else {
-            parse_error("non declaration in struct.", (*tl));
-            abort();
-        }
+		append_exp_list(&(str->op.struct_exp.body), decl);
     }
 
+	symbol_list_ptr = old_symbol_list_ptr;
     return str;
 }
 

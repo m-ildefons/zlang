@@ -31,6 +31,9 @@ const char* type_cn[] = {
     [type_unsigned] = "unsigned",
     [type_complex] = "complex",
     [type_string] = "string",
+	[type_struct] = "struct",
+	[type_union] = "union",
+	[type_enum] = "enum",
 };
 
 
