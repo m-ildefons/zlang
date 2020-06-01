@@ -394,8 +394,8 @@ char* asm_x86_64_load(const quadruple* q){
     char* code = strnew();
 
     int reg = get_register();
-	int xmm_reg = get_xmm_register();
-    printf("%s --> %s/%s\n", q->arg1->ident, registers[reg], registers[NUM_REGISTERS + xmm_reg]);
+	//int xmm_reg = get_xmm_register();
+    //printf("%s --> %s/%s\n", q->arg1->ident, registers[reg], registers[NUM_REGISTERS + xmm_reg]);
 
     if(usage[reg] != NULL){
         strapp(&code, "    subq      $8, %%rsp\n");
