@@ -10,6 +10,7 @@
 
 #include "parse.h"
 
+
 asn* parse_for_loop_exp(token** tl, size_t* tnt){
 	token* tlp = (*tl);
 	int scope = tlp->level;
@@ -42,8 +43,11 @@ asn* parse_for_loop_exp(token** tl, size_t* tnt){
 	asn* for_exp = make_for_exp(init, cond, move, NULL, scope);
 	tlp = (*tl);
 
-	if(tlp->type != token_colon)
+	if(tlp->type != token_colon){
+		delete_exp(for_exp);
 		return NULL;
+	}
+
 	pop_token(&tlp, tl, tnt);
 
 	parse_compound_statement(tl,
@@ -70,8 +74,10 @@ asn* parse_while_loop_exp(token** tl, size_t* tnt){
 	asn* while_exp = make_while_exp(condition, NULL, scope);
 	tlp = (*tl);
 
-	if(tlp->type != token_colon)
+	if(tlp->type != token_colon){
+		delete_exp(while_exp);
 		return NULL;
+	}
 
 	pop_token(&tlp, tl, tnt);
 
