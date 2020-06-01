@@ -40,6 +40,7 @@ const char* type_cn[] = {
 declarator* new_declarator(){
     declarator* d = malloc(sizeof(declarator));
     assert(d != NULL);
+	d->type = 0; // defaults to pointer
     d->size = 0;
     return d;
 }
@@ -55,6 +56,9 @@ declarator* copy_declarator(const declarator* decl)
 specifier* new_specifier(){
     specifier* s = malloc(sizeof(specifier));
     assert(s != NULL);
+	s->type = 0; // defaults to void
+	s->storage_class = 0; // defaults to auto
+	s->output_class = 0; // defaults to auto
     return s;
 }
 
