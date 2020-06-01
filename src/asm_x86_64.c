@@ -158,27 +158,40 @@ char* asm_x86_64_func_start(const quadruple* q){
 	if(frame_size > 0)
     	strapp(&code, "    subq      $%zu, %%rsp\n", frame_size);
 
-	const char* reg;
+	const char* reg = NULL;
+	char* src;
 	int i;
 	for(i = 0, e = q->args->top; e != NULL; e = e->next, i++){
 //printf("%d %s, %d %d\n", i, e->sym->ident, e->sym->mem_loc, e->sym->reg_loc);
+		src = strnew();
 		switch(i){
-			case 0: reg = "rdi"; break;
-			case 1: reg = "rsi"; break;
-			case 2: reg = "rdx"; break;
-			case 3: reg = "rcx"; break;
-			case 4: reg = "r8 "; break;
-			case 5: reg = "r9 "; break;
-			default: break;
+			case 0: reg = "rdi"; set_register(RDI, NULL);  break;
+			case 1: reg = "rsi"; set_register(RSI, NULL);  break;
+			case 2: reg = "rdx"; set_register(RDX, NULL);  break;
+			case 3: reg = "rcx"; set_register(RCX, NULL);  break;
+			case 4: reg = "r8"; set_register(R8, NULL); break;
+			case 5: reg = "r9"; set_register(R9, NULL); break;
+			default:
+				reg = NULL;
+				strapp(&src, "%d(%%rbp)", 8 * (i - 4)); // rbp + 16 is the first argument
+				break;
 		}
-		if(e->sym->mem_loc > 0){
+		if(reg != NULL && e->sym->mem_loc > 0){
 			strapp(&code,
 				"    movq      %%%s, -%d(%%rbp)\n",
 				reg,
 				e->sym->mem_loc);
+		} else if(e->sym->mem_loc > 0){
+			strapp(&code,
+				"    movq      %s, %%rbx\n", src);
+			strapp(&code,
+				"    movq      %%rbx, -%d(%%rbp)\n",
+				e->sym->mem_loc);
 		}
+		free(src);
 	}
 
+	set_register(RAX, NULL);
     return code;
 }
 
@@ -196,42 +209,161 @@ char* asm_x86_64_func_call(const quadruple* q){
 	char* code = strnew();
 
 	if(usage[RAX] != NULL){
-		char* ps = push_stack(usage[RAX]);
-		strapp(&code, "%s", ps);
-		free(ps);
+		emit_push_stack(&code, usage[RAX]);
+		set_register(RAX, NULL);
 	}
 
 	int i;
-	const char* reg;
+	int num_args;
+	char* src;
+	char* dest;
+
 	symbol_list_entry* e = q->args->top;
-	for(i = 0; e != NULL; e = e->next, i++){
-		switch(i){
-			case 0: reg = "rdi"; break;
-			case 1: reg = "rsi"; break;
-			case 2: reg = "rdx"; break;
-			case 3: reg = "rcx"; break;
-			case 4: reg = "r8 "; break;
-			case 5: reg = "r9 "; break;
-			default:
-				strapp(&code,
-					"    subq      $8, %%rsp\n");
-				reg = "rsp";
+	for(num_args = 0, e = q->args->top; e != NULL; e = e->next, num_args++){
+		int reg = 0;
+		switch(num_args){
+			case 1: reg = RDI; break;
+			case 2: reg = RSI; break;
+			case 3: reg = RDX; break;
+			case 4: reg = RCX; break;
+			case 5: reg = R8; break;
+			case 6: reg = R9; break;
+			default: reg = 0; break;
 		}
-		if(e->sym->mem_loc > 0 && e->sym->reg_loc < 0){
-			strapp(&code, "    movq      -%d(%%rbp), %%%s\n",
-				e->sym->mem_loc,
-				reg);
-		} else {
-			printf("%s %d\n", e->sym->ident, e->sym->reg_loc);
-			strapp(&code, "    movq      %%%s, %%%s\n",
-				registers[e->sym->reg_loc],
-				reg);
+
+		if(reg != 0 && usage[reg] != NULL){
+			emit_push_stack(&code, usage[reg]);
+			set_register(reg, NULL);
 		}
 	}
 
+	int padding = (8 * (num_args - 6) + (frame_size % 16)) % 16;
+	if(padding != 0)
+		strapp(&code,
+			"    subq      $%d, %%rsp # Frame padding to 16 byte boundary\n",
+			padding);
+	printf("Found %d arguments, frame size: %zu\n", num_args, frame_size);
+	int k;
+	for(k = num_args; k > 0; k--){
+		for(i = 0, e = q->args->top; i < k-1; i++, e = e->next){}
+
+		if(strcmp(e->sym->ident, ".placeholder") == 0)
+			continue;
+
+		dest = strnew();
+		src = strnew();
+
+		if(e->sym->reg_loc < 0 && e->sym->mem_loc >= 0){
+			strapp(&src, "-%d(%%rbp)", e->sym->mem_loc);
+		} else if(e->sym->reg_loc >= 0){
+			strapp(&src, "%%%s", registers[e->sym->reg_loc]);
+//			set_register(e->sym->reg_loc, NULL);
+		}
+
+		switch(k){
+			case 1: strapp(&dest, "%%rdi"); break;
+			case 2: strapp(&dest, "%%rsi"); break;
+			case 3: strapp(&dest, "%%rdx"); break;
+			case 4: strapp(&dest, "%%rcx"); break;
+			case 5: strapp(&dest, "%%r8"); break;
+			case 6: strapp(&dest, "%%r9"); break;
+			default:
+				strapp(&code, "    subq      $8, %%rsp\n");
+				strapp(&dest, "(%%rsp)");
+		}
+
+		if(k > 6){
+			strapp(&code, "    movq      %s, %%rax\n", src);
+			strapp(&code, "    movq      %%rax, %s\n", dest);
+		} else {
+			strapp(&code, "    movq      %s, %s\n", src, dest);
+		}
+
+		printf("Argument %d: %s (%s --> %s)\n", k, e->sym->ident, src, dest);
+		free(dest);
+		free(src);
+	}
+/*
+	for(i = 0, e = q->args->top; e != NULL; e = e->next, i++){
+		if(strcmp(e->sym->ident, ".placeholder") == 0)
+			continue;
+
+		src = strnew();
+		dest = strnew();
+
+		if(e->sym->reg_loc < 0 && e->sym->mem_loc >= 0){
+			strapp(&src, "-%d(%%rbp)", e->sym->mem_loc);
+		} else if(e->sym->reg_loc >= 0){
+			strapp(&src, "%%%s", registers[e->sym->reg_loc]);
+			set_register(e->sym->reg_loc, NULL);
+		}
+
+		switch(i){
+			case 0:
+				strapp(&dest, "%%rdi");
+				if(usage[RDI] != NULL)
+					emit_push_stack(&code, usage[RDI]);
+				set_register(RDI, e->sym);
+				break;
+			case 1:
+				strapp(&dest, "%%rsi");
+				if(usage[RSI] != NULL)
+					emit_push_stack(&code, usage[RSI]);
+				set_register(RSI, e->sym);
+				break;
+			case 2:
+				strapp(&dest, "%%rdx");
+				if(usage[RDX] != NULL)
+					emit_push_stack(&code, usage[RDX]);
+				set_register(RDX, e->sym);
+				break;
+			case 3:
+				strapp(&dest, "%%rcx");
+				if(usage[RCX] != NULL)
+					emit_push_stack(&code, usage[RCX]);
+				set_register(RCX, e->sym);
+				break;
+			case 4:
+				strapp(&dest, "%%r8 ");
+				if(usage[R8] != NULL)
+					emit_push_stack(&code, usage[R8]);
+				set_register(R8, e->sym);
+				break;
+			case 5:
+				strapp(&dest, "%%r9 ");
+				if(usage[R9] != NULL)
+					emit_push_stack(&code, usage[R9]);
+				set_register(R9, e->sym);
+				break;
+			default:
+				strapp(&code,
+					"    subq      $8, %%rsp\n");
+				strapp(&dest, "(%%rsp)");
+		}
+		if(i > 5){
+			strapp(&code, "    movq      %s, %%rax\n", src);
+			strapp(&code, "    movq      %%rax, %s\n", dest);
+		} else {
+			strapp(&code, "    movq      %s, %s\n", src, dest);
+		}
+
+		printf("passing %s in %s\n", e->sym->ident, dest);
+		free(src);
+		free(dest);
+	}
+*/
+	print_registers();
+	printf("Frame size: %zu (%zu)\n", frame_size, frame_size % 16);
+	printf("Misalignment: %d bytes\n", (8 * (num_args - 6)) % 16);
 	strapp(&code, "    movq      $0, %%rax\n");
 	strapp(&code, "    call      %s\n", q->arg1->ident);
 	set_register(RAX, q->res);
+	set_register(RDI, NULL);
+	set_register(RSI, NULL);
+	set_register(RDX, NULL);
+	set_register(RCX, NULL);
+	set_register(R8, NULL);
+	set_register(R9, NULL);
 	return code;
 }
 
@@ -262,7 +394,8 @@ char* asm_x86_64_load(const quadruple* q){
     char* code = strnew();
 
     int reg = get_register();
-//    printf("%s --> %s\n", q->arg1->ident, registers[reg]);
+	int xmm_reg = get_xmm_register();
+    printf("%s --> %s/%s\n", q->arg1->ident, registers[reg], registers[NUM_REGISTERS + xmm_reg]);
 
     if(usage[reg] != NULL){
         strapp(&code, "    subq      $8, %%rsp\n");
@@ -468,8 +601,8 @@ char* push_stack(symbol* sym){
 	char* code = strnew();
 	strapp(&code, "    subq      $8, %%rsp\n");
 	strapp(&code, "    movq      %%%s, (%%rsp)\n", registers[sym->reg_loc]);
-	rel_stack_pos += 8;
-	sym->mem_loc = rel_stack_pos;
+	frame_size += 8;
+	sym->mem_loc = frame_size;
 	return code;
 }
 
@@ -478,8 +611,21 @@ char* pop_stack(symbol* sym){
 	int reg = get_register();
 	strapp(&code, "    movq      (%%rsp), %%%s\n", registers[reg]);
 	strapp(&code, "    addq      $8, %%rsp\n");
+	frame_size -= 8;
 	set_register(reg, sym);
 	return code;
+}
+
+void emit_push_stack(char** code, symbol* sym){
+	char* ps = push_stack(sym);
+	strapp(code, "%s", ps);
+	free(ps);
+}
+
+void emit_pop_stack(char** code, symbol* sym){
+	char* ps = pop_stack(sym);
+	strapp(code, "%s", ps);
+	free(ps);
 }
 
 int get_register(){
@@ -492,6 +638,15 @@ int get_register(){
             return i;
     }
     return -1; // No register found --> Error
+}
+
+int get_xmm_register(){
+	int i;
+	for(i = 0; i < NUM_REGISTERS; i++){
+		if(xmm_usage[i] == NULL)
+			return i;
+	}
+	return -1;
 }
 
 void set_register(int reg, symbol* s){

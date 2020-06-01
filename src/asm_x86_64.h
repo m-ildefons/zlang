@@ -82,7 +82,11 @@ char* asm_x86_64_compl(const quadruple* q);
 char* push_stack(symbol* sym);
 char* pop_stack(symbol* sym);
 
+void emit_push_stack(char** code, symbol* sym);
+void emit_pop_stack(char** code, symbol* sym);
+
 int get_register(void);
+int get_xmm_register(void);
 void set_register(int reg, symbol* s);
 void print_registers(void);
 
