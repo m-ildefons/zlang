@@ -14,6 +14,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include "zlang.h"
 #include "lex.h"
@@ -26,27 +27,10 @@
 #include "elf_out.h"
 
 
-static int verbosity;
-static int verbosity_lex;
-static int verbosity_parse;
-static int verbosity_ast;
-static int verbosity_asmgen;
-static int verbosity_asm;
 char* filename = NULL;
 char* asm_out = NULL;
 char* elf_out = NULL;
 
-static struct option long_options[] = {
-	{"verbose", no_argument, &verbosity, 1},
-	{"quiet", no_argument, &verbosity, 1},
-    {"Vlex", no_argument, &verbosity_lex, 1},
-    {"Vparse", no_argument, &verbosity_parse, 1},
-    {"Vast", no_argument, &verbosity_ast, 1},
-    {"Vic", no_argument, &verbosity_asmgen, 1},
-    {"Vasm", no_argument, &verbosity_asm, 1},
-	{"output", required_argument, 0, 'o'},
-    {NULL, 0, NULL, 0},
-};
 
 static void print_separator(const char* title);
 
@@ -60,46 +44,79 @@ static void print_separator(const char* title){
 }
 
 int main(int argc, char* argv[]){
-	int c;
-	int opt_idx;
-	while((c = getopt_long_only(argc, argv, "foqv:", long_options, &opt_idx))){
-        if(c == -1){
-            break;
-        } else if(c == 0){
-            /* If this option set a flag, do nothing else now. */
-        	if(long_options[opt_idx].flag != 0)
-        		break;
-        	printf("option %s", long_options[opt_idx].name);
-        	if(optarg)
-        		printf(" with arg %s", optarg);
-        	printf("\n");
-        } else if(c == 'f'){
-        	  printf("option -f with value `%s'\n", optarg);
-        } else if(c == 'o'){
-        	  printf("option -o with value `%s'\n", optarg);
-		} else {
-            fprintf(stderr, "Invalid argument: %c\n", c);
-            abort();
-        }
+#define OPTION(s, l, n, d)                                                    \
+	assert(n == 0 || n == 1);
+#include "options.inc"
+	const char* const arg_is_set = "set";
+#define OPTION(s, l, n, d) const char *arg_##s = 0;
+#include "options.inc"
+	int positional_arguments = 0;
+	int i;
+	for(i = 0; i < argc; i++){
+#define OPTION(s, l, n, d)                                                    \
+		{                                                                     \
+			if(strcmp("-" #s, argv[i]) == 0){                                 \
+				assert(arg_##s == 0);                                         \
+				if(n == 0){                                                   \
+					arg_##s = arg_is_set;                                     \
+				} else {                                                      \
+					assert(i + 1 < argc);                                     \
+				}                                                             \
+			} else if(strncmp((n == 0) ? "--" #l : "--" #l "=",               \
+						argv[i], strlen("--" #l "=")) == 0){                  \
+				assert(arg_##s == 0);                                         \
+				if(n == 0){                                                   \
+					arg_##s = arg_is_set;                                     \
+				} else {                                                      \
+				}                                                             \
+			}                                                                 \
+		}
+#include "options.inc"
+		argv[positional_arguments++] = argv[i];
 	}
 
-    if(verbosity)
-        printf("verbose flag is set\n");
+	if(arg_v){
+#define OPTION(s, l, n, d)                                                    \
+		fprintf(stderr, "%s = %s\n", #s, (arg_##s != 0) ? arg_##s : "not set");
+#include "options.inc"
+		fprintf(stderr, "Positional arguments:\n");
+		for(i = 0; i < positional_arguments; i++){
+			fprintf(stderr, "%s\n", argv[i]);
+		}
+	}
 
-    if(optind < argc){
-        printf ("non-option ARGV-elements: ");
-        while(optind < argc){
+	if(arg_h){
+		printf("Usage ZLang [ options ] file...\n\n");
+		printf("Options:\n\n");
+#define OPTION(s, l, n, d)                                                    \
+		if(n == 0){                                                           \
+			printf("    %s       %s        \t%s\n", "-" #s, "--" #l, #d);     \
+		} else {                                                              \
+			printf("    %s <arg> %s=<arg>  \t%s\n", "-" #s, "--" #l, #d);     \
+		}
+#include "options.inc"
+		printf("\nZLang Compiler version %d.%d.%s\n",
+			__ZLANG_MAJ__,
+			__ZLANG_MIN__,
+			__ZLANG_SUB__);
+		exit(0);
+	}
+
+    if(optind < positional_arguments){
+        while(optind < positional_arguments){
             if(filename != NULL)
                 free(filename);
+			if(asm_out != NULL)
+				free(asm_out);
+			if(elf_out != NULL)
+				free(elf_out);
             filename = strdup(argv[optind]);
             asm_out = basename(filename);
             elf_out = basename(filename);
             strrep(&asm_out, ".x", ".s");
             strrep(&elf_out, ".x", "");
-            printf ("%s", filename);
             optind++;
         }
-        printf("\n");
     }
 
     printf("In/Asm/Elf: %s %s %s\n", filename, asm_out, elf_out);
@@ -110,7 +127,8 @@ int main(int argc, char* argv[]){
         printf("\033[91mError\033[39m: File not found: %s\n", filename);
         exit(1);
     } else if(access(filename, X_OK) != -1){
-        printf("\033[91mError\033[39m: Can not compile directory: %s\n", filename);
+        printf("\033[91mError\033[39m: Can not compile directory: %s\n",
+				filename);
         exit(1);
     }
 
