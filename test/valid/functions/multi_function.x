@@ -11,9 +11,17 @@ int three(int a, int b):
 
 int main():
     int z = 5;
+
+    // w = 1
     int w = four(z + 3);
+
+    // y = 7 + 5
     int y = one(z) + two(z, w);
+
+    // x = 5 + 3
     int x = z + one(w);
+
+    // 5 + 1 + 12 - 8 = 10
     return z + w + y - x;
 
 int four(int y):
