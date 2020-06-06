@@ -283,80 +283,18 @@ char* asm_x86_64_func_call(const quadruple* q){
 		free(dest);
 		free(src);
 	}
-/*
-	for(i = 0, e = q->args->top; e != NULL; e = e->next, i++){
-		if(strcmp(e->sym->ident, ".placeholder") == 0)
-			continue;
 
-		src = strnew();
-		dest = strnew();
-
-		if(e->sym->reg_loc < 0 && e->sym->mem_loc >= 0){
-			strapp(&src, "-%d(%%rbp)", e->sym->mem_loc);
-		} else if(e->sym->reg_loc >= 0){
-			strapp(&src, "%%%s", registers[e->sym->reg_loc]);
-			set_register(e->sym->reg_loc, NULL);
-		}
-
-		switch(i){
-			case 0:
-				strapp(&dest, "%%rdi");
-				if(usage[RDI] != NULL)
-					emit_push_stack(&code, usage[RDI]);
-				set_register(RDI, e->sym);
-				break;
-			case 1:
-				strapp(&dest, "%%rsi");
-				if(usage[RSI] != NULL)
-					emit_push_stack(&code, usage[RSI]);
-				set_register(RSI, e->sym);
-				break;
-			case 2:
-				strapp(&dest, "%%rdx");
-				if(usage[RDX] != NULL)
-					emit_push_stack(&code, usage[RDX]);
-				set_register(RDX, e->sym);
-				break;
-			case 3:
-				strapp(&dest, "%%rcx");
-				if(usage[RCX] != NULL)
-					emit_push_stack(&code, usage[RCX]);
-				set_register(RCX, e->sym);
-				break;
-			case 4:
-				strapp(&dest, "%%r8 ");
-				if(usage[R8] != NULL)
-					emit_push_stack(&code, usage[R8]);
-				set_register(R8, e->sym);
-				break;
-			case 5:
-				strapp(&dest, "%%r9 ");
-				if(usage[R9] != NULL)
-					emit_push_stack(&code, usage[R9]);
-				set_register(R9, e->sym);
-				break;
-			default:
-				strapp(&code,
-					"    subq      $8, %%rsp\n");
-				strapp(&dest, "(%%rsp)");
-		}
-		if(i > 5){
-			strapp(&code, "    movq      %s, %%rax\n", src);
-			strapp(&code, "    movq      %%rax, %s\n", dest);
-		} else {
-			strapp(&code, "    movq      %s, %s\n", src, dest);
-		}
-
-		printf("passing %s in %s\n", e->sym->ident, dest);
-		free(src);
-		free(dest);
-	}
-*/
 	print_registers();
 	printf("Frame size: %zu (%zu)\n", frame_size, frame_size % 16);
 	printf("Misalignment: %d bytes\n", (8 * (num_args - 6)) % 16);
 	strapp(&code, "    movq      $0, %%rax\n");
 	strapp(&code, "    call      %s\n", q->arg1->ident);
+
+	if(padding != 0)
+		strapp(&code,
+			"    addq      $%d, %%rsp # remove frame padding\n",
+			padding);
+
 	set_register(RAX, q->res);
 	set_register(RDI, NULL);
 	set_register(RSI, NULL);
