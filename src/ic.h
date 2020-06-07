@@ -35,8 +35,11 @@ typedef struct four_address_code {
         fac_jne,
 
         // memory ops
-        fac_load,
-        fac_store,
+        fac_load,       // load
+        fac_store,      // store
+		fac_addr,       // load address
+		fac_from,       // load from address
+		fac_into,       // store to address
 
         // comparison ops
         fac_compare,
