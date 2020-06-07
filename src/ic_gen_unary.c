@@ -70,8 +70,32 @@ quad_list* ic_gen_unary_compl(asn* node){
 
 quad_list* ic_gen_reference(asn* node){
     quad_list* IC = NULL;
-//    quad_list* inner = ic_gen(node->op.unary_exp.val);
-//    quad_list_app_quad_list(&IC, inner);
+
+	symbol* inner_sym;
+	if(node->op.unary_exp.val->tag != var_tag){
+		quad_list* inner = ic_gen(node->op.unary_exp.val);
+		inner_sym = get_tmp();
+
+	    quad_list_app_quad_list(&IC, inner);
+	} else {
+		inner_sym = node->op.unary_exp.val->op.var_exp.sym;
+
+	}
+
+	symbol* res_sym = gen_tmp();
+	declarator* ptr = new_declarator();
+	ptr->type = decl_pointer;
+	type_link* tl = new_type_link();
+	tl->cls = cls_decl;
+	tl->type.decl = ptr;
+	type_link_attach(&(res_sym), tl);
+	copy_type_list(inner_sym, &res_sym);
+
+	quadruple* addr = make_quad(fac_addr, inner_sym, NULL, res_sym);
+
+	quad_list_app_quad(&IC, addr);
+
+	delete_symbol(&res_sym);
     return IC;
 }
 
