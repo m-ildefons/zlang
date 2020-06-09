@@ -18,6 +18,7 @@
 #include "ast.h"
 #include "strop.h"
 #include "storage_location.h"
+#include "assembly.h"
 
 #define NUM_REGISTERS 0x10
 

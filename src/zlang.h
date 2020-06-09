@@ -37,5 +37,8 @@ extern char* filename;
 extern char* asm_out;
 extern char* elf_out;
 
+// emit intel assembly
+extern int asm_intel;
+
 #endif
 

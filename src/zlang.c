@@ -31,6 +31,7 @@ char* filename = NULL;
 char* asm_out = NULL;
 char* elf_out = NULL;
 
+int asm_intel = 0; // off - emit gnu asm by default.
 
 static void print_separator(const char* title);
 
@@ -102,6 +103,12 @@ int main(int argc, char* argv[]){
 		exit(0);
 	}
 
+	if(arg_i){
+		asm_intel = 1;
+	} else {
+		asm_intel = 0;
+	}
+
     if(optind < positional_arguments){
         while(optind < positional_arguments){
             if(filename != NULL)
@@ -158,6 +165,8 @@ int main(int argc, char* argv[]){
     print_separator("Generating Assembly Code");
 
     char* asm_code = gen_asm_x86_64(IC);
+
+	print_separator("Final Assembly Code");
     fprintf(stdout, "%s", asm_code);
     write_file(asm_out, asm_code);
 

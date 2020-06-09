@@ -93,8 +93,7 @@ char* gen_asm_x86_64(const quad_list* IC){
 	strapp(&data, "    .section  .data\n");
 	for(e = symbol_list_ptr->top; e != NULL; e = e->next){
 		if(!is_function(e->sym->stype)){
-			strapp(&code, "    .global    %s\n", e->sym->ident);
-
+			strapp(&data, "    .global    %s\n", e->sym->ident);
 			strapp(&data, "%s:\n", e->sym->ident);
 			strapp(&data, "    .long      %d\n", e->sym->reg_loc);
 			strapp(&data, "    .align     8\n");
@@ -199,8 +198,9 @@ char* asm_x86_64_func_end(const quadruple* q){
     char* code = strnew();
     strapp(&code, "    movq      $0, %%rax\n");
     strapp(&code, "    movq      %%rbp, %%rsp\n");
-    strapp(&code, "    popq      %%rbp\n");
-    strapp(&code, "    ret\n");
+    //strapp(&code, "    popq      %%rbp\n");
+	emit(&code, "popq", "%rbp", NULL);
+	emit(&code, "ret", NULL, NULL);
     strapp(&code, "    .size     %s, .-%s\n", q->arg1->ident, q->arg1->ident);
     return code;
 }
