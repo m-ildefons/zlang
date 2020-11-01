@@ -196,9 +196,8 @@ char* asm_x86_64_func_start(const quadruple* q){
 
 char* asm_x86_64_func_end(const quadruple* q){
     char* code = strnew();
-    strapp(&code, "    movq      $0, %%rax\n");
-    strapp(&code, "    movq      %%rbp, %%rsp\n");
-    //strapp(&code, "    popq      %%rbp\n");
+	emit(&code, "movq", "$0", "%rax");
+    emit(&code, "movq", "%rbp", "%rsp");
 	emit(&code, "popq", "%rbp", NULL);
 	emit(&code, "ret", NULL, NULL);
     strapp(&code, "    .size     %s, .-%s\n", q->arg1->ident, q->arg1->ident);
