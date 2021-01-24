@@ -240,7 +240,12 @@ char* asm_x86_64_func_call(const quadruple* q){
     }
   }
 
-  int padding = (8 * (num_args - 6) + (int) (frame_size % 16)) % 16;
+  int padding;
+  if (num_args > 6)
+    padding = (8 * (num_args - 6) + (int) (frame_size % 16)) % 16;
+  else
+    padding = (int) (frame_size % 16);
+
   if(padding != 0)
     strapp(&code,
       "    subq      $%d, %%rsp  # Frame padding to 16 byte boundary\n",
