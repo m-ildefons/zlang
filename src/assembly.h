@@ -19,6 +19,13 @@
  *
  * Emits an instruction at the end of the code. Does automatic formatting.
  */
-void emit(char** code, const char* inst, const char* arg1, const char* arg2);
+#define emit(code, inst, arg1, arg2) \
+  __emit(code, inst, arg1, arg2, __FILE__, __LINE__)
+void __emit(char** code,
+            const char* inst,
+            const char* arg1,
+            const char* arg2,
+            const char* file,
+            unsigned int line);
 
 #endif
