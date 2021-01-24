@@ -26,4 +26,3 @@ quad_list* ic_gen_var(asn* node){
     free(tmp_id);
     return IC;
 }
-
