@@ -10,19 +10,19 @@
 
 #include "util.h"
 
-int max(int l, int r){
-    return (l > r ? l : r);
+int max(int l, int r) {
+  return (l > r ? l : r);
 }
 
-char* basename(const char* path){
-    char* ptr = strrchr(path, '/');
-    if(ptr == NULL){
-        if((*path) == '/')
-            return strdup("/");
-        else
-            return strdup(path);
-    } else {
-        return strdup(ptr + 1);
-    }
+char* basename(const char* path) {
+  char* ptr = strrchr(path, '/');
+  if (ptr == NULL) {
+    if ((*path) == '/')
+      return strdup("/");
+    else
+      return strdup(path);
+  } else {
+    return strdup(ptr + 1);
+  }
 }
 

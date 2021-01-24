@@ -49,29 +49,29 @@ const char* fac_cn[] = {
 
 
 quadruple* make_quad(int op,
-                    symbol* arg1,
-                    symbol* arg2,
-                    symbol* res){
-    quadruple* q = malloc(sizeof(quadruple));
-    assert(q != NULL);
-    q->op = op;
+                     symbol* arg1,
+                     symbol* arg2,
+                     symbol* res) {
+  quadruple* q = malloc(sizeof(quadruple));
+  assert(q != NULL);
+  q->op = op;
 
-    q->arg1 = arg1;
-    if(q->arg1 != NULL) // take ownership of the pointer since we are deleting.
-        q->arg1->ref_count++;
+  q->arg1 = arg1;
+  if(q->arg1 != NULL) // take ownership of the pointer since we are deleting.
+    q->arg1->ref_count++;
 
-    q->arg2 = arg2;
-    if(q->arg2 != NULL)
-        q->arg2->ref_count++;
+  q->arg2 = arg2;
+  if(q->arg2 != NULL)
+    q->arg2->ref_count++;
 
-    q->res = res;
-    if(q->res != NULL)
-        q->res->ref_count++;
+  q->res = res;
+  if(q->res != NULL)
+    q->res->ref_count++;
 
-    q->symbol_list_ptr = NULL;
-    q->temp_list_ptr = NULL;
-	q->args = NULL;
-    return q;
+  q->symbol_list_ptr = NULL;
+  q->temp_list_ptr = NULL;
+  q->args = NULL;
+  return q;
 }
 
 void delete_quad(quadruple* q){

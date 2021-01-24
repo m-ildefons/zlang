@@ -10,7 +10,7 @@ TEST=$(SRC:%.x=%_test)
 
 .PHONY: all clean
 
-all: $(TEST) $(SUBDIR) clean
+all: $(TEST) $(SUBDIR)
 	@echo "$(shell pwd) \e[92mALL SUCCESS\e[39m"
 
 %_subdir:
@@ -25,13 +25,14 @@ all: $(TEST) $(SUBDIR) clean
 	fi
 
 %.out: %.bin
-	@./$< > $@;
+	@./$< > $@
 
 %.bin: %.s
-	@gcc $< -o $@;
+	@gcc $< -o $@
 
 %.s: %.x
-	@$(CC) $< > /dev/null; \
+	@$(CC) $< > /dev/null
 
 clean:
+	@$(MAKE) clean -C $(@:%_subdir=%)
 	@rm -f $(OUT) $(BIN) $(ASM)

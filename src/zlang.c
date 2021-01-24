@@ -46,77 +46,77 @@ static void print_separator(const char* title){
 
 int main(int argc, char* argv[]){
 #define OPTION(s, l, n, d)                                                    \
-	assert(n == 0 || n == 1);
+  assert(n == 0 || n == 1);
 #include "options.inc"
-	const char* const arg_is_set = "set";
+  const char* const arg_is_set = "set";
 #define OPTION(s, l, n, d) const char *arg_##s = 0;
 #include "options.inc"
-	int positional_arguments = 0;
-	int i;
-	for(i = 0; i < argc; i++){
+  int positional_arguments = 0;
+  int i;
+  for(i = 0; i < argc; i++){
 #define OPTION(s, l, n, d)                                                    \
-		{                                                                     \
-			if(strcmp("-" #s, argv[i]) == 0){                                 \
-				assert(arg_##s == 0);                                         \
-				if(n == 0){                                                   \
-					arg_##s = arg_is_set;                                     \
-				} else {                                                      \
-					assert(i + 1 < argc);                                     \
-				}                                                             \
-			} else if(strncmp((n == 0) ? "--" #l : "--" #l "=",               \
-						argv[i], strlen("--" #l "=")) == 0){                  \
-				assert(arg_##s == 0);                                         \
-				if(n == 0){                                                   \
-					arg_##s = arg_is_set;                                     \
-				} else {                                                      \
-				}                                                             \
-			}                                                                 \
-		}
+    {                                                                         \
+      if(strcmp("-" #s, argv[i]) == 0){                                       \
+        assert(arg_##s == 0);                                                 \
+        if(n == 0){                                                           \
+          arg_##s = arg_is_set;                                               \
+        } else {                                                              \
+          assert(i + 1 < argc);                                               \
+        }                                                                     \
+      } else if(strncmp((n == 0) ? "--" #l : "--" #l "=",                     \
+            argv[i], strlen("--" #l "=")) == 0){                              \
+        assert(arg_##s == 0);                                                 \
+        if(n == 0){                                                           \
+          arg_##s = arg_is_set;                                               \
+        } else {                                                              \
+        }                                                                     \
+      }                                                                       \
+    }
 #include "options.inc"
-		argv[positional_arguments++] = argv[i];
-	}
+    argv[positional_arguments++] = argv[i];
+  }
 
-	if(arg_v){
+  if(arg_v){
 #define OPTION(s, l, n, d)                                                    \
-		fprintf(stderr, "%s = %s\n", #s, (arg_##s != 0) ? arg_##s : "not set");
+    fprintf(stderr, "%s = %s\n", #s, (arg_##s != 0) ? arg_##s : "not set");
 #include "options.inc"
-		fprintf(stderr, "Positional arguments:\n");
-		for(i = 0; i < positional_arguments; i++){
-			fprintf(stderr, "%s\n", argv[i]);
-		}
-	}
+    fprintf(stderr, "Positional arguments:\n");
+    for(i = 0; i < positional_arguments; i++){
+      fprintf(stderr, "%s\n", argv[i]);
+    }
+  }
 
-	if(arg_h){
-		printf("Usage ZLang [ options ] file...\n\n");
-		printf("Options:\n\n");
+  if(arg_h){
+    printf("Usage ZLang [ options ] file...\n\n");
+    printf("Options:\n\n");
 #define OPTION(s, l, n, d)                                                    \
-		if(n == 0){                                                           \
-			printf("    %s       %s        \t%s\n", "-" #s, "--" #l, #d);     \
-		} else {                                                              \
-			printf("    %s <arg> %s=<arg>  \t%s\n", "-" #s, "--" #l, #d);     \
-		}
+    if(n == 0){                                                               \
+      printf("    %s       %s        \t%s\n", "-" #s, "--" #l, #d);           \
+    } else {                                                                  \
+      printf("    %s <arg> %s=<arg>  \t%s\n", "-" #s, "--" #l, #d);           \
+    }
 #include "options.inc"
-		printf("\nZLang Compiler version %d.%d.%s\n",
-			__ZLANG_MAJ__,
-			__ZLANG_MIN__,
-			__ZLANG_SUB__);
-		exit(0);
-	}
+    printf("\nZLang Compiler version %d.%d.%s\n",
+      __ZLANG_MAJ__,
+      __ZLANG_MIN__,
+      __ZLANG_SUB__);
+    exit(0);
+  }
 
-	if(arg_i){
-		asm_intel = 1;
-	} else {
-		asm_intel = 0;
-	}
+  if(arg_i){
+    asm_intel = 1;
+  } else {
+    asm_intel = 0;
+  }
 
     if(optind < positional_arguments){
         while(optind < positional_arguments){
             if(filename != NULL)
                 free(filename);
-			if(asm_out != NULL)
-				free(asm_out);
-			if(elf_out != NULL)
-				free(elf_out);
+      if(asm_out != NULL)
+        free(asm_out);
+      if(elf_out != NULL)
+        free(elf_out);
             filename = strdup(argv[optind]);
             asm_out = basename(filename);
             elf_out = basename(filename);
@@ -135,14 +135,14 @@ int main(int argc, char* argv[]){
         exit(1);
     } else if(access(filename, X_OK) != -1){
         printf("\033[91mError\033[39m: Can not compile directory: %s\n",
-				filename);
+        filename);
         exit(1);
     }
 
     print_separator("Lexing");
 
-	size_t tnt = 0;
-	token* tl = NULL;
+  size_t tnt = 0;
+  token* tl = NULL;
     lex(filename, &tl, &tnt);
     token* tlh = tl; // save token list for free later
     size_t tlhnt = tnt;
@@ -166,7 +166,7 @@ int main(int argc, char* argv[]){
 
     char* asm_code = gen_asm_x86_64(IC);
 
-	print_separator("Final Assembly Code");
+  print_separator("Final Assembly Code");
     fprintf(stdout, "%s", asm_code);
     write_file(asm_out, asm_code);
 

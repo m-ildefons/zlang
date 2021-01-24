@@ -22,12 +22,12 @@ static const char* registers[] = {
 static size_t rel_stack_pos;
 static size_t frame_size;
 static size_t size_of[type_enum + 1] = {
-    [type_void] = 8,
-    [type_bool] = 1,
-    [type_char] = 1,
-    [type_int] = 8,
-    [type_real] = 8,
-	[type_string] = 8,
+  [type_void] = 8,
+  [type_bool] = 1,
+  [type_char] = 1,
+  [type_int] = 8,
+  [type_real] = 8,
+  [type_string] = 8,
 };
 
 char* gen_asm_x86_64(const quad_list* IC){
@@ -90,6 +90,7 @@ char* gen_asm_x86_64(const quad_list* IC){
 
 	symbol_list_entry* e;
 	char* data = strnew();
+  strapp(&data, "\n");
 	strapp(&data, "    .section  .data\n");
 	for(e = symbol_list_ptr->top; e != NULL; e = e->next){
 		if(!is_function(e->sym->stype)){
@@ -103,30 +104,33 @@ char* gen_asm_x86_64(const quad_list* IC){
 	strapp(&code, data);
 	free(data);
 
-	if(string_count > 0 || real_count > 0)
+	if (string_count > 0 || real_count > 0) {
+    strapp(&code, "\n");
 		strapp(&code, "    .section  .rodata\n");
 
-	for(idx = 0; idx < string_count; idx++){
-		strapp(&code, ".SC%u:\n", idx);
-		strapp(&code, "    .string   \"%s\"\n", string_index[idx]);
-	}
+  	for(idx = 0; idx < string_count; idx++){
+  		strapp(&code, ".SC%u:\n", idx);
+  		strapp(&code, "    .string   \"%s\"\n", string_index[idx]);
+  	}
 
-	for(idx = 0; idx < real_count; idx++){
-		unsigned long bits = *((unsigned long*) &(real_index[idx]));
-		unsigned int upper = ((unsigned int*) &bits)[0];
-		unsigned int lower = ((unsigned int*) &bits)[1];
-		strapp(&code, ".RC%u:\n", idx);
-		strapp(&code, "    .align    8\n");
-		strapp(&code, "    .long     %u\n", upper);
-		strapp(&code, "    .long     %u\n", lower);
-	}
+  	for(idx = 0; idx < real_count; idx++){
+  		unsigned long bits = *((unsigned long*) &(real_index[idx]));
+  		unsigned int upper = ((unsigned int*) &bits)[0];
+  		unsigned int lower = ((unsigned int*) &bits)[1];
+  		strapp(&code, ".RC%u:\n", idx);
+  		strapp(&code, "    .align    8\n");
+  		strapp(&code, "    .long     %u\n", upper);
+  		strapp(&code, "    .long     %u\n", lower);
+  	}
+  }
 
-    free(bname);
-    return code;
+  free(bname);
+  return code;
 }
 
 char* asm_x86_64_func_start(const quadruple* q){
     char* code = strnew();
+    strapp(&code, "\n");
     strapp(&code, "    .section  .text\n");
     strapp(&code, "    .global   %s\n", q->arg1->ident);
     strapp(&code, "    .type     %s, @function\n", q->arg1->ident);
@@ -194,14 +198,14 @@ char* asm_x86_64_func_start(const quadruple* q){
     return code;
 }
 
-char* asm_x86_64_func_end(const quadruple* q){
-    char* code = strnew();
-	emit(&code, "movq", "$0", "%rax");
-    emit(&code, "movq", "%rbp", "%rsp");
-	emit(&code, "popq", "%rbp", NULL);
-	emit(&code, "ret", NULL, NULL);
-    strapp(&code, "    .size     %s, .-%s\n", q->arg1->ident, q->arg1->ident);
-    return code;
+char* asm_x86_64_func_end(const quadruple* q) {
+  char* code = strnew();
+  emit(&code, "movq", "$0", "%rax");
+  emit(&code, "movq", "%rbp", "%rsp");
+  emit(&code, "popq", "%rbp", NULL);
+  emit(&code, "ret", NULL, NULL);
+  strapp(&code, "    .size     %s, .-%s\n", q->arg1->ident, q->arg1->ident);
+  return code;
 }
 
 char* asm_x86_64_func_call(const quadruple* q){
@@ -236,7 +240,7 @@ char* asm_x86_64_func_call(const quadruple* q){
 		}
 	}
 
-	int padding = (8 * (num_args - 6) + (frame_size % 16)) % 16;
+	int padding = (8 * (num_args - 6) + (int) (frame_size % 16)) % 16;
 	if(padding != 0)
 		strapp(&code,
 			"    subq      $%d, %%rsp # Frame padding to 16 byte boundary\n",
