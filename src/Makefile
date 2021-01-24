@@ -4,42 +4,42 @@ CFLAGS+= -DNDEBUG
 C_DEBUG_FLAGS= -O0 -g -fsanitize=address -fno-omit-frame-pointer
 C_DEBUG_FLAGS+= -D__GIT_REV__=\"$(shell git rev-parse --short HEAD)\"
 C_WARN_FLAGS= -Wall \
-			-Wextra \
-			-Wpedantic \
-			-Winline \
-			-Wundef \
-			-Wshadow \
-			-Winit-self \
-			-Wformat-nonliteral \
-			-Wcast-qual \
-			-Wcast-align \
-			-Wsign-conversion \
-			-Wpointer-arith \
-			-Wbad-function-cast \
-			-Wmissing-prototypes \
-			-Wmissing-include-dirs \
-			-Wmissing-declarations \
-			-Wstrict-prototypes \
-			-Wstrict-overflow=5 \
-			-Wnested-externs \
-			-Wwrite-strings \
-			-Wfloat-equal \
-			-Wdisabled-optimization \
-			-Wformat=2 \
-			-Wformat-extra-args \
-			-Wformat-security \
-			-Wformat-nonliteral \
-			-Wformat-signedness \
-			-Wlogical-op \
-			-Wredundant-decls \
-			-Wswitch-default \
-			-Wunused-function \
-			-Wunused-label \
-			-Wunused-value \
-			-Wunused-variable \
-			-Wunused-parameter \
-			-Wnull-dereference
-			#-ansi
+              -Wextra \
+              -Wpedantic \
+              -Winline \
+              -Wundef \
+              -Wshadow \
+              -Winit-self \
+              -Wformat-nonliteral \
+              -Wcast-qual \
+              -Wcast-align \
+              -Wsign-conversion \
+              -Wpointer-arith \
+              -Wbad-function-cast \
+              -Wmissing-prototypes \
+              -Wmissing-include-dirs \
+              -Wmissing-declarations \
+              -Wstrict-prototypes \
+              -Wstrict-overflow=5 \
+              -Wnested-externs \
+              -Wwrite-strings \
+              -Wfloat-equal \
+              -Wdisabled-optimization \
+              -Wformat=2 \
+              -Wformat-extra-args \
+              -Wformat-security \
+              -Wformat-nonliteral \
+              -Wformat-signedness \
+              -Wlogical-op \
+              -Wredundant-decls \
+              -Wswitch-default \
+              -Wunused-function \
+              -Wunused-label \
+              -Wunused-value \
+              -Wunused-variable \
+              -Wunused-parameter \
+              -Wnull-dereference
+              #-ansi
 LDFLAGS= -L/usr/lib/x86_64-linux-gnu/
 LD_DEBUG_FLAGS= -lasan -fno-omit-frame-pointer -fsanitize=address
 OUT=../bin/zlang
