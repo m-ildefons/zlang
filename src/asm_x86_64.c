@@ -59,6 +59,9 @@ char* gen_asm_x86_64(const quad_list* IC) {
       case fac_jne: snippet = asm_x86_64_jump(ql->quad); break;
       case fac_load: snippet = asm_x86_64_load(ql->quad); break;
       case fac_store: snippet = asm_x86_64_store(ql->quad); break;
+      case fac_addr: snippet = asm_x86_64_addr(ql->quad); break;
+      case fac_from: snippet = asm_x86_64_from(ql->quad); break;
+      case fac_into: snippet = asm_x86_64_into(ql->quad); break;
       case fac_compare: snippet = asm_x86_64_compare(ql->quad); break;
       case fac_setl:
       case fac_setle:
@@ -398,7 +401,7 @@ char* asm_x86_64_store(const quadruple* q) {
     strapp(&code, "    subq      $8, %%rsp\n");
     strapp(&code, "    movq      %%%s, (%%rsp)\n", registers[q->arg1->reg_loc]);
   } else if (q->arg1->reg_loc < 0) {
-      strapp(&code, "    movq      %%rax, -%d(%%rbp)\n", q->res->mem_loc);
+    strapp(&code, "    movq      %%rax, -%d(%%rbp)\n", q->res->mem_loc);
   } else if (q->res->mem_loc < 0) {
     frame_size += 8;
     strapp(&code, "    subq      $8, %%rsp\n");
@@ -406,10 +409,56 @@ char* asm_x86_64_store(const quadruple* q) {
     q->res->mem_loc = frame_size;
   } else {
     strapp(&code,
-           "    movq      %%%s, -%d(%%rbp)\n",
+           "    movq      %%%s, -%d(%%rbp)  # store\n",
            registers[q->arg1->reg_loc],
            q->res->mem_loc);
   }
+  set_register(q->arg1->reg_loc, NULL);
+  return code;
+}
+
+char* asm_x86_64_addr(const quadruple* q) {
+  char* code = strnew();
+  int reg = get_register();
+  strapp(&code,
+         "    leaq      -%d(%rbp), %%%s\n",
+         q->arg1->mem_loc,
+         registers[reg]);
+  set_register(reg, q->res);
+  return code;
+}
+
+char* asm_x86_64_from(const quadruple* q) {
+  char* code = strnew();
+  int reg = get_register();
+  strapp(&code,
+         " movq (%%%s), %%%s\n",
+         registers[q->arg1->reg_loc],
+         registers[reg]);
+  set_register(reg, q->res);
+  return code;
+}
+
+char* asm_x86_64_into(const quadruple* q) {
+  char* code = strnew();
+  int reg = get_register();
+  if (q->res->mem_loc <= 0) {
+    strapp(&code,
+           " movq (%%%s), %%%s\n",
+           registers[q->res->reg_loc],
+           registers[reg]);
+  } else if (q->res->reg_loc <= 0) {
+    strapp(&code,
+           " movq -%d(%rbp), %%%s\n",
+           q->res->mem_loc,
+           registers[reg]);
+
+  }
+  strapp(&code,
+         " movq %%%s, (%%%s)\n",
+         registers[q->arg1->reg_loc],
+         registers[reg]);
+  set_register(reg, q->res);
   set_register(q->arg1->reg_loc, NULL);
   return code;
 }

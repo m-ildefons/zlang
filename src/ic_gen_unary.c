@@ -101,52 +101,62 @@ quad_list* ic_gen_reference(asn* node){
 
 quad_list* ic_gen_dereference(asn* node){
     quad_list* IC = NULL;
-//    quad_list* inner = ic_gen(node->op.unary_exp.val);
-//    quad_list_app_quad_list(&IC, inner);
+    quad_list* inner = ic_gen(node->op.unary_exp.val);
+    symbol* inner_sym = get_tmp();
+    symbol* tmp_sym = gen_tmp();
+    copy_type_list(inner_sym, &tmp_sym);
+    quadruple* q = make_quad(fac_from, inner_sym, NULL, tmp_sym);
+    quad_list_app_quad_list(&IC, inner);
+    quad_list_app_quad(&IC, q);
+    delete_symbol(&tmp_sym);
     return IC;
 }
 
 quad_list* ic_gen_incdec(asn* node){
-    quad_list* IC = NULL;
-    symbol* val = NULL;
-    if(node->op.unary_exp.val->tag == var_tag)
-        val = node->op.unary_exp.val->op.var_exp.sym;
+  quad_list* IC = NULL;
+  symbol* val = NULL;
+  if (node->op.unary_exp.val->tag == var_tag) {
+    val = node->op.unary_exp.val->op.var_exp.sym;
+  }
 
-    quad_list* inner = ic_gen(node->op.unary_exp.val);
+
+  quad_list* inner = ic_gen(node->op.unary_exp.val);
 	symbol* inner_sym = get_tmp();
 
 	symbol* one_sym = gen_symbol("1");
-    copy_type_list(inner_sym, &one_sym);
+  copy_type_list(inner_sym, &one_sym);
 
 	symbol* tmp_sym = gen_tmp();
-    copy_type_list(one_sym, &tmp_sym);
+  copy_type_list(one_sym, &tmp_sym);
 
 	symbol* res_sym = gen_tmp();
-    copy_type_list(inner_sym, &res_sym);
+  copy_type_list(inner_sym, &res_sym);
 
-    int fac_type;
-    switch(node->tag){
-        case inc_tag: fac_type = fac_add; break;
-        case dec_tag: fac_type = fac_sub; break;
-        default: fac_type = fac_add;
-    }
+  int fac_type;
+  switch(node->tag){
+    case inc_tag: fac_type = fac_add; break;
+    case dec_tag: fac_type = fac_sub; break;
+    default: fac_type = fac_add;
+  }
 
-    quadruple* q1 = make_quad(fac_load, one_sym, NULL, tmp_sym);
-    quadruple* q2 = make_quad(fac_type, inner_sym, tmp_sym, res_sym);
-    quadruple* q3;
-    if(val != NULL)
-        q3 = make_quad(fac_store, res_sym, NULL, val);
-    else
-        q3 = make_quad(fac_store, res_sym, NULL, inner_sym);
+  quadruple* q1 = make_quad(fac_load, one_sym, NULL, tmp_sym);
+  quadruple* q2 = make_quad(fac_type, inner_sym, tmp_sym, res_sym);
+  quadruple* q3;
+  if(val != NULL)
+      q3 = make_quad(fac_store, res_sym, NULL, val);
+  else if (node->op.unary_exp.val->tag == deref_tag)
+      q3 = make_quad(fac_into, res_sym, NULL, node->op.unary_exp.val->op.unary_exp.val->op.var_exp.sym);
+  else
+      q3 = make_quad(fac_store, res_sym, NULL, inner_sym);
 
-    quad_list_app_quad_list(&IC, inner);
-    quad_list_app_quad(&IC, q1);
-    quad_list_app_quad(&IC, q2);
-    quad_list_app_quad(&IC, q3);
+  quad_list_app_quad_list(&IC, inner);
+  quad_list_app_quad(&IC, q1);
+  quad_list_app_quad(&IC, q2);
+  quad_list_app_quad(&IC, q3);
 
-    delete_symbol(&one_sym);
-    delete_symbol(&tmp_sym);
-    delete_symbol(&res_sym);
-    return IC;
+  delete_symbol(&one_sym);
+  delete_symbol(&tmp_sym);
+  delete_symbol(&res_sym);
+  return IC;
 }
 

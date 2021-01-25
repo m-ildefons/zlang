@@ -67,6 +67,9 @@ char* asm_x86_64_return(const quadruple* q);
 
 char* asm_x86_64_load(const quadruple* q);
 char* asm_x86_64_store(const quadruple* q);
+char* asm_x86_64_addr(const quadruple* q);
+char* asm_x86_64_from(const quadruple* q);
+char* asm_x86_64_into(const quadruple* q);
 
 char* asm_x86_64_label(const quadruple* q);
 char* asm_x86_64_jump(const quadruple* q);
